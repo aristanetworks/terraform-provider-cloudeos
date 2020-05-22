@@ -1,0 +1,21 @@
+// Copyright (c) 2019 Arista Networks, Inc.  All rights reserved.
+// Arista Networks, Inc. Confidential and Proprietary.
+
+syntax = "proto3";
+
+package time;
+option go_package = "github.com/terraform-providers/terraform-provider-cloudeos/cloudeos/internal/time";
+
+import "google/protobuf/timestamp.proto";
+
+message TimeRange {
+    google.protobuf.Timestamp start_time = 1;
+    google.protobuf.Timestamp end_time = 2;
+}
+
+message RequestAtTime {
+    oneof at_time {
+        TimeRange range = 1;
+        google.protobuf.Timestamp time = 2;
+    }
+}
