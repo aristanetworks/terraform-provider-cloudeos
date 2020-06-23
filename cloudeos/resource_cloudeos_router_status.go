@@ -1,5 +1,6 @@
-// Copyright (c) 2019 Arista Networks, Inc.  All rights reserved.
-// Arista Networks, Inc. Confidential and Proprietary.
+// Copyright (c) 2020 Arista Networks, Inc.
+// Use of this source code is governed by the Mozilla Public License Version 2.0
+// that can be found in the LICENSE file.
 
 package cloudeos
 
@@ -153,6 +154,12 @@ func cloudeosRouterStatus() *schema.Resource {
 			"tf_id": {
 				Required: true,
 				Type:     schema.TypeString,
+			},
+			"routing_resource_info": {
+				Type:        schema.TypeList,
+				Optional:    true,
+				Description: "List of all route table and association resources.",
+				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 		},
 	}
