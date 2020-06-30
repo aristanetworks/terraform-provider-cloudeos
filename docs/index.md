@@ -26,8 +26,8 @@ provider "cloudeos" {
 
 ### Argument Reference
 cvaas_domain - (Required) Domain name "apiserver.arista.io".
-cvaas_server - (Required) <description>
-service_account_web_token - (Required) <decription>
+cvaas_server - (Required) CVaaS Server "www.arista.io"
+service_account_web_token - (Required) The access token to authenticate the client to CVaaS.
 
 
 ## Resources
