@@ -7,7 +7,7 @@ regions across Cloud Providers.
 
 ## Terminology
 
-* CVaaS : Arista [CloudVision] (https://www.arista.com/en/products/eos/eos-cloudvision) as a Service
+* CVaaS : Arista [CloudVision](https://www.arista.com/en/products/eos/eos-cloudvision) as a Service
 * CloudEdge - A CloudEOS Edge router is typically deployed at the edge of a site (AWS/Azure/GCP region,
     Data center Edge).
 * CloudLeaf - A CloudEOS Leaf router is deployed in a application VPC that is connected to a CloudEdge
