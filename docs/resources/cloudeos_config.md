@@ -1,9 +1,9 @@
-# cloudeos_config Resource
+# cloudeos_router_config
 
-cloudeos_config resource sends CloudEOS deployment related info to CVaaS and obtain the bootstrap config
+cloudeos_config resource sends CloudEOS router deployment info to CVaaS to obtain the bootstrap config
 with which the router will be created with. The bootstrap configuration is used by the CloudEOS Router
 to start streaming TerminAttr to CVaaS and provision itself to a container.
-CloudEOS can act as Route Reflector, an edge router or a leaf router.
+CloudEOS router can act as Route Reflector, an edge router or a leaf router.
 
 ## Example Usage
 
@@ -13,39 +13,39 @@ resource "aws_vpc" "vpc" {
 }
 
 resource "cloudeos_topology" "topology" {
-   topology_name = "topo-test"          // topology name
-   bgp_asn = "65000-65100"              // BGP ASN range
-   vtep_ip_cidr = "10.0.0.0/16"          // VTEP CIDR
-   terminattr_ip_cidr = "10.1.0.0/16"    // Terminattr CIDR
-   dps_controlplane_cidr = "10.2.0.0/16" // DPS control plane cidr
+   topology_name = "topo-test"
+   bgp_asn = "65000-65100"
+   vtep_ip_cidr = "192.168.0.0/24"
+   terminattr_ip_cidr = "192.168.1.0/24"
+   dps_controlplane_cidr = "192.168.2.0/24"
 }
 
 resource "cloudeos_router_config" "cloudeos" {
-  cloud_provider = "aws"                                   // aws/azure
-  topology_name = cloudeos_topology.topology.topology_name // Name of  Topology this CloudEOS belongs
-  role = "CloudEdge"                                       // CloudLeaf/CloudEdge
-  cnps = "dev"                                             // Cloud Network Private Segments Name
-  vpc_id = aws_vpc.vpc.id                                  // VPC/VNET ID in which this CloudEOS is deployed
-  region = aws_vpc.vpc.region                              // Region of deployment
-  is_rr = false                                            // true if this CloudEOS acts as Route Reflector
-  intf_name = ["edgecloudeos1Intf0", "edgecloudeos1Intf1"] // List of interface name attached to this CloudEOS.
-  intf_private_ip = ["15.0.0.101", "15.0.1.101"]           // List of private IP of interfaces.
-  intf_type = ["public", "internal"]                       // Type of interfaces
+  cloud_provider = "aws"
+  topology_name = cloudeos_topology.topology.topology_name
+  role = "CloudEdge"
+  cnps = "dev"
+  vpc_id = aws_vpc.vpc.id
+  region = aws_vpc.vpc.region
+  is_rr = false
+  intf_name = ["publicIntf", "internalIntf"]
+  intf_private_ip = ["10.0.0.101", "10.0.1.101"]
+  intf_type = ["public", "internal"]
 }
 ```
 
 ## Argument Reference
 
-* `cloud_provider` - (Required) aws/azure.
-* `cnps` - (Optional) Cloud Network Private Segments Name.
+* `cloud_provider` - (Required) Cloud Provider for this deployment. Supports only aws or azure.
+* `cnps` - (Optional) Cloud Network Private Segments Name. ( VRF name )
 * `region` - (Required) Region of deployment.
-* `topology_name` - (Required) Name of topology this CloudEOS is part of.
+* `topology_name` - (Required) Name of topology this CloudEOS the router will de deployed in.
 * `tags` - (Optional) A mapping of tags to assign to the resource.
 * `vpc_id` - (Required) VPC ID in which this CloudEOS is deployed.
 * `role` - (Optional) CloudEdge or CloudLeaf (Same as VPC role).
 * `is_rr` - (Optional) true if this CloudEOS acts as a Route Reflector.
-* `ami` - (Optional) CloudEOS image.
-* `key_name` - (Optional) keypair name.
+* `ami` - (Optional) CloudEOS image. ( AWS only )
+* `key_name` - (Optional) keypair name ( AWS only )
 * `availability_zone` - (Optional) Availability Zone of VPC.
 * `intf_name` - (Required) List of interface names.
 * `intf_private_ip` - (Required) List of interface private IPs.

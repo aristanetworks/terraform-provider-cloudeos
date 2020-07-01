@@ -1,5 +1,6 @@
-// Copyright (c) 2019 Arista Networks, Inc.  All rights reserved.
-// Arista Networks, Inc. Confidential and Proprietary.
+// Copyright (c) 2020 Arista Networks, Inc.
+// Use of this source code is governed by the Mozilla Public License Version 2.0
+// that can be found in the LICENSE file.
 
 package main
 
