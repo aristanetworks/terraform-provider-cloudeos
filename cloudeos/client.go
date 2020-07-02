@@ -49,7 +49,7 @@ type wrpcRequest struct {
 	Params  map[string]interface{}
 }
 
-func aristaCvpClient(server string, webToken string) (*Client, error) {
+func aristaCvaasClient(server string, webToken string) (*Client, error) {
 	var u = url.URL{Scheme: "wss", Host: server, Path: "/api/v3/wrpc/"}
 	req, _ := http.NewRequest("GET", "https://"+server, nil)
 	req.Header.Set("Authorization", "Bearer "+webToken)
@@ -61,12 +61,13 @@ func aristaCvpClient(server string, webToken string) (*Client, error) {
 	dialer.TLSClientConfig = &tls.Config{}
 	ws, resp, err := dialer.Dial(u.String(), req.Header)
 	if err != nil {
-		log.Printf("Websocket dial failed: %v", err)
-		return nil, err
+		log.Printf("Failed connecting to CVaaS. Websocket dial failed: %v", err)
+		return nil, fmt.Errorf("Failed connecting to CVaaS, error : %v", err)
 	}
 
 	if resp.StatusCode != http.StatusSwitchingProtocols {
-		return nil, fmt.Errorf("Received unexpected http response, statusCode: %v", resp.StatusCode)
+		return nil, fmt.Errorf("Failed connecting to CVaaS, unexpected http response: %v",
+			resp.StatusCode)
 	}
 
 	log.Printf("Created websocket client :%v", resp)
@@ -83,7 +84,7 @@ func (c *Client) wrpcSend(request *wrpcRequest) (map[string]interface{}, error) 
 	resp := make(map[string]interface{})
 	err := c.wrpcClient.WriteJSON(request)
 	if err != nil {
-		log.Printf("Failed to send %s request to CVP : %s",
+		log.Printf("Failed to send %s request to CVaaS : %s",
 			request.Params["method"].(string), err)
 		return resp, err
 	}
@@ -94,7 +95,7 @@ func (c *Client) wrpcSend(request *wrpcRequest) (map[string]interface{}, error) 
 	// Read response from clouddeploy service
 	err = c.wrpcClient.ReadJSON(&resp)
 	if err != nil {
-		log.Printf("Failed to get %s response from CVP, Error: %v",
+		log.Printf("Failed to get %s response from CVaaS, Error: %v",
 			request.Params["method"].(string), err)
 		return resp, err
 	}
@@ -185,7 +186,7 @@ func getRoleType(role string) api.RoleType {
 }
 
 func (p *CloudeosProvider) getDeviceEnrollmentToken() (string, error) {
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
 		log.Printf("Failed to create new client to execute AddEnrollmentToken message")
 		return "", err
@@ -235,9 +236,10 @@ func (p *CloudeosProvider) getDeviceEnrollmentToken() (string, error) {
 //CheckForTopologyDuplicates check if there already exists an entry in CVaaS
 func (p *CloudeosProvider) CheckForTopologyDuplicates(d *schema.ResourceData,
 	topoType string) (bool, error) {
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
-		return true, fmt.Errorf("Failed to create new client to execute ListTopology message")
+		log.Printf("Failed to create new CVaaS client to execute CheckForTopologyDuplicates")
+		return true, err
 	}
 	defer client.wrpcClient.Close()
 
@@ -263,7 +265,7 @@ func (p *CloudeosProvider) CheckForTopologyDuplicates(d *schema.ResourceData,
 	}
 	topoInfo.FieldMask = fieldMask
 
-	log.Printf("[CVP-INFO]ListTopologyInfoRequestPb:%s", topoInfo)
+	log.Printf("[CVaaS-INFO]ListTopologyInfoRequestPb:%s", topoInfo)
 
 	listTopoInfoRequest := api.ListTopologyInfoRequest{
 		Filter: []*api.TopologyInfo{topoInfo},
@@ -333,9 +335,9 @@ func (p *CloudeosProvider) CheckForTopologyDuplicates(d *schema.ResourceData,
 
 //AddVpcConfig adds VPC resource to Aeris
 func (p *CloudeosProvider) AddVpcConfig(d *schema.ResourceData) error {
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
-		log.Printf("Failed to create new client to execute AddVpc message")
+		log.Printf("Failed to create new client to connect to CVaaS for AddVpcConfig")
 		return err
 	}
 	defer client.wrpcClient.Close()
@@ -361,7 +363,7 @@ func (p *CloudeosProvider) AddVpcConfig(d *schema.ResourceData) error {
 	}
 	vpc.FieldMask = fieldMask
 
-	log.Printf("[CVP-INFO]AddVpcRequestPb:%s", vpc)
+	log.Printf("[CVaaS-INFO]AddVpcRequestPb:%s", vpc)
 
 	addVpcRequest := api.AddVpcRequest{
 		Vpc: vpc,
@@ -407,7 +409,7 @@ func (p *CloudeosProvider) AddVpcConfig(d *schema.ResourceData) error {
 
 //GetVpc gets vpc which satisfy the filter
 func (p *CloudeosProvider) GetVpc(d *schema.ResourceData) error {
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
 		log.Printf("Failed to create new client to execute GetVpc message")
 		return err
@@ -428,7 +430,7 @@ func (p *CloudeosProvider) GetVpc(d *schema.ResourceData) error {
 	getVpcRequest := api.GetVpcRequest{
 		Vpc: vpc,
 	}
-	log.Printf("[CVP-INFO]GetVpcRequestPb:%s", vpc)
+	log.Printf("[CVaaS-INFO]GetVpcRequestPb:%s", vpc)
 
 	request := wrpcRequest{
 		Token:   "RPC_Token_Get_" + d.Get("tf_id").(string),
@@ -442,7 +444,7 @@ func (p *CloudeosProvider) GetVpc(d *schema.ResourceData) error {
 
 	err = client.wrpcClient.WriteJSON(request)
 	if err != nil {
-		log.Printf("Failed to send %s request to CVP : %s",
+		log.Printf("Failed to send %s request to CVaaS : %s",
 			request.Params["method"].(string), err)
 		return err
 	}
@@ -452,7 +454,7 @@ func (p *CloudeosProvider) GetVpc(d *schema.ResourceData) error {
 	resp := make(map[string]interface{})
 	err = client.wrpcClient.ReadJSON(&resp)
 	if err != nil {
-		log.Printf("Failed to get %s response from CVP, Error: %v",
+		log.Printf("Failed to get %s response from CVaaS, Error: %v",
 			request.Params["method"].(string), err)
 		return err
 	}
@@ -524,7 +526,7 @@ func (p *CloudeosProvider) GetVpc(d *schema.ResourceData) error {
 
 //CheckVpcDeletionStatus returns nil if Vpc doesn't exist
 func (p *CloudeosProvider) CheckVpcDeletionStatus(d *schema.ResourceData) error {
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
 		log.Printf("Failed to create new client in CheckVpcDeletionStatus")
 		return err
@@ -546,7 +548,7 @@ func (p *CloudeosProvider) CheckVpcDeletionStatus(d *schema.ResourceData) error 
 	getVpcRequest := api.GetVpcRequest{
 		Vpc: vpc,
 	}
-	log.Printf("[CVP-INFO]GetVpcRequestPb:%s", vpc)
+	log.Printf("[CVaaS-INFO]GetVpcRequestPb:%s", vpc)
 
 	request := wrpcRequest{
 		Token:   "RPC_Token_Get_" + d.Get("tf_id").(string),
@@ -560,7 +562,7 @@ func (p *CloudeosProvider) CheckVpcDeletionStatus(d *schema.ResourceData) error 
 
 	err = client.wrpcClient.WriteJSON(request)
 	if err != nil {
-		log.Printf("Failed to send %s request to CVP : %s",
+		log.Printf("Failed to send %s request to CVaaS : %s",
 			request.Params["method"].(string), err)
 		return err
 	}
@@ -570,7 +572,7 @@ func (p *CloudeosProvider) CheckVpcDeletionStatus(d *schema.ResourceData) error 
 	resp := make(map[string]interface{})
 	err = client.wrpcClient.ReadJSON(&resp)
 	if err != nil {
-		log.Printf("Failed to get %s response from CVP, Error: %v",
+		log.Printf("Failed to get %s response from CVaaS, Error: %v",
 			request.Params["method"].(string), err)
 		return err
 	}
@@ -600,7 +602,7 @@ func (p *CloudeosProvider) CheckVpcDeletionStatus(d *schema.ResourceData) error 
 
 //ListVpc gets all vpc which satisfy the filter
 func (p *CloudeosProvider) ListVpc(d *schema.ResourceData) error {
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
 		log.Printf("Failed to create new client to execute ListVpc message")
 		return err
@@ -627,7 +629,7 @@ func (p *CloudeosProvider) ListVpc(d *schema.ResourceData) error {
 	listVpcRequest := api.ListVpcRequest{
 		Filter: []*api.Vpc{vpc},
 	}
-	log.Printf("[CVP-INFO]ListVpcRequestPb:%s", vpc)
+	log.Printf("[CVaaS-INFO]ListVpcRequestPb:%s", vpc)
 
 	request := wrpcRequest{
 		Token:   "RPC_Token_List_" + vpcName + "_" + d.Get("region").(string),
@@ -641,7 +643,7 @@ func (p *CloudeosProvider) ListVpc(d *schema.ResourceData) error {
 
 	err = client.wrpcClient.WriteJSON(request)
 	if err != nil {
-		log.Printf("Failed to send %s request to CVP : %s",
+		log.Printf("Failed to send %s request to CVaaS : %s",
 			request.Params["method"].(string), err)
 		return err
 	}
@@ -651,7 +653,7 @@ func (p *CloudeosProvider) ListVpc(d *schema.ResourceData) error {
 	resp := make(map[string]interface{})
 	err = client.wrpcClient.ReadJSON(&resp)
 	if err != nil {
-		log.Printf("Failed to get %s response from CVP, Error: %v",
+		log.Printf("Failed to get %s response from CVaaS, Error: %v",
 			request.Params["method"].(string), err)
 		return err
 	}
@@ -727,7 +729,7 @@ func (p *CloudeosProvider) ListVpc(d *schema.ResourceData) error {
 
 //CheckVpcPresence check if VPC is created in Aeris status path
 func (p *CloudeosProvider) CheckVpcPresence(d *schema.ResourceData) error {
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
 		log.Printf("Failed to create new client to execute CheckVpcPresence")
 		return err
@@ -752,7 +754,7 @@ func (p *CloudeosProvider) CheckVpcPresence(d *schema.ResourceData) error {
 	listVpcRequest := api.ListVpcRequest{
 		Filter: []*api.Vpc{vpc},
 	}
-	log.Printf("[CVP-INFO]CheckVpcRequestPb:%s", vpc)
+	log.Printf("[CVaaS-INFO]CheckVpcRequestPb:%s", vpc)
 
 	request := wrpcRequest{
 		Token:   "RPC_Token_List_" + vpcID + "_" + d.Get("region").(string),
@@ -766,7 +768,7 @@ func (p *CloudeosProvider) CheckVpcPresence(d *schema.ResourceData) error {
 
 	err = client.wrpcClient.WriteJSON(request)
 	if err != nil {
-		log.Printf("Failed to send %s request to CVP : %s",
+		log.Printf("Failed to send %s request to CVaaS : %s",
 			request.Params["method"].(string), err)
 		return err
 	}
@@ -776,7 +778,7 @@ func (p *CloudeosProvider) CheckVpcPresence(d *schema.ResourceData) error {
 	resp := make(map[string]interface{})
 	err = client.wrpcClient.ReadJSON(&resp)
 	if err != nil {
-		log.Printf("Failed to get %s response from CVP, Error: %v",
+		log.Printf("Failed to get %s response from CVaaS, Error: %v",
 			request.Params["method"].(string), err)
 		return err
 	}
@@ -804,7 +806,7 @@ func (p *CloudeosProvider) CheckVpcPresence(d *schema.ResourceData) error {
 
 //AddVpc adds VPC resource to Aeris
 func (p *CloudeosProvider) AddVpc(d *schema.ResourceData) error {
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
 		log.Printf("Failed to create new client to execute AddVpc message")
 		return err
@@ -862,7 +864,7 @@ func (p *CloudeosProvider) AddVpc(d *schema.ResourceData) error {
 	addVpcRequest := api.AddVpcRequest{
 		Vpc: vpc,
 	}
-	log.Printf("[CVP-INFO]AddVpcRequestPb:%s", vpc)
+	log.Printf("[CVaaS-INFO]AddVpcRequestPb:%s", vpc)
 
 	request := wrpcRequest{
 		Token:   "RPC_Token_Add_" + vpc.Name + "_" + d.Get("region").(string),
@@ -884,7 +886,7 @@ func (p *CloudeosProvider) AddVpc(d *schema.ResourceData) error {
 
 //DeleteVpc deletes VPC resource from Aeris
 func (p *CloudeosProvider) DeleteVpc(d *schema.ResourceData) error {
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
 		log.Printf("Failed to create new client to execute DeleteVpc message")
 		return err
@@ -910,7 +912,7 @@ func (p *CloudeosProvider) DeleteVpc(d *schema.ResourceData) error {
 		Vpc: vpc,
 	}
 
-	log.Printf("[CVP-INFO]DeleteVpcRequestPb:%s", vpc)
+	log.Printf("[CVaaS-INFO]DeleteVpcRequestPb:%s", vpc)
 	request := wrpcRequest{
 		Token:   "RPC_Token_Delete_" + vpcName + "_" + d.Get("region").(string),
 		Command: "serviceRequest",
@@ -932,22 +934,22 @@ func getBgpAsn(bgpAsnRange string) (uint32, uint32, error) {
 	asnRange := strings.Split(bgpAsnRange, "-")
 	asnLow, err := strconv.ParseUint(asnRange[0], 10, 32)
 	if err != nil {
-		log.Printf("[CVP-ERROR]Can't parse bgp asn")
+		log.Printf("[CVaaS-ERROR]Can't parse bgp asn")
 	}
 	asnHigh, err := strconv.ParseUint(asnRange[1], 10, 32)
 	if err != nil {
-		log.Printf("[CVP-ERROR]Can't parse bgp asn")
+		log.Printf("[CVaaS-ERROR]Can't parse bgp asn")
 	}
-	log.Printf("[CVP-INFO]Bgp Asn Range %v - %v", asnLow, asnHigh)
+	log.Printf("[CVaaS-INFO]Bgp Asn Range %v - %v", asnLow, asnHigh)
 	return uint32(asnLow), uint32(asnHigh), err
 }
 
 //ListTopology gets the Topology from Aeris which satisfy the filter
 func (p *CloudeosProvider) ListTopology(d *schema.ResourceData) error {
 	// Create new client, as the client that provider created might have died.
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
-		log.Printf("[CVP-ERROR]Failed to create new client in ListTopology")
+		log.Printf("[CVaaS-ERROR]Failed to create new client in ListTopology")
 		return err
 	}
 	defer client.wrpcClient.Close()
@@ -967,7 +969,7 @@ func (p *CloudeosProvider) ListTopology(d *schema.ResourceData) error {
 	}
 	topoInfo.FieldMask = fieldMask
 
-	log.Printf("[CVP-INFO]ListTopologyInfoRequestPb:%s", topoInfo)
+	log.Printf("[CVaaS-INFO]ListTopologyInfoRequestPb:%s", topoInfo)
 
 	listTopoInfoRequest := api.ListTopologyInfoRequest{
 		Filter: []*api.TopologyInfo{topoInfo},
@@ -985,7 +987,7 @@ func (p *CloudeosProvider) ListTopology(d *schema.ResourceData) error {
 
 	err = client.wrpcClient.WriteJSON(request)
 	if err != nil {
-		log.Printf("Failed to send %s request to CVP : %s",
+		log.Printf("Failed to send %s request to CVaaS : %s",
 			request.Params["method"].(string), err)
 		return err
 	}
@@ -1001,7 +1003,7 @@ func (p *CloudeosProvider) ListTopology(d *schema.ResourceData) error {
 		// read respose from clouddeploy
 		err = client.wrpcClient.ReadJSON(&resp)
 		if err != nil {
-			log.Printf("Failed to get %s response from CVP, Error: %v",
+			log.Printf("Failed to get %s response from CVaaS, Error: %v",
 				request.Params["method"].(string), err)
 			return err
 		}
@@ -1078,9 +1080,9 @@ func (p *CloudeosProvider) ListTopology(d *schema.ResourceData) error {
 //CheckTopologyDeletionStatus returns nil if topology doesn't exist
 func (p *CloudeosProvider) CheckTopologyDeletionStatus(d *schema.ResourceData) error {
 	// Create new client
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
-		log.Printf("[CVP-ERROR]Failed to create new client CheckTopologyDeletionStatus")
+		log.Printf("[CVaaS-ERROR]Failed to create new client CheckTopologyDeletionStatus")
 		return err
 	}
 	defer client.wrpcClient.Close()
@@ -1096,7 +1098,7 @@ func (p *CloudeosProvider) CheckTopologyDeletionStatus(d *schema.ResourceData) e
 	}
 	topoInfo.FieldMask = fieldMask
 
-	log.Printf("[CVP-INFO]GetTopologyInfoRequestPb:%s", topoInfo)
+	log.Printf("[CVaaS-INFO]GetTopologyInfoRequestPb:%s", topoInfo)
 
 	getTopoInfoRequest := api.GetTopologyInfoRequest{
 		TopologyInfo: topoInfo,
@@ -1114,7 +1116,7 @@ func (p *CloudeosProvider) CheckTopologyDeletionStatus(d *schema.ResourceData) e
 
 	err = client.wrpcClient.WriteJSON(request)
 	if err != nil {
-		log.Printf("Failed to send %s request to CVP : %s",
+		log.Printf("Failed to send %s request to CVaaS : %s",
 			request.Params["method"].(string), err)
 		return err
 	}
@@ -1125,7 +1127,7 @@ func (p *CloudeosProvider) CheckTopologyDeletionStatus(d *schema.ResourceData) e
 	// read respose from clouddeploy
 	err = client.wrpcClient.ReadJSON(&resp)
 	if err != nil {
-		log.Printf("Failed to get %s response from CVP, Error: %v",
+		log.Printf("Failed to get %s response from CVaaS, Error: %v",
 			request.Params["method"].(string), err)
 		return err
 	}
@@ -1162,9 +1164,9 @@ func (p *CloudeosProvider) CheckTopologyDeletionStatus(d *schema.ResourceData) e
 //AddTopology adds Topology resource to Aeris
 func (p *CloudeosProvider) AddTopology(d *schema.ResourceData) error {
 	// Create new client, as the client that provider created might have died.
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
-		log.Printf("[CVP-ERROR]Failed to create new client in AddTopology")
+		log.Printf("[CVaaS-ERROR]Failed to create new client in AddTopology")
 		return err
 	}
 	defer client.wrpcClient.Close()
@@ -1172,7 +1174,7 @@ func (p *CloudeosProvider) AddTopology(d *schema.ResourceData) error {
 	// get bgp asn
 	asnLow, asnHigh, err := getBgpAsn(d.Get("bgp_asn").(string))
 	if err != nil {
-		log.Printf("[CVP-ERROR]Failed to parse bgp asn")
+		log.Printf("[CVaaS-ERROR]Failed to parse bgp asn")
 		return err
 	}
 
@@ -1208,7 +1210,7 @@ func (p *CloudeosProvider) AddTopology(d *schema.ResourceData) error {
 	}
 	topoInfo.FieldMask = fieldMask
 
-	log.Printf("[CVP-INFO]AddTopologyInfoRequestPb:%s", topoInfo)
+	log.Printf("[CVaaS-INFO]AddTopologyInfoRequestPb:%s", topoInfo)
 	addTopoInfoRequest := api.AddTopologyInfoRequest{
 		TopologyInfo: topoInfo,
 	}
@@ -1253,9 +1255,9 @@ func (p *CloudeosProvider) AddTopology(d *schema.ResourceData) error {
 //DeleteTopology deletes Topology resource from Aeris
 func (p *CloudeosProvider) DeleteTopology(d *schema.ResourceData) error {
 	// Create new client, as the client that provider created might have died.
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
-		log.Printf("[CVP-ERROR]Failed to create new client in DeleteTopology")
+		log.Printf("[CVaaS-ERROR]Failed to create new client in DeleteTopology")
 		return err
 	}
 	defer client.wrpcClient.Close()
@@ -1298,9 +1300,9 @@ func (p *CloudeosProvider) DeleteTopology(d *schema.ResourceData) error {
 //AddClosTopology adds clos Topology resource to Aeris
 func (p *CloudeosProvider) AddClosTopology(d *schema.ResourceData) error {
 	// Create new client, as the client that provider created might have died.
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
-		log.Printf("[CVP-ERROR]Failed to create new client in AddClosTopology")
+		log.Printf("[CVaaS-ERROR]Failed to create new client in AddClosTopology")
 		return err
 	}
 	defer client.wrpcClient.Close()
@@ -1345,7 +1347,7 @@ func (p *CloudeosProvider) AddClosTopology(d *schema.ResourceData) error {
 	addTopoInfoRequest := api.AddTopologyInfoRequest{
 		TopologyInfo: topoInfo,
 	}
-	log.Printf("[CVP-INFO]AddTopologyInfoRequestPb:%s", topoInfo)
+	log.Printf("[CVaaS-INFO]AddTopologyInfoRequestPb:%s", topoInfo)
 
 	token := d.Get("topology_name").(string) + "_3_" + d.Get("name").(string)
 	request := wrpcRequest{
@@ -1390,9 +1392,9 @@ func (p *CloudeosProvider) AddClosTopology(d *schema.ResourceData) error {
 //DeleteClosTopology deletes clos Topology resource from Aeris
 func (p *CloudeosProvider) DeleteClosTopology(d *schema.ResourceData) error {
 	// Create new client, as the client that provider created might have died.
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
-		log.Printf("[CVP-ERROR]Failed to create new client in DeleteClosTopology")
+		log.Printf("[CVaaS-ERROR]Failed to create new client in DeleteClosTopology")
 		return err
 	}
 	defer client.wrpcClient.Close()
@@ -1421,7 +1423,7 @@ func (p *CloudeosProvider) DeleteClosTopology(d *schema.ResourceData) error {
 	}
 	topoInfo.FieldMask = fieldMask
 
-	log.Printf("[CVP-INFO]DeleteClosTopology DeleteTopologyInfoRequestPb:%s", topoInfo)
+	log.Printf("[CVaaS-INFO]DeleteClosTopology DeleteTopologyInfoRequestPb:%s", topoInfo)
 	delTopoInfoRequest := api.DeleteTopologyInfoRequest{
 		TopologyInfo: topoInfo,
 	}
@@ -1448,9 +1450,9 @@ func (p *CloudeosProvider) DeleteClosTopology(d *schema.ResourceData) error {
 //AddWanTopology adds wan Topology resource to Aeris
 func (p *CloudeosProvider) AddWanTopology(d *schema.ResourceData) error {
 	// Create new client, as the client that provider created might have died.
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
-		log.Printf("[CVP-ERROR]Failed to create new client in AddWanTopology")
+		log.Printf("[CVaaS-ERROR]Failed to create new client in AddWanTopology")
 		return err
 	}
 	defer client.wrpcClient.Close()
@@ -1486,7 +1488,7 @@ func (p *CloudeosProvider) AddWanTopology(d *schema.ResourceData) error {
 	addTopoInfoRequest := api.AddTopologyInfoRequest{
 		TopologyInfo: topoInfo,
 	}
-	log.Printf("[CVP-INFO]AddTopologyInfoRequestPb:%s", topoInfo)
+	log.Printf("[CVaaS-INFO]AddTopologyInfoRequestPb:%s", topoInfo)
 
 	token := d.Get("topology_name").(string) + "_2_" + d.Get("name").(string)
 	request := wrpcRequest{
@@ -1530,9 +1532,9 @@ func (p *CloudeosProvider) AddWanTopology(d *schema.ResourceData) error {
 //DeleteWanTopology deletes wan Topology resource from Aeris
 func (p *CloudeosProvider) DeleteWanTopology(d *schema.ResourceData) error {
 	// Create new client, as the client that provider created might have died.
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
-		log.Printf("[CVP-ERROR]Failed to create new client in DeleteClosTopology")
+		log.Printf("[CVaaS-ERROR]Failed to create new client in DeleteClosTopology")
 		return err
 	}
 	defer client.wrpcClient.Close()
@@ -1586,7 +1588,7 @@ func (p *CloudeosProvider) DeleteWanTopology(d *schema.ResourceData) error {
 
 //AddSubnet adds subnet resource to Aeris
 func (p *CloudeosProvider) AddSubnet(d *schema.ResourceData) error {
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
 		log.Printf("Failed to create new client to execute AddSubnet message")
 		return err
@@ -1655,7 +1657,7 @@ func (p *CloudeosProvider) AddSubnet(d *schema.ResourceData) error {
 
 //DeleteSubnet deletes subnet resource from Aeris
 func (p *CloudeosProvider) DeleteSubnet(d *schema.ResourceData) error {
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
 		log.Printf("Failed to create new client to execute DeleteSubnet message")
 		return err
@@ -1837,7 +1839,7 @@ func parseRtrResponse(rtr map[string]interface{}, d *schema.ResourceData) error 
 //ListRouter gets router details from CloudDeploy
 func (p *CloudeosProvider) ListRouter(d *schema.ResourceData) error {
 	// create new client
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
 		log.Printf("Failed to create new client to execute ListRouter message")
 		return err
@@ -1867,7 +1869,7 @@ func (p *CloudeosProvider) ListRouter(d *schema.ResourceData) error {
 	}
 	rtr.FieldMask = fieldMask
 
-	log.Printf("[CVP-INFO]ListRouterRequestPb:%v", rtr)
+	log.Printf("[CVaaS-INFO]ListRouterRequestPb:%v", rtr)
 
 	listRouterRequest := api.ListRouterRequest{
 		Filter: []*api.Router{rtr},
@@ -1885,7 +1887,7 @@ func (p *CloudeosProvider) ListRouter(d *schema.ResourceData) error {
 
 	err = client.wrpcClient.WriteJSON(request)
 	if err != nil {
-		log.Printf("Failed to send %s request to CVP : %s",
+		log.Printf("Failed to send %s request to CVaaS : %s",
 			request.Params["method"].(string), err)
 		return err
 	}
@@ -1925,7 +1927,7 @@ func (p *CloudeosProvider) ListRouter(d *schema.ResourceData) error {
 //GetRouter gets router details from CloudDeploy
 func (p *CloudeosProvider) GetRouter(d *schema.ResourceData) error {
 	// create new client
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
 		log.Printf("Failed to create new client to execute GetRouter message")
 		return err
@@ -1943,7 +1945,7 @@ func (p *CloudeosProvider) GetRouter(d *schema.ResourceData) error {
 	}
 	rtr.FieldMask = fieldMask
 
-	log.Printf("[CVP-INFO]GetRouterRequestPb:%s", rtr)
+	log.Printf("[CVaaS-INFO]GetRouterRequestPb:%s", rtr)
 
 	getRouterRequest := api.GetRouterRequest{
 		Router: rtr,
@@ -1961,7 +1963,7 @@ func (p *CloudeosProvider) GetRouter(d *schema.ResourceData) error {
 
 	err = client.wrpcClient.WriteJSON(request)
 	if err != nil {
-		log.Printf("Failed to send %s request to CVP : %s",
+		log.Printf("Failed to send %s request to CVaaS : %s",
 			request.Params["method"].(string), err)
 		return err
 	}
@@ -2001,7 +2003,7 @@ func (p *CloudeosProvider) GetRouter(d *schema.ResourceData) error {
 //CheckRouterDeletionStatus returns nil if Router doesn't exist
 func (p *CloudeosProvider) CheckRouterDeletionStatus(d *schema.ResourceData) error {
 	// create new client
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
 		log.Printf("Failed to create new client in CheckRouterDeletionStatus")
 		return err
@@ -2019,7 +2021,7 @@ func (p *CloudeosProvider) CheckRouterDeletionStatus(d *schema.ResourceData) err
 	}
 	rtr.FieldMask = fieldMask
 
-	log.Printf("[CVP-INFO]GetRouterRequestPb:%s", rtr)
+	log.Printf("[CVaaS-INFO]GetRouterRequestPb:%s", rtr)
 
 	getRouterRequest := api.GetRouterRequest{
 		Router: rtr,
@@ -2037,7 +2039,7 @@ func (p *CloudeosProvider) CheckRouterDeletionStatus(d *schema.ResourceData) err
 
 	err = client.wrpcClient.WriteJSON(request)
 	if err != nil {
-		log.Printf("Failed to send %s request to CVP : %s",
+		log.Printf("Failed to send %s request to CVaaS : %s",
 			request.Params["method"].(string), err)
 		return err
 	}
@@ -2083,7 +2085,7 @@ func (p *CloudeosProvider) AddRouterConfig(d *schema.ResourceData) error {
 	}
 
 	// Create new client.
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
 		log.Printf("Failed to create new client to execute AddRouter message")
 		return err
@@ -2192,7 +2194,7 @@ func (p *CloudeosProvider) CheckEdgeRouterPresence(d *schema.ResourceData) error
 	//  - If we found a router then that router is an edge router.
 
 	// create new client
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
 		log.Printf("Failed to create new client to execute CheckEdgeRouter message")
 		return err
@@ -2217,7 +2219,7 @@ func (p *CloudeosProvider) CheckEdgeRouterPresence(d *schema.ResourceData) error
 	listVpcRequest := api.ListVpcRequest{
 		Filter: []*api.Vpc{vpc},
 	}
-	log.Printf("[CVP-INFO]ListVpcRequestPb:%s", vpc)
+	log.Printf("[CVaaS-INFO]ListVpcRequestPb:%s", vpc)
 
 	request := wrpcRequest{
 		Token:   "RPC_Token_List_" + d.Get("region").(string),
@@ -2231,7 +2233,7 @@ func (p *CloudeosProvider) CheckEdgeRouterPresence(d *schema.ResourceData) error
 
 	err = client.wrpcClient.WriteJSON(request)
 	if err != nil {
-		log.Printf("Failed to send %s request to CVP : %s",
+		log.Printf("Failed to send %s request to CVaaS : %s",
 			request.Params["method"].(string), err)
 		return err
 	}
@@ -2243,7 +2245,7 @@ func (p *CloudeosProvider) CheckEdgeRouterPresence(d *schema.ResourceData) error
 	for {
 		err = client.wrpcClient.ReadJSON(&resp1)
 		if err != nil {
-			log.Printf("Failed to get %s response from CVP, Error: %v",
+			log.Printf("Failed to get %s response from CVaaS, Error: %v",
 				request.Params["method"].(string), err)
 			return err
 		}
@@ -2288,7 +2290,7 @@ func (p *CloudeosProvider) CheckEdgeRouterPresence(d *schema.ResourceData) error
 			return err
 		}
 		rtr.FieldMask = fieldMask
-		log.Printf("[CVP-INFO]ToResourceListEdgeRouter RequestPb:%s", rtr)
+		log.Printf("[CVaaS-INFO]ToResourceListEdgeRouter RequestPb:%s", rtr)
 		listRouterRequest := api.ListRouterRequest{
 			Filter: []*api.Router{rtr},
 		}
@@ -2305,7 +2307,7 @@ func (p *CloudeosProvider) CheckEdgeRouterPresence(d *schema.ResourceData) error
 
 		err = client.wrpcClient.WriteJSON(request)
 		if err != nil {
-			log.Printf("Failed to send %s request to CVP : %s",
+			log.Printf("Failed to send %s request to CVaaS : %s",
 				request.Params["method"].(string), err)
 			return err
 		}
@@ -2318,7 +2320,7 @@ func (p *CloudeosProvider) CheckEdgeRouterPresence(d *schema.ResourceData) error
 			// read response from clouddeploy
 			err = client.wrpcClient.ReadJSON(&resp)
 			if err != nil {
-				log.Printf("Failed to get %s response from CVP, Error: %v",
+				log.Printf("Failed to get %s response from CVaaS, Error: %v",
 					request.Params["method"].(string), err)
 				return err
 			}
@@ -2384,7 +2386,7 @@ func getAndCreateRouteTableIDs(d *schema.ResourceData) *api.RouteTableIds {
 //AddRouter adds Router resource to Aeris
 func (p *CloudeosProvider) AddRouter(d *schema.ResourceData) error {
 	// Create new client.
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
 		log.Printf("Failed to create new client to execute AddRouter message")
 		return err
@@ -2513,7 +2515,7 @@ func (p *CloudeosProvider) AddRouter(d *schema.ResourceData) error {
 //DeleteRouter deletes Router resource from Aeris
 func (p *CloudeosProvider) DeleteRouter(d *schema.ResourceData) error {
 	// Create new client, as the client that provider created might have died.
-	client, err := aristaCvpClient(p.server, p.srvcAcctToken)
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
 		log.Printf("Failed to create new client to execute DeleteRouter message")
 		return err

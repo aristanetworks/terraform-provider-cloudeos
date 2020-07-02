@@ -1,6 +1,6 @@
 BINARY=terraform-provider-cloudeos
 VERSION=$(shell awk '{ if ($$2=="providerCloudEOSVersion") print $$4 }' ./cloudeos/version.go | tr -d \")
-TEST=./
+TEST=./cloudeos
 
 default: build-all
 
@@ -11,7 +11,7 @@ linux:
 	GOOS=linux CGO_ENABLED=0 GOARCH=386 go build -o $(BINARY)_$(VERSION)_linux_x86
 
 darwin:
-	GOOS=darwin CGO_ENABLED=0 GOARCH=amd64 go build -v -o $(BINARY)_$(VERSION)_darwin_amd64
+	GOOS=darwin CGO_ENABLED=0 GOARCH=amd64 go build -o $(BINARY)_$(VERSION)_darwin_amd64
 
 test:
 	go test $(TEST) -timeout=30s -parallel=4
