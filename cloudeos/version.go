@@ -3,4 +3,4 @@
 
 package cloudeos
 
-var providerCloudEOSVersion = "0.0.7"
+var providerCloudEOSVersion = "0.0.8"

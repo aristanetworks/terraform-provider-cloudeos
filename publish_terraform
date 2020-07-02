@@ -1,0 +1,66 @@
+#!/bin/bash
+
+# This script should be used to build or build and publish provider-cloudeos
+# binaries to dist. To build only, run this script as "./publish_terraform b".
+# To build and publish, run as "./publish_terraform" directly.
+#
+# Note, when build only provider-cloudeos version number will not change,
+# when build and publish, script will increment version number to build
+# and publish binaries with this new version number. New version number
+# must be merged so people will be on same page.
+
+# Create directories
+mkdir .terraform
+cd .terraform
+mkdir plugins
+cd plugins
+mkdir darwin_amd64
+mkdir linux_amd64
+cd ../../
+
+# Read current version from versionf ile
+vfile="./cloudeos/version.go"
+if [ -f "$vfile" ]; then
+    version=$(cat $vfile | grep providerCloudEOSVersion | grep -oP [0-9]+.[0-9]+.[0-9]+)
+else
+   version="0.0.0"
+fi
+echo provider-cloudeos current version $version
+
+# Increment the version if we are publishing
+if [ $# -eq 0 ] || [ $1 != 'b' ]; then
+    oldversion=$version
+    IFS='.'
+    read -ra ADDR <<< "$version"
+    d=${ADDR[2]}
+    IFS=$OLDIFS
+    version="${ADDR[0]}.${ADDR[1]}.$((d+1))"
+    echo provider-cloudeos version $oldversion to $version
+
+    # Wrtie the new version back to version file
+    sed -i "s/$oldversion/$version/g" "$vfile"
+fi
+
+# Build binaries and put into corresponding directories
+echo Building provider-cloudeos binary terraform-provider-cloudeos_v$version
+CGO_ENABLED=0 GOOS=linux go build -o terraform-provider-cloudeos_v$version
+mv terraform-provider-cloudeos_v$version .terraform/plugins/linux_amd64/
+
+CGO_ENABLED=0 GOOS=darwin go build -o terraform-provider-cloudeos_v$version
+mv terraform-provider-cloudeos_v$version .terraform/plugins/darwin_amd64/
+
+if [ $# -eq 0 ] || [ $1 != 'b' ]; then
+    echo Publishing provider-cloudeos binary tarball terraform-cloudeos-plugin_v$version.tar.gz and terraform-cloudeos-plugin_latest.tar.gz
+    # Create tarball and publish
+    tar -czvf terraform-cloudeos-plugin_v$version.tar.gz .terraform
+    a4 scp terraform-cloudeos-plugin_v$version.tar.gz $1
+    tar -czvf terraform-cloudeos-plugin_latest.tar.gz .terraform
+    a4 scp terraform-cloudeos-plugin_latest.tar.gz $1
+
+    echo Cleaning up
+    # Cleanning up
+    rm -r .terraform
+    rm terraform-cloudeos-plugin*
+
+    echo Please git add/commit/push and merge your version file change!!!
+fi
