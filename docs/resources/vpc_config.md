@@ -7,6 +7,26 @@ attributes necessary for VPC creation.
 ## Example Usage
 
 ```hcl
+resource "cloudeos_topology" "topology" {
+   topology_name = "topo-test"
+   bgp_asn = "65000-65100"
+   vtep_ip_cidr = "1.0.0.0/16"
+   terminattr_ip_cidr = "4.0.0.0/16"
+   dps_controlplane_cidr = "3.0.0.0/16"
+}
+
+resource "cloudeos_clos" "clos" {
+   name = "clos-test"
+   topology_name = cloudeos_topology.topology.topology_name
+   cv_container_name = "CloudLeaf"
+}
+
+resource "cloudeos_wan" "wan" {
+   name = "wan-test"
+   topology_name = cloudeos_topology.topology.topology_name
+   cv_container_name = "CloudEdge"
+}
+
 resource "cloudeos_vpc_config" "vpc" {
   cloud_provider = "aws"                                     // Cloud Provider "aws/azure"
   topology_name = cloudeos_topology.topology.topology_name   // Topology resource name
