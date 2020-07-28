@@ -8,10 +8,11 @@
 package clouddeploy_v1
 
 import (
-        time "github.com/terraform-providers/terraform-provider-cloudeos/cloudeos/internal/time"
 	context "context"
 	fmt "fmt"
 	math "math"
+
+	time "github.com/terraform-providers/terraform-provider-cloudeos/cloudeos/internal/time"
 
 	proto "github.com/golang/protobuf/proto"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"

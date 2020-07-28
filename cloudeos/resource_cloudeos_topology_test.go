@@ -25,6 +25,19 @@ func TestResourceTopology(t *testing.T) {
 				ExpectError: regexp.MustCompile("cloudeos_topology topo-test1 already exists"),
 			},
 			{
+				Config:      testInvalidVtepCidr,
+				ExpectError: regexp.MustCompile("is not a valid CIDR"),
+			},
+			{
+				Config:      testInvalidTACidr,
+				ExpectError: regexp.MustCompile("is not a valid CIDR"),
+			},
+			{
+				Config:      testInvalidDPSCidr,
+				ExpectError: regexp.MustCompile("is not a valid CIDR"),
+			},
+
+			{
 				Config: testResourceInitialTopologyConfig,
 				Check:  testResourceInitialTopologyCheck,
 			},
@@ -76,6 +89,54 @@ resource "cloudeos_topology" "topology1" {
    terminattr_ip_cidr = "11.0.0.0/16"
    dps_controlplane_cidr = "12.0.0.0/16"
    depends_on = [cloudeos_topology.topology0]
+}
+`, os.Getenv("token"))
+
+var testInvalidVtepCidr = fmt.Sprintf(`
+provider "cloudeos" {
+  cvaas_domain = "apiserver.cv-play.corp.arista.io"
+  cvaas_server = "www.cv-play.corp.arista.io"
+  // clouddeploy token
+  service_account_web_token = %q
+}
+resource "cloudeos_topology" "topology3" {
+   topology_name = "topo-test3"
+   bgp_asn = "65000-65100"
+   vtep_ip_cidr = "4.0.0.0"
+   terminattr_ip_cidr = "5.0.0.0/35"
+   dps_controlplane_cidr = "6.0.0.0/16"
+}
+`, os.Getenv("token"))
+
+var testInvalidTACidr = fmt.Sprintf(`
+provider "cloudeos" {
+  cvaas_domain = "apiserver.cv-play.corp.arista.io"
+  cvaas_server = "www.cv-play.corp.arista.io"
+  // clouddeploy token
+  service_account_web_token = %q
+}
+resource "cloudeos_topology" "topology3" {
+   topology_name = "topo-test3"
+   bgp_asn = "65000-65100"
+   vtep_ip_cidr = "4.0.0.0/8"
+   terminattr_ip_cidr = "5.0.0.0/35"
+   dps_controlplane_cidr = "6.0.0.0/16"
+}
+`, os.Getenv("token"))
+
+var testInvalidDPSCidr = fmt.Sprintf(`
+provider "cloudeos" {
+  cvaas_domain = "apiserver.cv-play.corp.arista.io"
+  cvaas_server = "www.cv-play.corp.arista.io"
+  // clouddeploy token
+  service_account_web_token = %q
+}
+resource "cloudeos_topology" "topology3" {
+   topology_name = "topo-test3"
+   bgp_asn = "65000-65100"
+   vtep_ip_cidr = "4.0.0.0/8"
+   terminattr_ip_cidr = "5.0.0.0/35"
+   dps_controlplane_cidr = "256.0.0.0/16"
 }
 `, os.Getenv("token"))
 
