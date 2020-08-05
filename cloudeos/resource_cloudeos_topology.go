@@ -115,7 +115,6 @@ func cloudeosTopologyDelete(d *schema.ResourceData, m interface{}) error {
 	if err != nil {
 		return err
 	}
-
 	uuid := "cloudeos-topology" + strings.TrimPrefix(d.Get("tf_id").(string), TopoPrefix)
 	// wait for topology deletion
 	err = resource.Retry(d.Timeout(schema.TimeoutDelete), func() *resource.RetryError {
@@ -127,7 +126,6 @@ func cloudeosTopologyDelete(d *schema.ResourceData, m interface{}) error {
 	if err != nil {
 		return errors.New("Failed to destroy " + uuid + " error: " + err.Error())
 	}
-
 	log.Print("Successfully deleted " + uuid)
 	d.SetId("")
 	return nil

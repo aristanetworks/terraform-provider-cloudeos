@@ -6,6 +6,7 @@ package cloudeos
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -147,9 +148,10 @@ func cloudeosRouterStatus() *schema.Resource {
 				Type:     schema.TypeBool,
 			},
 			"deployment_status": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Deployment Status of the CloudEOS Router",
+				Computed:    true,
 			},
 			"tf_id": {
 				Required: true,
@@ -161,6 +163,12 @@ func cloudeosRouterStatus() *schema.Resource {
 				Description: "List of all route table and association resources.",
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
+			"router_bgp_asn": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Optional:    true,
+				Description: "BGP ASN computed on the CloudEOS Router",
+			},
 		},
 	}
 }
@@ -170,6 +178,25 @@ func cloudeosRouterStatusCreate(d *schema.ResourceData, m interface{}) error {
 	err := provider.AddRouter(d)
 	if err != nil {
 		return err
+	}
+	//Retry GetRouter for router_bgp_asn
+	err = resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
+		err := provider.GetRouterStatus(d)
+		if err != nil {
+			return resource.RetryableError(fmt.Errorf("GetRouter failed: %s", err))
+		}
+		bgpAsn := d.Get("router_bgp_asn").(string)
+		if bgpAsn != "" {
+			return nil
+		}
+		return resource.RetryableError(fmt.Errorf("attempting to get router bgp asn"))
+	})
+	if err != nil {
+		err := provider.DeleteRouter(d)
+		if err != nil {
+			return errors.New("bgp asn isn't present in router response. Failed during cleanup")
+		}
+		return errors.New("BGP ASN for the Router not returned.(Try terraform apply again)")
 	}
 
 	uuid := "cloudeos-router-status" + strings.TrimPrefix(d.Get("tf_id").(string), RtrPrefix)

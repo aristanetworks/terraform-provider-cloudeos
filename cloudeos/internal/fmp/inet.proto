@@ -1,0 +1,39 @@
+// Copyright (c) 2020 Arista Networks, Inc.
+// Use of this source code is governed by the Mozilla Public License Version 2.0
+// that can be found in the LICENSE file.
+
+// Useful types that come from ietf-inet-types.yang
+
+syntax = "proto3";
+
+package fmp;
+
+option go_package = "arista/resources/fmp";
+
+message IPAddress {
+	string value = 1;
+}
+
+message IPv4Address {
+	string value = 1;
+}
+
+message IPv6Address {
+	string value = 1;
+}
+
+message IPPrefix {
+	string value = 1;
+}
+
+message IPv4Prefix {
+	string value = 1;
+}
+
+message IPv6Prefix {
+	string value = 1;
+}
+
+message Port {
+	uint32 value = 1;
+}

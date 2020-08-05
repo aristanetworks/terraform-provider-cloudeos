@@ -42,6 +42,7 @@ func Provider() terraform.ResourceProvider {
 			"cloudeos_topology":      cloudeosTopology(),
 			"cloudeos_clos":          cloudeosClos(),
 			"cloudeos_wan":           cloudeosWan(),
+			"cloudeos_aws_vpn":       cloudeosAwsVpn(),
 		},
 
 		ConfigureFunc: configureCloudEOSProvider,

@@ -1,0 +1,92 @@
+// Copyright (c) 2020 Arista Networks, Inc.  All rights reserved.
+// Arista Networks, Inc. Confidential and Proprietary.
+// Subject to Arista Networks, Inc.'s EULA.
+// FOR INTERNAL USE ONLY. NOT FOR DISTRIBUTION.
+
+syntax = "proto3";
+
+package arista.clouddeploy.v1;
+
+option go_package = "github.com/terraform-providers/terraform-provider-cloudeos/cloudeos/internal/api/clouddeploy_v1;clouddeploy_v1";
+
+import "google/protobuf/wrappers.proto";
+
+import "fmp/extensions.proto";
+import "fmp/inet.proto";
+
+message IpsecInfo {
+   google.protobuf.StringValue ike_integrity = 1;
+   google.protobuf.StringValue ike_encryption = 2;
+   google.protobuf.StringValue ike_lifetime = 3;
+   google.protobuf.StringValue ike_pfs = 4;
+   google.protobuf.StringValue ike_preshared_key = 5;
+   google.protobuf.StringValue ipsec_integrity = 6;
+   google.protobuf.StringValue ipsec_encryption = 7;
+   google.protobuf.StringValue ipsec_pfs = 8;
+   google.protobuf.StringValue ipsec_mode = 9;
+   google.protobuf.StringValue dpd_interval = 10;
+   google.protobuf.StringValue dpd_retries = 11;
+}
+
+message TunnelInfo {
+   fmp.IPAddress               tunnel_aws_endpoint_ip = 1;
+   google.protobuf.StringValue tunnel_bgp_asn = 2;
+   fmp.IPAddress               tunnel_router_overlay_ip = 3;
+   fmp.IPAddress               tunnel_aws_overlay_ip = 4;
+   google.protobuf.StringValue tunnel_bgp_holdtime = 5;
+   google.protobuf.StringValue tunnel_preshared_key = 6;
+   IpsecInfo ipsec_info = 7;
+}
+
+message TunnelInfoList {
+    repeated TunnelInfo tunnel_info = 1;
+}
+
+message AWSVpnConfig {
+   option (fmp.model) = "rw";
+
+   AWSVpnKey key = 1;
+   google.protobuf.StringValue tgw_id = 2;
+   google.protobuf.StringValue vpn_connection_id = 3;
+   google.protobuf.StringValue cgw_id = 4;
+   google.protobuf.StringValue cloudeos_router_id = 5;
+   google.protobuf.StringValue cloudeos_vpc_id = 6;
+   google.protobuf.StringValue vpn_tgw_attachment_id = 7;
+   TunnelInfoList tunnel_info_list = 8;
+   google.protobuf.StringValue cnps = 9;
+   google.protobuf.StringValue vpn_gateway_id = 10;
+}
+
+message AWSVpnKey {
+   option (fmp.model_key) = true;
+   google.protobuf.StringValue tf_id = 1;
+}
+
+/*
+message AWSTgwKey {
+   option (fmp.model_key) = true;
+   google.protobuf.StringValue tf_id = 1;
+}
+
+message AWSTgwVpcAttachment {
+   google.protobuf.StringValue tgw_id = 1;
+   google.protobuf.StringValue vpc_id = 2;
+   google.protobuf.StringValue tgw_vpc_attachment_id = 3;
+}
+
+message AWSTgwRouteTable {
+   google.protobuf.StringValue tgw_id = 1;
+   google.protobuf.StringValue route_table_id = 2;
+   google.protobuf.StringValue cnps = 3;
+   fmp.RepeatedString route_table_associations = 4;
+}
+
+message AWSTgwConfig {
+   option (fmp.model) = "rw";
+
+   AWSTgwKey key = 1;
+   google.protobuf.StringValue tgw_id = 2;
+   fmp.RepeatedString AWSTgwVpnConfig aws_tgw_vpn = 3;
+   fmp.RepeatedString AWSTgwRouteTable aws_tgw_rttable = 3;
+}
+*/
