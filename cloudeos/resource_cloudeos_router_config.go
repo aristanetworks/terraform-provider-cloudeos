@@ -40,6 +40,7 @@ func cloudeosRouterConfig() *schema.Resource {
 					}
 					return
 				},
+				DiffSuppressFunc: suppressAttributeChange,
 			},
 			"cnps": {
 				Optional: true,
@@ -50,8 +51,9 @@ func cloudeosRouterConfig() *schema.Resource {
 				Type:     schema.TypeString,
 			},
 			"topology_name": {
-				Required: true,
-				Type:     schema.TypeString,
+				Required:         true,
+				Type:             schema.TypeString,
+				DiffSuppressFunc: suppressAttributeChange,
 			},
 			"tags": {
 				Type:        schema.TypeMap,

@@ -42,8 +42,9 @@ func cloudeosVpcConfig() *schema.Resource {
 				},
 			},
 			"cnps": {
-				Required: true,
-				Type:     schema.TypeString,
+				Required:         true,
+				Type:             schema.TypeString,
+				DiffSuppressFunc: suppressAttributeChange,
 			},
 			"region": {
 				Required: true,

@@ -29,14 +29,16 @@ func cloudeosClos() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Clos topology name",
+				Type:             schema.TypeString,
+				Required:         true,
+				Description:      "Clos topology name",
+				DiffSuppressFunc: suppressAttributeChange,
 			},
 			"topology_name": {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Base topology name",
+				Type:             schema.TypeString,
+				Required:         true,
+				Description:      "Base topology name",
+				DiffSuppressFunc: suppressAttributeChange,
 			},
 			"fabric": {
 				Type:        schema.TypeString,
@@ -68,10 +70,11 @@ func cloudeosClos() *schema.Resource {
 				Default:  false,
 			},
 			"cv_container_name": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     "CloudLeaf",
-				Description: "Container name for leaf",
+				Type:             schema.TypeString,
+				Optional:         true,
+				Default:          "CloudLeaf",
+				Description:      "Container name for leaf",
+				DiffSuppressFunc: suppressAttributeChange,
 			},
 			"tf_id": {
 				Computed: true,

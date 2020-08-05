@@ -28,14 +28,16 @@ func cloudeosWan() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Wan fabric name",
+				Type:             schema.TypeString,
+				Required:         true,
+				Description:      "Wan fabric name",
+				DiffSuppressFunc: suppressAttributeChange,
 			},
 			"topology_name": {
-				Type:        schema.TypeString,
-				Required:    true,
-				Description: "Base topology name",
+				Type:             schema.TypeString,
+				Required:         true,
+				Description:      "Base topology name",
+				DiffSuppressFunc: suppressAttributeChange,
 			},
 			"edge_to_edge_peering": {
 				Type:     schema.TypeBool,
@@ -53,10 +55,11 @@ func cloudeosWan() *schema.Resource {
 				Default:  true,
 			},
 			"cv_container_name": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Container name for edge",
-				Default:     "CloudEdge",
+				Type:             schema.TypeString,
+				Optional:         true,
+				Description:      "Container name for edge",
+				Default:          "CloudEdge",
+				DiffSuppressFunc: suppressAttributeChange,
 			},
 			"tf_id": {
 				Computed: true,
