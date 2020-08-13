@@ -124,6 +124,12 @@ func cloudeosRouterConfig() *schema.Resource {
 				ForceNew:    true,
 			},
 			"peerroutetableid1": {
+				Type:       schema.TypeList,
+				Computed:   true,
+				Elem:       &schema.Schema{Type: schema.TypeString},
+				Deprecated: "This attribute is deprecated, use peer_routetable_id",
+			},
+			"peer_routetable_id": {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},

@@ -50,3 +50,16 @@ resource "cloudeos_router_config" "cloudeos" {
 * `intf_name` - (Required) List of interface names.
 * `intf_private_ip` - (Required) List of interface private IPs.
 * `intf_type` - (Required) List of Interface type (public, private, internal).
+
+## Attributes Reference
+
+In addition to Arguments listed above - the following Attributes are exported
+
+* `ID` - The ID of cloudeos_config Resource.
+* `bootstrap_cfg` - Bootstrap configuration for the CloudEOS router.
+* `peer_routetable_id` - Router table ID of peer.
+
+## Timeouts
+
+* `create` - (Default of 5 minute) Used when creating the cloudeos_config Resource.
+* `delete` - (Defaults to 10 minutes) Used when deleting the cloudeos_config Resource.

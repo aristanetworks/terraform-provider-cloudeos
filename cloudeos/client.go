@@ -477,6 +477,11 @@ func (p *CloudeosProvider) GetVpc(d *schema.ResourceData) error {
 										if err != nil {
 											return err
 										}
+										err = d.Set("peer_vpc_cidr", peer[k])
+										if err != nil {
+											return err
+										}
+
 									}
 								}
 							} else if strings.EqualFold(k, "peer_vpc_info") {
@@ -1820,6 +1825,9 @@ func parseRtrResponse(rtr map[string]interface{}, d *schema.ResourceData) error 
 
 	if err := d.Set("ha_rtr_id", haRtrID); err != nil {
 		return fmt.Errorf("Not able to set ha_rtr_id: %v", err)
+	}
+	if err := d.Set("peer_routetable_id", peerRtTblID); err != nil {
+		return fmt.Errorf("Not able to set peer route table ID: %v ", err)
 	}
 	if err := d.Set("peerroutetableid1", peerRtTblID); err != nil {
 		return fmt.Errorf("Not able to set peer route table ID: %v ", err)

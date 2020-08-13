@@ -163,3 +163,13 @@ resource "cloudeos_router_status" "cloudeos" {
 * `cnps` - (Optional) Cloud Network Private Segments ( VRF name )
 * `region` - (Required) Region of deployment.
 * `is_rr` - (Optional) true if this CloudEOS acts as a Route Reflector.
+
+## Attributes Reference
+
+In addition to Arguments listed above - the following Attributes are exported
+
+* `ID` - The ID of cloudeos_status Resource.
+
+## Timeouts
+
+* `delete` - (Defaults to 10 minutes) Used when deleting the cloudeos_status Resource.

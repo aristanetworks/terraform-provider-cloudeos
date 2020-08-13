@@ -112,6 +112,12 @@ func cloudeosVpcConfig() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 			"peervpcidr": {
+				Type:       schema.TypeString,
+				Computed:   true,
+				Elem:       &schema.Schema{Type: schema.TypeString},
+				Deprecated: "This attribute is deprecated, use peer_vpc_cidr",
+			},
+			"peer_vpc_cidr": {
 				Type:     schema.TypeString,
 				Computed: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},

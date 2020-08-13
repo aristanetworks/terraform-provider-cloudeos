@@ -36,3 +36,13 @@ resource "cloudeos_topology" "topology" {
     Every CloudEOS Router needs a unique TerminAttr local IP.
 * `dps_controlplane_cidr` - (Required) Each CloudEOS router needs a unique IP for Dynamic Path Selection.
 * `eos_managed` - (Optional) List of CloudEOS devices already deployed.
+
+## Attributes Reference
+
+In addition to the Arguments listed above - the following Attributes are exported:
+
+* `ID` - The ID of the Topology Resource.
+
+## Timeouts
+
+* `delete` - (Defaults to 5 minutes) Used when deleting the Topology Resource.

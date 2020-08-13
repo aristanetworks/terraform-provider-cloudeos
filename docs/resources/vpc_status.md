@@ -164,3 +164,13 @@ resource "cloudeos_vpc_status" "vpc" {
 * `resource_group` - (Optional) Azure resource group.
 * `role` - (Required) VPC role, CloudEdge/CloudLeaf.
 * `account` - (Required) The unique identifier of the account.
+
+## Attributes Reference
+
+In addition to Arguments listed above - the following Attributes are exported
+
+* `ID` - The ID of vpc_status Resource.
+
+## Timeouts
+
+* `delete` - (Defaults to 5 minutes) Used when deleting the vpc_status Resource.

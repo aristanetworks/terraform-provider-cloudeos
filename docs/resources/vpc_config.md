@@ -51,3 +51,24 @@ resource "cloudeos_vpc_config" "vpc" {
 * `vnet_name` - (Optional) VNET name, only valid for Azure.
 * `role` - (Required) CloudEdge or CloudLeaf.
 * `tags` - (Optional) A mapping of tags to assign to the resource.
+
+## Attributes Reference
+
+In addition to Arguments listed above - the following Attributes are exported
+
+* `ID` - The ID of vpc_config Resource.
+
+A CloudLeaf VPC peers with the CloudEdge VPC to enables communcation between instances in either VPC.
+CloudEOS across two peer VPC can communicate with each other as if they are within the same network.
+The following Attributes are exported in CloudLeaf VPC that gives information about the peer CloudEdge VPC
+
+* `peer_vpc_id` - ID of the peer CloudEdge VPC, only valid for AWS.
+* `peer_vpc_cidr` - CIDR of the peer CloudEdge VPC, only valid for AWS.
+* `peer_vnet_id` - ID of the peer CloudEdge VNET, only valid for Azure.
+* `peer_rg_name` - Resource Group name of the peer CloudEdge, only valid for Azure.
+* `peer_vnet_name` - VNET name of the peer CloudEdge, only valid for Azure.
+
+## Timeouts
+
+* `create` - (Default of 3 minute) Used when creating the vpc_config Resource.
+* `delete` - (Defaults to 5 minutes) Used when deleting the vpc_config Resource.

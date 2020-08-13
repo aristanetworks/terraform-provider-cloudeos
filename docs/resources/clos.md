@@ -38,3 +38,13 @@ resource "cloudeos_clos" "clos" {
 * `leaf_to_edge_peering` - (Optional) Leaf to edge VPC peering, default is `true`.
 * `leaf_to_edge_igw` - (Optional) Leaf to edge VPC connection through Internet Gateway, default is `false`.
 * `leaf_encryption` - (Optional) Support encryption using Ipsec between Leaf and Edge. Default is `false`.
+
+## Attributes Reference
+
+In addition to the Arguments listed above - the following Attributes are exported
+
+* `ID` - The ID of the Clos Resource.
+
+## Timeouts
+
+* `delete` - (Defaults to 5 minutes) Used when deleting the Clos Resource.

@@ -35,3 +35,12 @@ resource "cloudeos_wan" "wan" {
 * `edge_to_edge_dedicated_connect` - (Optional) Dedicated connection between two Edge VPC,
     default is false. ( Not Supported yet )
 
+## Attributes Reference
+
+In addition to the Arguments listed above - the following Attributes are exported
+
+* `ID` - The ID of the Wan Resource.
+
+## Timeouts
+
+* `delete` - (Defaults to 5 minutes) Used when deleting the Wan Resource.

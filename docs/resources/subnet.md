@@ -84,3 +84,9 @@ resource "cloudeos_subnet" "subnet" {
 * `subnet_id` - (Required) ID of subnet deployed in AWS/Azure.
 * `cidr_block` - (Required) CIDR of the subnet.
 * `subnet_name` - (Required) Name of the subnet.
+
+## Attributes Reference
+
+In addition to the Arguments listed above - the following Attributes are exported:
+
+* `ID` - The ID of the Subnet Resource.
