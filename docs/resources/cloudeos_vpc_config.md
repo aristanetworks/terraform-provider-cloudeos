@@ -1,8 +1,7 @@
 # vpc_config Resource
 
-VPC resource provides info to CVaaS related to AWS VPC (Azure resource group) in which
-CloudEOS gets deployed. AWS vpc and Azure resource_group depend on vpc_config to obtain
-attributes necessary for VPC creation.
+The `vpc_config` resource provides information about the AWS VPC and Azure Resource Group which is being deployed, to CVaaS. 
+CVaaS returns the information required by the Leaf VPC/VNETs to create a Peering connection with its corresponding Edge.
 
 ## Example Usage
 
@@ -45,8 +44,8 @@ resource "cloudeos_vpc_config" "vpc" {
 ## Argument Reference
 
 * `topology_name` - (Required) Name of topology resource.
-* `clos_name` - (Optional) Clos Name this VPC refers to for attributes.
-* `wan_name` - (Optional) Wan Name this VPC refers to for attributes.
+* `clos_name` - (Optional) CLOS Name this VPC refers to for attributes.
+* `wan_name` - (Optional) WAN Name this VPC refers to for attributes.
 * `rg_name` - (Optional) Resource group name, only valid for Azure.
 * `vnet_name` - (Optional) VNET name, only valid for Azure.
 * `role` - (Required) CloudEdge or CloudLeaf.
@@ -56,15 +55,14 @@ resource "cloudeos_vpc_config" "vpc" {
 
 In addition to Arguments listed above - the following Attributes are exported
 
-* `ID` - The ID of vpc_config Resource.
+* `ID` - The ID of cloudeos_vpc_config Resource.
 
-A CloudLeaf VPC peers with the CloudEdge VPC to enables communcation between instances in either VPC.
-CloudEOS across two peer VPC can communicate with each other as if they are within the same network.
-The following Attributes are exported in CloudLeaf VPC that gives information about the peer CloudEdge VPC
+A CloudLeaf VPC peers with the CloudEdge VPC to enable communication between instances between them.
+The following Attributes are exported in CloudLeaf VPC that provides information about the peer CloudEdge VPC.
 
-* `peer_vpc_id` - ID of the peer CloudEdge VPC, only valid for AWS.
-* `peer_vpc_cidr` - CIDR of the peer CloudEdge VPC, only valid for AWS.
-* `peer_vnet_id` - ID of the peer CloudEdge VNET, only valid for Azure.
+* `peer_vpc_id` - ID of the CloudEdge peer VPC, only valid for AWS.
+* `peer_vpc_cidr` - CIDR of the CloudEdge peer VPC, only valid for AWS.
+* `peer_vnet_id` - ID of the CloudEdge peer VNET, only valid for Azure.
 * `peer_rg_name` - Resource Group name of the peer CloudEdge, only valid for Azure.
 * `peer_vnet_name` - VNET name of the peer CloudEdge, only valid for Azure.
 

@@ -39,7 +39,7 @@ resource "cloudeos_wan" "wan" {
 
 In addition to the Arguments listed above - the following Attributes are exported
 
-* `ID` - The ID of the Wan Resource.
+* `ID` - The ID of the cloudeos_wan resource.
 
 ## Timeouts
 

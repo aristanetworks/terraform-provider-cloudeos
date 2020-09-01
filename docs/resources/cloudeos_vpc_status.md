@@ -1,7 +1,6 @@
 # vpc_status Resource
 
-VPC resource provides AWS VPC (Azure resource group) deployment info to CVaaS.
-It depends on AWS vpc and Azure resource_group.
+The `vpc_status` resource provides AWS VPC or Azure Resource Group/VNET deployment info to CVaaS.
 
 ## Example Usage
 
@@ -148,28 +147,27 @@ resource "cloudeos_vpc_status" "vpc" {
 
 ## Argument Reference
 
-* `cloud_provider` - (Required) aws/azure.
-* `cnps` - (Required) Cloud Network Private Segments Name.
-* `region` - (Required) Region of deployment.
-* `rg_name` - (Optional) Resource group name, only valid for Azure.
-* `vnet_name` - (Optional) VNET name, only valid for Azure.
-* `vpc_id` - (Required) VPC ID, this is equiv to vnet_id in Azure.
+* `cloud_provider` - (Required) The Cloud Provider in which the VPC/VNET is deployed.
+* `cnps` - (Required) Cloud Network Private Segments Name. ( VRF Name )
 * `topology_name` - (Required) Name of topology resource.
-* `clos_name` - (Optional) Clos Name this VPC refers to for attributes.
-* `wan_name` - (Optional) Wan Name this VPC refers to for attributes.
+* `region` - (Required) Region of deployment.
+* `vpc_id` - (Required) VPC ID, this is equiv to vnet_id in Azure.
 * `role` - (Required) CloudEdge or CloudLeaf.
-* `tags` - (Optional) A mapping of tags to assign to the resource.
-* `cidr_block` - (Optional) CIDR Block for VPC.
-* `igw`- (Optional) Internet gateway id.
-* `resource_group` - (Optional) Azure resource group.
 * `role` - (Required) VPC role, CloudEdge/CloudLeaf.
 * `account` - (Required) The unique identifier of the account.
+* `rg_name` - (Optional) Resource group name, only valid for Azure.
+* `vnet_name` - (Optional) VNET name, only valid for Azure.
+* `clos_name` - (Optional) Clos Name this VPC refers to for attributes.
+* `wan_name` - (Optional) Wan Name this VPC refers to for attributes.
+* `tags` - (Optional) A mapping of tags to assign to the resource.
+* `cidr_block` - (Optional) CIDR Block for VPC.
+* `igw`- (Optional) Internet gateway id, only valid for AWS.
 
 ## Attributes Reference
 
 In addition to Arguments listed above - the following Attributes are exported
 
-* `ID` - The ID of vpc_status Resource.
+* `ID` - The ID of cloudeos_vpc_status Resource.
 
 ## Timeouts
 

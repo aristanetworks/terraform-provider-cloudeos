@@ -10,7 +10,10 @@ For example, a deployment which spans across 2 AWS regions ( us-east-1 and us-we
 and 1 Azure region ( westus2 ) will need the user to create 1 `cloudeos_topology` resource,
 1 `cloudeos_wan` resource and 3 `cloudeos_clos` resource.
 
-##### Note: Two `cloudeos_topology` with the same topology_name cannot be created.
+The `cloudeos_topology` resource created above is then referenced by other `CloudEOS` resources to associate with
+a given topology.
+
+#### Note: Two `cloudeos_topology` with the same topology_name cannot be created.
 
 ## Example Usage
 
@@ -41,7 +44,7 @@ resource "cloudeos_topology" "topology" {
 
 In addition to the Arguments listed above - the following Attributes are exported:
 
-* `ID` - The ID of the Topology Resource.
+* `ID` - The ID of the cloudeos_topology Resource.
 
 ## Timeouts
 

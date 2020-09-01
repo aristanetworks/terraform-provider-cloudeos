@@ -1,15 +1,15 @@
 # `cloudeos_clos`
 
-`cloudeos_clos` is a dependent on the `cloudeos_topology` resource and is used to provide attributes
+The `cloudeos_clos` resource is dependent on the `cloudeos_topology` resource and is used to provide attributes
 for the underlay and overlay connectivity for inter-vpc communication in the same region.
 A `cloudeos_topology` can consist of multiple `cloudeos_clos` resources dependent on the number of
-Leaf-Edge CLOS networks there are across multiple regions or Cloud Providers.
+Leaf-Edge CLOS networks there in a network spanning multiple regions.
 
-For example, if the customer has 2 AWS regions ( us-east-1 and us-west-1) and 1 Azure region
-( westus2 ) in which they want to deploy this CloudEOS network. You would have to create
-3 `cloudeos_clos` resources, one each of the CLOS networks in that region.
+For example, if the customer has two AWS regions ( us-east-1 and us-west-1) and one Azure region
+( westus2 ) that they want to deploy. You would have to create three `cloudeos_clos` resources, 
+one each for the CLOS network in that region.
 
-To refer to attributes defined in Clos resource, leaf VPC and leaf CloudEOS use
+To refer to attributes defined in the clos resource; leaf VPC and leaf CloudEOS use
 the clos name in their resource definition.
 
 ## Example Usage
@@ -31,8 +31,8 @@ resource "cloudeos_clos" "clos" {
 
 ## Argument Reference
 
-* `name` - (Required) Clos resource name.
-* `topology_name` - (Required) Topology name this clos resource depends on.
+* `name` - (Required) CLOS resource name.
+* `topology_name` - (Required) Topology name that this clos resource depends on.
 * `cv_container_name` - (Required) CVaaS Container Name to which the CloudLeaf Routers will be added to.
 * `fabric` - (Optional) full_mesh or hub_spoke, default value is `hub_spoke`.
 * `leaf_to_edge_peering` - (Optional) Leaf to edge VPC peering, default is `true`.
@@ -43,8 +43,8 @@ resource "cloudeos_clos" "clos" {
 
 In addition to the Arguments listed above - the following Attributes are exported
 
-* `ID` - The ID of the Clos Resource.
+* `ID` - The ID of the cloudeos_clos Resource.
 
 ## Timeouts
 
-* `delete` - (Defaults to 5 minutes) Used when deleting the Clos Resource.
+* `delete` - (Defaults to 5 minutes) Used when deleting the CLOS Resource.

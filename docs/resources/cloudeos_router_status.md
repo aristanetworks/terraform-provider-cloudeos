@@ -1,6 +1,6 @@
 # cloudeos_router_status
 
-cloudeos_router_status sends information about the deployed CloudEOS router to CVaaS.
+The `cloudeos_router_status` resource sends information about the deployed CloudEOS router to CVaaS.
 
 ## Example Usage
 
@@ -147,7 +147,8 @@ resource "cloudeos_router_status" "cloudeos" {
 * `intf_private_ip` - (Required) List of private IPs attached to the interfaces.
 * `intf_subnet_id` - (Required) List of subnet IDs of interfaces.
 * `intf_type` - (Required) List of interface types. Values supported : public, internal, private.
-* `cv_container` - (Optional) Container in CVaaS the router will be added to.
+* `region` - (Required) Region of deployment.
+* `cv_container` - (Optional) Container in CVaaS to which the router will be added to.
 * `vpc_id` - (Optional) VPC/VNET ID of the VPC in which the CloudEOS is deployed in.
 * `rg_name` - (Optional) Resource group name, only for Azure.
 * `rg_location` - (Optional) Resource group location, only for Azure.
@@ -161,14 +162,13 @@ resource "cloudeos_router_status" "cloudeos" {
 * `public_rt_table_ids` - (Optional) List of public route table IDs.
 * `ha_name` - (Optional) Cloud HA pair name.
 * `cnps` - (Optional) Cloud Network Private Segments ( VRF name )
-* `region` - (Required) Region of deployment.
 * `is_rr` - (Optional) true if this CloudEOS acts as a Route Reflector.
 
 ## Attributes Reference
 
 In addition to Arguments listed above - the following Attributes are exported
 
-* `ID` - The ID of cloudeos_status Resource.
+* `ID` - The ID of cloudeos_router_status Resource.
 
 ## Timeouts
 
