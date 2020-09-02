@@ -6,9 +6,9 @@ cloud providers and regions. The solution deploys the network fabric using BGP-E
 To get the desired parameters and requirements from the user about this fabric we have the following
 resources: `cloudeos_topology`, `cloudeos_clos` and `cloudeos_wan`.
 
-For example, a deployment which spans across 2 AWS regions ( us-east-1 and us-west-1 )
-and 1 Azure region ( westus2 ) will need the user to create 1 `cloudeos_topology` resource,
-1 `cloudeos_wan` resource and 3 `cloudeos_clos` resource.
+For example, a deployment which spans across two AWS regions ( us-east-1 and us-west-1 )
+and one Azure region ( westus2 ) will need the user to create: one `cloudeos_topology` resource,
+one `cloudeos_wan` resource and three `cloudeos_clos` resource.
 
 The `cloudeos_topology` resource created above is then referenced by other `CloudEOS` resources to associate with
 a given topology.

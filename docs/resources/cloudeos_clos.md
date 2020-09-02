@@ -1,13 +1,12 @@
 # `cloudeos_clos`
 
 The `cloudeos_clos` resource is dependent on the `cloudeos_topology` resource and is used to provide attributes
-for the underlay and overlay connectivity for inter-vpc communication in the same region.
+for the underlay and overlay connectivity for inter-vpc communication between Leaf and Edge routers in the same region.
 A `cloudeos_topology` can consist of multiple `cloudeos_clos` resources dependent on the number of
 Leaf-Edge CLOS networks there in a network spanning multiple regions.
 
-For example, if the customer has two AWS regions ( us-east-1 and us-west-1) and one Azure region
-( westus2 ) that they want to deploy. You would have to create three `cloudeos_clos` resources, 
-one each for the CLOS network in that region.
+For example, if you want to deploy a Leaf-Spine topology in two AWS regions ( us-east-1 and us-west-1) and one Azure region
+( westus2 ). You would have to create three `cloudeos_clos` resources, one each for the CLOS network in that region.
 
 To refer to attributes defined in the clos resource; leaf VPC and leaf CloudEOS use
 the clos name in their resource definition.
@@ -47,4 +46,4 @@ In addition to the Arguments listed above - the following Attributes are exporte
 
 ## Timeouts
 
-* `delete` - (Defaults to 5 minutes) Used when deleting the CLOS Resource.
+* `delete` - (Defaults to 5 minutes) Used when deleting the cloudeos_clos Resource.

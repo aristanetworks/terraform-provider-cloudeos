@@ -1,6 +1,6 @@
-# vpc_config Resource
+# cloudeos_vpc_config Resource
 
-The `vpc_config` resource provides information about the AWS VPC and Azure Resource Group which is being deployed, to CVaaS. 
+The `cloudeos_vpc_config` resource provides information about the AWS VPC and Azure Resource Group which is being deployed, to CVaaS.
 CVaaS returns the information required by the Leaf VPC/VNETs to create a Peering connection with its corresponding Edge.
 
 ## Example Usage
@@ -68,5 +68,5 @@ The following Attributes are exported in CloudLeaf VPC that provides information
 
 ## Timeouts
 
-* `create` - (Default of 3 minute) Used when creating the vpc_config Resource.
-* `delete` - (Defaults to 5 minutes) Used when deleting the vpc_config Resource.
+* `create` - (Default of 3 minute) Used when creating the cloudeos_vpc_config Resource.
+* `delete` - (Defaults to 5 minutes) Used when deleting the cloudeos_vpc_config Resource.

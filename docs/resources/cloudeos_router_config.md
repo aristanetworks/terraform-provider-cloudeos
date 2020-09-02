@@ -1,8 +1,8 @@
 # cloudeos_router_config
 
-The `cloudeos_config` resource sends CloudEOS router deployment information to CVaaS to obtain the bootstrap config
-with which the router will be deployed with. The bootstrap configuration is used by the CloudEOS Router
-to start streaming TerminAttr to CVaaS and provision itself to a container. 
+The `cloudeos_router_config` resource sends CloudEOS router deployment information to CVaaS to obtain the bootstrap config
+with which the router will be deployed. The bootstrap configuration is used by the CloudEOS Router
+to start streaming to CVaaS using TerminAttr, and provision to a CVaaS container.
 A CloudEOS router can act as Route Reflector, an edge router or a leaf router.
 
 ## Example Usage
@@ -37,14 +37,14 @@ resource "cloudeos_router_config" "cloudeos" {
 ## Argument Reference
 
 * `cloud_provider` - (Required) Cloud Provider for this deployment. Supports only aws or azure.
-* `vpc_id` - (Required) VPC ID in which this CloudEOS is deployed.
+* `vpc_id` - (Required) VPC/VNET ID in which this CloudEOS is deployed.
 * `region` - (Required) Region of deployment.
-* `topology_name` - (Required) Name of the topology in which this CloudEOS the router will de deployed in.
+* `topology_name` - (Required) Name of the topology in which this CloudEOS router is deployed in.
 * `intf_name` - (Required) List of interface names.
 * `intf_private_ip` - (Required) List of interface private IPs. Currently, only supports 1 IP address per interface.
-* `intf_type` - (Required) List of Interface type (public, private, internal). A `public` interface has a public IP 
-                 associated with it. An `internal` interface is the interface which connects the Leaf and Edge routers. 
-                 And a `private` interface is one which is the default GW interface for all host traffic. 
+* `intf_type` - (Required) List of Interface type (public, private, internal). A `public` interface has a public IP
+                 associated with it. An `internal` interface is the interface which connects the Leaf and Edge routers.
+                 And a `private` interface is the default GW interface for all host traffic.
 * `cnps` - (Optional) Cloud Network Private Segments Name. ( VRF name )
 * `tags` - (Optional) A mapping of tags to assign to the resource.
 * `role` - (Optional) CloudEdge or CloudLeaf (Same as VPC role).

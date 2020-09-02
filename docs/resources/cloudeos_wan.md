@@ -1,8 +1,15 @@
 # cloudeos_wan
 
 The `cloudeos_wan` resource is used to provide attributes for the underlay and overlay connectivity
-amongst Edges and Route Reflectors. To refer to attributes defined in Wan resource, Edge VPC and edge CloudEOS use
-the wan name in their resource definition.
+amongst Edges and Route Reflectors which are part of single WAN Network. In a traditional network topology,
+a WAN Network includes multiple site/branch/cloud Edges connected through Ipsec VPN and/or private connects.
+Similarly here, we have extended that concept which allows you to connect multiple clouds and regions
+in a single WAN fabric.
+
+The Edge/RR VPC and Edge CloudEOS router associate with a WAN using its `name`.
+It is also possible to create multiple isolated WAN fabrics by creating multiple `cloudeos_wan` resources
+and then associating the WAN name to the corresponding resource.
+
 
 ## Example Usage
 

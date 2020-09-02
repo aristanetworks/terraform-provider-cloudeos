@@ -1,6 +1,6 @@
-# vpc_status Resource
+# cloudeos_vpc_status Resource
 
-The `vpc_status` resource provides AWS VPC or Azure Resource Group/VNET deployment info to CVaaS.
+The `cloudeos_vpc_status` resource provides AWS VPC or Azure Resource Group/VNET deployment information to CVaaS.
 
 ## Example Usage
 
@@ -171,4 +171,4 @@ In addition to Arguments listed above - the following Attributes are exported
 
 ## Timeouts
 
-* `delete` - (Defaults to 5 minutes) Used when deleting the vpc_status Resource.
+* `delete` - (Defaults to 5 minutes) Used when deleting the cloudeos_vpc_status Resource.
