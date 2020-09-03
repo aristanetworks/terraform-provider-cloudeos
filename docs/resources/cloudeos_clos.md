@@ -2,14 +2,14 @@
 
 The `cloudeos_clos` resource is dependent on the `cloudeos_topology` resource and is used to provide attributes
 for the underlay and overlay connectivity for inter-vpc communication between Leaf and Edge routers in the same region.
-A `cloudeos_topology` can consist of multiple `cloudeos_clos` resources dependent on the number of
-Leaf-Edge CLOS networks there in a network spanning multiple regions.
+A `cloudeos_topology` can have multiple `cloudeos_clos` resources, depending on the number of
+Leaf-Edge CLOS networks in the entire network topology.
 
-For example, if you want to deploy a Leaf-Spine topology in two AWS regions ( us-east-1 and us-west-1) and one Azure region
+For example, if you want to deploy a Leaf-Edge topology in two AWS regions ( us-east-1 and us-west-1) and one in an Azure region
 ( westus2 ). You would have to create three `cloudeos_clos` resources, one each for the CLOS network in that region.
 
-To refer to attributes defined in the clos resource; leaf VPC and leaf CloudEOS use
-the clos name in their resource definition.
+To refer to attributes defined in the CLOS resource, leaf VPC and leaf CloudEOS use
+the `cloudeos_clos` name in their resource definition.
 
 ## Example Usage
 
@@ -32,7 +32,7 @@ resource "cloudeos_clos" "clos" {
 
 * `name` - (Required) CLOS resource name.
 * `topology_name` - (Required) Topology name that this clos resource depends on.
-* `cv_container_name` - (Required) CVaaS Container Name to which the CloudLeaf Routers will be added to.
+* `cv_container_name` - (Required) CVaaS Configlet Container Name to which the CloudLeaf Routers will be added to.
 * `fabric` - (Optional) full_mesh or hub_spoke, default value is `hub_spoke`.
 * `leaf_to_edge_peering` - (Optional) Leaf to edge VPC peering, default is `true`.
 * `leaf_to_edge_igw` - (Optional) Leaf to edge VPC connection through Internet Gateway, default is `false`.

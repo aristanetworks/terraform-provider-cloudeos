@@ -1,6 +1,6 @@
 # cloudeos_router_status
 
-The `cloudeos_router_status` resource is created after a CloudEOS router has been deployed. It sends all the information
+The `cloudeos_router_status` resource should be created after a CloudEOS router has been deployed. It sends all the information
 about the deployed CloudEOS router to CVaaS. Unlike `cloudeos_router_config` which takes minimal input about how the
 CloudEOS router should be deployed, `cloudeos_router_status` provides detailed deployment information after the router
 is deployed.

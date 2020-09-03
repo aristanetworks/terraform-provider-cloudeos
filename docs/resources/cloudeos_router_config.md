@@ -1,9 +1,8 @@
 # cloudeos_router_config
 
-The `cloudeos_router_config` resource sends CloudEOS router deployment information to CVaaS to obtain the bootstrap config
-with which the router will be deployed. The bootstrap configuration is used by the CloudEOS Router
-to start streaming to CVaaS using TerminAttr, and provision to a CVaaS container.
-A CloudEOS router can act as Route Reflector, an edge router or a leaf router.
+The `cloudeos_router_config` resource should be created before the CloudEOS Router is deployed. It sends deployment
+information to CVaaS, which returns the bootstrap configuration with which the router
+will be deployed. After the CloudEOS Router boots up, it will start streaming to CVaaS and register itself.
 
 ## Example Usage
 
