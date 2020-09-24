@@ -106,6 +106,21 @@ func cloudeosVpcConfig() *schema.Resource {
 					return
 				},
 			},
+			"topology_id": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "cloudeos_topology resource ID",
+			},
+			"wan_id": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "cloudeos_wan resource ID",
+			},
+			"clos_id": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "cloudeos_clos resource ID",
+			},
 			"peer_vpc_id": {
 				Type:     schema.TypeString,
 				Computed: true,
