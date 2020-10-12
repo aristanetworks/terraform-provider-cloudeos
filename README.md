@@ -43,21 +43,3 @@ provider "cloudeos" {
 
 ## Resources
 Documentation for the resources supported by the CloudEOS Provider can be found in the [resources](https://github.com/aristanetworks/terraform-provider-cloudeos/tree/master/docs/resources) folder.
-
-## Limitations and Caveats
-
-### v0.1.0
-* The `cloudeos_topology, cloudeos_clos and cloudeos_wan` resources do not support updates. These resources cannot be
-  changed after the other cloudeos resources have been deployed.
-* A CloudLeaf VPC and Router should only be deployed after a CloudEdge VPC and Router have been deployed.
-  Without a deployed CloudEdge router, CloudLeaf routers cannot stream to CVaaS.
-* A CloudEdge should only be destroyed after all the corresponding CloudLeafs have been destroyed.
-* The VPC `cidr_block` cannot be changed after the VPC is deployed. You will have to delete the VPC and redeploy
-  again.
-* Before deploying the CloudEOS router, the Configlet Container must be manually created on CVaaS.
-* CloudEOS Route Reflector Routers ( with `is_rr = true` ) can only be deployed in a single VPC.
-* CloudEOS Route Reflector should be deployed in the same VPC as one of the CloudEOS Edge Routers. If you want the
-  Route Reflectors to be in its own VPC, create a new `cloudeos_clos` resource and associate the `cloudeos_vpc_config`
-  resource with the `cloudeos_clos` name.
-* The `cnps` attribute for the `cloudeos_vpc_config` doesn't support updates.
-  To update `cnps` you will have to redeploy the resource.

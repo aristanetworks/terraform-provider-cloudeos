@@ -1,4 +1,4 @@
-# cloudeos_vpc_config Resource
+# cloudeos_vpc_config
 
 The `cloudeos_vpc_config` resource sends the deployment information about the AWS VPC and Azure VNET to CVaaS.
 CVaaS returns the peering information required by the Leaf VPC/VNETs to create a VPC/VNET Peering connection with its
