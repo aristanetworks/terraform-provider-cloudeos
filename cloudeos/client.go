@@ -10,8 +10,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"strings"
+	"time"
 
 	api "github.com/terraform-providers/terraform-provider-cloudeos/cloudeos/internal/api"
 
@@ -29,6 +31,9 @@ const (
 	RtrPrefix    = "ar-rtr"
 	AwsVpnPrefix = "ar-aws-vpn"
 )
+
+// Retry attempts for wss connect
+const CVaaSRetryCount = 5
 
 //CloudeosProvider configuration
 type CloudeosProvider struct {
@@ -54,29 +59,61 @@ func aristaCvaasClient(server string, webToken string) (*Client, error) {
 	req.Header.Set("Authorization", "Bearer "+webToken)
 	req.URL = &u
 
-	log.Printf("Connecting to : %s", u.String())
-
 	var dialer = websocket.DefaultDialer
 	dialer.TLSClientConfig = &tls.Config{}
-	ws, resp, err := dialer.Dial(u.String(), req.Header)
-	if err != nil {
-		log.Printf("Failed connecting to CVaaS. Websocket dial failed: %v", err)
-		return nil, fmt.Errorf("Failed connecting to CVaaS, error : %v", err)
+
+	var respStatus string
+	var connectErr error
+	var backoffPeriod time.Duration = 4
+	for i := 1; i <= CVaaSRetryCount; i++ {
+		log.Printf("Connecting to : %s Attempt %d", u.String(), i)
+
+		ws, resp, err := dialer.Dial(u.String(), req.Header)
+		if err == nil {
+			log.Printf("Created websocket client :%v", resp)
+			defer resp.Body.Close()
+
+			client := &Client{
+				wrpcClient: ws,
+			}
+			return client, nil
+		}
+		// If the APIServer sends back an HTTP response with status != 101
+		// (Websocket Upgrade request rejected), check if it's an authorization
+		// issue and then fail. For any other err, log the HTTP response if
+		// possible and retry with an increasing backoff
+		if err == websocket.ErrBadHandshake {
+			log.Printf("Failed connecting to CVaaS. Websocket dial failed: %v", err)
+
+			if resp.StatusCode == http.StatusUnauthorized {
+				return nil, fmt.Errorf("Failed connecting to CVaaS, error : %v Status : %s",
+					err, resp.Status)
+			}
+			respStatus = resp.Status
+			connectErr = err
+
+			responseDump, err := httputil.DumpResponse(resp, true)
+			if err == nil {
+				log.Printf("CVaaS response: %q", responseDump)
+			}
+
+		} else {
+			log.Printf("Failed connecting to CVaas, error : %v", err)
+			connectErr = err
+		}
+
+		log.Printf("Retrying connection to CVaaS in %d seconds", backoffPeriod)
+		time.Sleep(backoffPeriod * time.Second)
+		backoffPeriod = backoffPeriod * 2
 	}
 
-	if resp.StatusCode != http.StatusSwitchingProtocols {
-		return nil, fmt.Errorf("Failed connecting to CVaaS, unexpected http response: %v",
-			resp.StatusCode)
+	// All retry attempts have failed
+	if respStatus != "" {
+		return nil, fmt.Errorf("Failed connecting to CVaaS, error : %v Status : %s",
+			connectErr, respStatus)
 	}
+	return nil, fmt.Errorf("Failed connecting to CVaaS, error : %v", connectErr)
 
-	log.Printf("Created websocket client :%v", resp)
-
-	defer resp.Body.Close()
-	client := &Client{
-		wrpcClient: ws,
-	}
-
-	return client, nil
 }
 
 func (c *Client) wrpcSend(request *wrpcRequest) (map[string]interface{}, error) {
