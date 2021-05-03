@@ -9,29 +9,26 @@ package clouddeploy_v1
 
 import (
 	context "context"
-	fmt "fmt"
-	math "math"
+	reflect "reflect"
+	sync "sync"
 
 	time "github.com/terraform-providers/terraform-provider-cloudeos/cloudeos/internal/time"
 
-	proto "github.com/golang/protobuf/proto"
-	timestamp "github.com/golang/protobuf/ptypes/timestamp"
-	field_mask "google.golang.org/genproto/protobuf/field_mask"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	fieldmaskpb "google.golang.org/protobuf/types/known/fieldmaskpb"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 )
 
-// Reference imports to suppress errors if they are not otherwise used.
-var _ = proto.Marshal
-var _ = fmt.Errorf
-var _ = math.Inf
-
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the proto package it is being compiled against.
-// A compilation error at this line likely means your copy of the
-// proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
+const (
+	// Verify that this generated code is sufficiently up-to-date.
+	_ = protoimpl.EnforceVersion(20 - protoimpl.MinVersion)
+	// Verify that runtime/protoimpl is sufficiently up-to-date.
+	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
+)
 
 type CloudProviderType int32
 
@@ -42,26 +39,47 @@ const (
 	CloudProviderType_CP_GCP         CloudProviderType = 3
 )
 
-var CloudProviderType_name = map[int32]string{
-	0: "CP_UNSPECIFIED",
-	1: "CP_AWS",
-	2: "CP_AZURE",
-	3: "CP_GCP",
-}
+// Enum value maps for CloudProviderType.
+var (
+	CloudProviderType_name = map[int32]string{
+		0: "CP_UNSPECIFIED",
+		1: "CP_AWS",
+		2: "CP_AZURE",
+		3: "CP_GCP",
+	}
+	CloudProviderType_value = map[string]int32{
+		"CP_UNSPECIFIED": 0,
+		"CP_AWS":         1,
+		"CP_AZURE":       2,
+		"CP_GCP":         3,
+	}
+)
 
-var CloudProviderType_value = map[string]int32{
-	"CP_UNSPECIFIED": 0,
-	"CP_AWS":         1,
-	"CP_AZURE":       2,
-	"CP_GCP":         3,
+func (x CloudProviderType) Enum() *CloudProviderType {
+	p := new(CloudProviderType)
+	*p = x
+	return p
 }
 
 func (x CloudProviderType) String() string {
-	return proto.EnumName(CloudProviderType_name, int32(x))
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
+func (CloudProviderType) Descriptor() protoreflect.EnumDescriptor {
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes[0].Descriptor()
+}
+
+func (CloudProviderType) Type() protoreflect.EnumType {
+	return &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes[0]
+}
+
+func (x CloudProviderType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use CloudProviderType.Descriptor instead.
 func (CloudProviderType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{0}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{0}
 }
 
 type TopologyType int32
@@ -72,24 +90,45 @@ const (
 	TopologyType_TOPO_WAN         TopologyType = 2
 )
 
-var TopologyType_name = map[int32]string{
-	0: "TOPO_UNSPECIFIED",
-	1: "TOPO_CLOS",
-	2: "TOPO_WAN",
-}
+// Enum value maps for TopologyType.
+var (
+	TopologyType_name = map[int32]string{
+		0: "TOPO_UNSPECIFIED",
+		1: "TOPO_CLOS",
+		2: "TOPO_WAN",
+	}
+	TopologyType_value = map[string]int32{
+		"TOPO_UNSPECIFIED": 0,
+		"TOPO_CLOS":        1,
+		"TOPO_WAN":         2,
+	}
+)
 
-var TopologyType_value = map[string]int32{
-	"TOPO_UNSPECIFIED": 0,
-	"TOPO_CLOS":        1,
-	"TOPO_WAN":         2,
+func (x TopologyType) Enum() *TopologyType {
+	p := new(TopologyType)
+	*p = x
+	return p
 }
 
 func (x TopologyType) String() string {
-	return proto.EnumName(TopologyType_name, int32(x))
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
+func (TopologyType) Descriptor() protoreflect.EnumDescriptor {
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes[1].Descriptor()
+}
+
+func (TopologyType) Type() protoreflect.EnumType {
+	return &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes[1]
+}
+
+func (x TopologyType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use TopologyType.Descriptor instead.
 func (TopologyType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{1}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{1}
 }
 
 type UnderlayConnectionType int32
@@ -101,26 +140,47 @@ const (
 	UnderlayConnectionType_UL_TGW     UnderlayConnectionType = 3
 )
 
-var UnderlayConnectionType_name = map[int32]string{
-	0: "UL_NA",
-	1: "UL_IGW",
-	2: "UL_PEERING",
-	3: "UL_TGW",
-}
+// Enum value maps for UnderlayConnectionType.
+var (
+	UnderlayConnectionType_name = map[int32]string{
+		0: "UL_NA",
+		1: "UL_IGW",
+		2: "UL_PEERING",
+		3: "UL_TGW",
+	}
+	UnderlayConnectionType_value = map[string]int32{
+		"UL_NA":      0,
+		"UL_IGW":     1,
+		"UL_PEERING": 2,
+		"UL_TGW":     3,
+	}
+)
 
-var UnderlayConnectionType_value = map[string]int32{
-	"UL_NA":      0,
-	"UL_IGW":     1,
-	"UL_PEERING": 2,
-	"UL_TGW":     3,
+func (x UnderlayConnectionType) Enum() *UnderlayConnectionType {
+	p := new(UnderlayConnectionType)
+	*p = x
+	return p
 }
 
 func (x UnderlayConnectionType) String() string {
-	return proto.EnumName(UnderlayConnectionType_name, int32(x))
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
+func (UnderlayConnectionType) Descriptor() protoreflect.EnumDescriptor {
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes[2].Descriptor()
+}
+
+func (UnderlayConnectionType) Type() protoreflect.EnumType {
+	return &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes[2]
+}
+
+func (x UnderlayConnectionType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use UnderlayConnectionType.Descriptor instead.
 func (UnderlayConnectionType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{2}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{2}
 }
 
 type OverlayConnectionType int32
@@ -132,26 +192,47 @@ const (
 	OverlayConnectionType_OL_IPSEC OverlayConnectionType = 3
 )
 
-var OverlayConnectionType_name = map[int32]string{
-	0: "OL_NA",
-	1: "OL_DPS",
-	2: "OL_VXLAN",
-	3: "OL_IPSEC",
-}
+// Enum value maps for OverlayConnectionType.
+var (
+	OverlayConnectionType_name = map[int32]string{
+		0: "OL_NA",
+		1: "OL_DPS",
+		2: "OL_VXLAN",
+		3: "OL_IPSEC",
+	}
+	OverlayConnectionType_value = map[string]int32{
+		"OL_NA":    0,
+		"OL_DPS":   1,
+		"OL_VXLAN": 2,
+		"OL_IPSEC": 3,
+	}
+)
 
-var OverlayConnectionType_value = map[string]int32{
-	"OL_NA":    0,
-	"OL_DPS":   1,
-	"OL_VXLAN": 2,
-	"OL_IPSEC": 3,
+func (x OverlayConnectionType) Enum() *OverlayConnectionType {
+	p := new(OverlayConnectionType)
+	*p = x
+	return p
 }
 
 func (x OverlayConnectionType) String() string {
-	return proto.EnumName(OverlayConnectionType_name, int32(x))
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
+func (OverlayConnectionType) Descriptor() protoreflect.EnumDescriptor {
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes[3].Descriptor()
+}
+
+func (OverlayConnectionType) Type() protoreflect.EnumType {
+	return &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes[3]
+}
+
+func (x OverlayConnectionType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use OverlayConnectionType.Descriptor instead.
 func (OverlayConnectionType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{3}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{3}
 }
 
 type RoleType int32
@@ -163,26 +244,47 @@ const (
 	RoleType_ROLE_LEAF        RoleType = 3
 )
 
-var RoleType_name = map[int32]string{
-	0: "ROLE_UNSPECIFIED",
-	1: "ROLE_EDGE",
-	2: "ROLE_SPINE",
-	3: "ROLE_LEAF",
-}
+// Enum value maps for RoleType.
+var (
+	RoleType_name = map[int32]string{
+		0: "ROLE_UNSPECIFIED",
+		1: "ROLE_EDGE",
+		2: "ROLE_SPINE",
+		3: "ROLE_LEAF",
+	}
+	RoleType_value = map[string]int32{
+		"ROLE_UNSPECIFIED": 0,
+		"ROLE_EDGE":        1,
+		"ROLE_SPINE":       2,
+		"ROLE_LEAF":        3,
+	}
+)
 
-var RoleType_value = map[string]int32{
-	"ROLE_UNSPECIFIED": 0,
-	"ROLE_EDGE":        1,
-	"ROLE_SPINE":       2,
-	"ROLE_LEAF":        3,
+func (x RoleType) Enum() *RoleType {
+	p := new(RoleType)
+	*p = x
+	return p
 }
 
 func (x RoleType) String() string {
-	return proto.EnumName(RoleType_name, int32(x))
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
+func (RoleType) Descriptor() protoreflect.EnumDescriptor {
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes[4].Descriptor()
+}
+
+func (RoleType) Type() protoreflect.EnumType {
+	return &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes[4]
+}
+
+func (x RoleType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use RoleType.Descriptor instead.
 func (RoleType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{4}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{4}
 }
 
 type DeploymentStatusCode int32
@@ -197,69 +299,111 @@ const (
 	DeploymentStatusCode_DEP_STATUS_ERR         DeploymentStatusCode = 3
 )
 
-var DeploymentStatusCode_name = map[int32]string{
-	0: "DEP_STATUS_UNSPECIFIED",
-	1: "DEP_STATUS_IN_PROGRESS",
-	2: "DEP_STATUS_SUCCESS",
-	3: "DEP_STATUS_ERR",
-}
+// Enum value maps for DeploymentStatusCode.
+var (
+	DeploymentStatusCode_name = map[int32]string{
+		0: "DEP_STATUS_UNSPECIFIED",
+		1: "DEP_STATUS_IN_PROGRESS",
+		2: "DEP_STATUS_SUCCESS",
+		3: "DEP_STATUS_ERR",
+	}
+	DeploymentStatusCode_value = map[string]int32{
+		"DEP_STATUS_UNSPECIFIED": 0,
+		"DEP_STATUS_IN_PROGRESS": 1,
+		"DEP_STATUS_SUCCESS":     2,
+		"DEP_STATUS_ERR":         3,
+	}
+)
 
-var DeploymentStatusCode_value = map[string]int32{
-	"DEP_STATUS_UNSPECIFIED": 0,
-	"DEP_STATUS_IN_PROGRESS": 1,
-	"DEP_STATUS_SUCCESS":     2,
-	"DEP_STATUS_ERR":         3,
+func (x DeploymentStatusCode) Enum() *DeploymentStatusCode {
+	p := new(DeploymentStatusCode)
+	*p = x
+	return p
 }
 
 func (x DeploymentStatusCode) String() string {
-	return proto.EnumName(DeploymentStatusCode_name, int32(x))
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
+func (DeploymentStatusCode) Descriptor() protoreflect.EnumDescriptor {
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes[5].Descriptor()
+}
+
+func (DeploymentStatusCode) Type() protoreflect.EnumType {
+	return &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes[5]
+}
+
+func (x DeploymentStatusCode) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use DeploymentStatusCode.Descriptor instead.
 func (DeploymentStatusCode) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{5}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{5}
 }
 
 type CVStatusCode int32
 
 const (
 	CVStatusCode_CV_STATUS_UNSPECIFIED     CVStatusCode = 0
-	CVStatusCode_CV_STATUS_RTR_CREATED     CVStatusCode = 1
-	CVStatusCode_CV_STATUS_RTR_DISCOVERED  CVStatusCode = 2
-	CVStatusCode_CV_STATUS_RTR_PROVISIONED CVStatusCode = 3
-	CVStatusCode_CV_STATUS_RTR_CONFIG_WIP  CVStatusCode = 4
-	CVStatusCode_CV_STATUS_RTR_READY       CVStatusCode = 5
-	CVStatusCode_CV_STATUS_RTR_FAILED      CVStatusCode = 6
-	CVStatusCode_CV_STATUS_RTR_INACTIVE    CVStatusCode = 7
+	CVStatusCode_CV_STATUS_RTR_CREATED     CVStatusCode = 1 // Rtr object is created. Waiting for router to start streaming
+	CVStatusCode_CV_STATUS_RTR_DISCOVERED  CVStatusCode = 2 // Router is streaming, waiting for router to be provisioned
+	CVStatusCode_CV_STATUS_RTR_PROVISIONED CVStatusCode = 3 // Router is provisioned. It is in the undefined container
+	CVStatusCode_CV_STATUS_RTR_CONFIG_WIP  CVStatusCode = 4 // A config is being applied to the router
+	CVStatusCode_CV_STATUS_RTR_READY       CVStatusCode = 5 // Rtr is ready for futher action/operation
+	CVStatusCode_CV_STATUS_RTR_FAILED      CVStatusCode = 6 // Rtr could not be created
+	CVStatusCode_CV_STATUS_RTR_INACTIVE    CVStatusCode = 7 // Rtr stopped streaming after it is provisioned
 )
 
-var CVStatusCode_name = map[int32]string{
-	0: "CV_STATUS_UNSPECIFIED",
-	1: "CV_STATUS_RTR_CREATED",
-	2: "CV_STATUS_RTR_DISCOVERED",
-	3: "CV_STATUS_RTR_PROVISIONED",
-	4: "CV_STATUS_RTR_CONFIG_WIP",
-	5: "CV_STATUS_RTR_READY",
-	6: "CV_STATUS_RTR_FAILED",
-	7: "CV_STATUS_RTR_INACTIVE",
-}
+// Enum value maps for CVStatusCode.
+var (
+	CVStatusCode_name = map[int32]string{
+		0: "CV_STATUS_UNSPECIFIED",
+		1: "CV_STATUS_RTR_CREATED",
+		2: "CV_STATUS_RTR_DISCOVERED",
+		3: "CV_STATUS_RTR_PROVISIONED",
+		4: "CV_STATUS_RTR_CONFIG_WIP",
+		5: "CV_STATUS_RTR_READY",
+		6: "CV_STATUS_RTR_FAILED",
+		7: "CV_STATUS_RTR_INACTIVE",
+	}
+	CVStatusCode_value = map[string]int32{
+		"CV_STATUS_UNSPECIFIED":     0,
+		"CV_STATUS_RTR_CREATED":     1,
+		"CV_STATUS_RTR_DISCOVERED":  2,
+		"CV_STATUS_RTR_PROVISIONED": 3,
+		"CV_STATUS_RTR_CONFIG_WIP":  4,
+		"CV_STATUS_RTR_READY":       5,
+		"CV_STATUS_RTR_FAILED":      6,
+		"CV_STATUS_RTR_INACTIVE":    7,
+	}
+)
 
-var CVStatusCode_value = map[string]int32{
-	"CV_STATUS_UNSPECIFIED":     0,
-	"CV_STATUS_RTR_CREATED":     1,
-	"CV_STATUS_RTR_DISCOVERED":  2,
-	"CV_STATUS_RTR_PROVISIONED": 3,
-	"CV_STATUS_RTR_CONFIG_WIP":  4,
-	"CV_STATUS_RTR_READY":       5,
-	"CV_STATUS_RTR_FAILED":      6,
-	"CV_STATUS_RTR_INACTIVE":    7,
+func (x CVStatusCode) Enum() *CVStatusCode {
+	p := new(CVStatusCode)
+	*p = x
+	return p
 }
 
 func (x CVStatusCode) String() string {
-	return proto.EnumName(CVStatusCode_name, int32(x))
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
+func (CVStatusCode) Descriptor() protoreflect.EnumDescriptor {
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes[6].Descriptor()
+}
+
+func (CVStatusCode) Type() protoreflect.EnumType {
+	return &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes[6]
+}
+
+func (x CVStatusCode) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use CVStatusCode.Descriptor instead.
 func (CVStatusCode) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{6}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{6}
 }
 
 type DeviceStatusCode int32
@@ -271,26 +415,47 @@ const (
 	DeviceStatusCode_DEVICE_STATUS_ERROR            DeviceStatusCode = 3
 )
 
-var DeviceStatusCode_name = map[int32]string{
-	0: "DEVICE_STATUS_UNSPECIFIED",
-	1: "DEVICE_STATUS_WORK_IN_PROGRESS",
-	2: "DEVICE_STATUS_SUCCESS",
-	3: "DEVICE_STATUS_ERROR",
-}
+// Enum value maps for DeviceStatusCode.
+var (
+	DeviceStatusCode_name = map[int32]string{
+		0: "DEVICE_STATUS_UNSPECIFIED",
+		1: "DEVICE_STATUS_WORK_IN_PROGRESS",
+		2: "DEVICE_STATUS_SUCCESS",
+		3: "DEVICE_STATUS_ERROR",
+	}
+	DeviceStatusCode_value = map[string]int32{
+		"DEVICE_STATUS_UNSPECIFIED":      0,
+		"DEVICE_STATUS_WORK_IN_PROGRESS": 1,
+		"DEVICE_STATUS_SUCCESS":          2,
+		"DEVICE_STATUS_ERROR":            3,
+	}
+)
 
-var DeviceStatusCode_value = map[string]int32{
-	"DEVICE_STATUS_UNSPECIFIED":      0,
-	"DEVICE_STATUS_WORK_IN_PROGRESS": 1,
-	"DEVICE_STATUS_SUCCESS":          2,
-	"DEVICE_STATUS_ERROR":            3,
+func (x DeviceStatusCode) Enum() *DeviceStatusCode {
+	p := new(DeviceStatusCode)
+	*p = x
+	return p
 }
 
 func (x DeviceStatusCode) String() string {
-	return proto.EnumName(DeviceStatusCode_name, int32(x))
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
+func (DeviceStatusCode) Descriptor() protoreflect.EnumDescriptor {
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes[7].Descriptor()
+}
+
+func (DeviceStatusCode) Type() protoreflect.EnumType {
+	return &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes[7]
+}
+
+func (x DeviceStatusCode) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use DeviceStatusCode.Descriptor instead.
 func (DeviceStatusCode) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{7}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{7}
 }
 
 type NetworkInterfaceType int32
@@ -302,57 +467,99 @@ const (
 	NetworkInterfaceType_INTF_TYPE_INTERNAL    NetworkInterfaceType = 3
 )
 
-var NetworkInterfaceType_name = map[int32]string{
-	0: "INTF_TYPE_UNSPECIFIED",
-	1: "INTF_TYPE_PRIVATE",
-	2: "INTF_TYPE_PUBLIC",
-	3: "INTF_TYPE_INTERNAL",
-}
+// Enum value maps for NetworkInterfaceType.
+var (
+	NetworkInterfaceType_name = map[int32]string{
+		0: "INTF_TYPE_UNSPECIFIED",
+		1: "INTF_TYPE_PRIVATE",
+		2: "INTF_TYPE_PUBLIC",
+		3: "INTF_TYPE_INTERNAL",
+	}
+	NetworkInterfaceType_value = map[string]int32{
+		"INTF_TYPE_UNSPECIFIED": 0,
+		"INTF_TYPE_PRIVATE":     1,
+		"INTF_TYPE_PUBLIC":      2,
+		"INTF_TYPE_INTERNAL":    3,
+	}
+)
 
-var NetworkInterfaceType_value = map[string]int32{
-	"INTF_TYPE_UNSPECIFIED": 0,
-	"INTF_TYPE_PRIVATE":     1,
-	"INTF_TYPE_PUBLIC":      2,
-	"INTF_TYPE_INTERNAL":    3,
+func (x NetworkInterfaceType) Enum() *NetworkInterfaceType {
+	p := new(NetworkInterfaceType)
+	*p = x
+	return p
 }
 
 func (x NetworkInterfaceType) String() string {
-	return proto.EnumName(NetworkInterfaceType_name, int32(x))
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
+func (NetworkInterfaceType) Descriptor() protoreflect.EnumDescriptor {
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes[8].Descriptor()
+}
+
+func (NetworkInterfaceType) Type() protoreflect.EnumType {
+	return &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes[8]
+}
+
+func (x NetworkInterfaceType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use NetworkInterfaceType.Descriptor instead.
 func (NetworkInterfaceType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{8}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{8}
 }
 
 type TopologyInfoType int32
 
 const (
 	TopologyInfoType_TOPO_INFO_TYPE_UNSPECIFIED TopologyInfoType = 0
-	TopologyInfoType_TOPO_INFO_META             TopologyInfoType = 1
+	TopologyInfoType_TOPO_INFO_META             TopologyInfoType = 1 // Topology meta info
 	TopologyInfoType_TOPO_INFO_WAN              TopologyInfoType = 2
 	TopologyInfoType_TOPO_INFO_CLOS             TopologyInfoType = 3
 )
 
-var TopologyInfoType_name = map[int32]string{
-	0: "TOPO_INFO_TYPE_UNSPECIFIED",
-	1: "TOPO_INFO_META",
-	2: "TOPO_INFO_WAN",
-	3: "TOPO_INFO_CLOS",
-}
+// Enum value maps for TopologyInfoType.
+var (
+	TopologyInfoType_name = map[int32]string{
+		0: "TOPO_INFO_TYPE_UNSPECIFIED",
+		1: "TOPO_INFO_META",
+		2: "TOPO_INFO_WAN",
+		3: "TOPO_INFO_CLOS",
+	}
+	TopologyInfoType_value = map[string]int32{
+		"TOPO_INFO_TYPE_UNSPECIFIED": 0,
+		"TOPO_INFO_META":             1,
+		"TOPO_INFO_WAN":              2,
+		"TOPO_INFO_CLOS":             3,
+	}
+)
 
-var TopologyInfoType_value = map[string]int32{
-	"TOPO_INFO_TYPE_UNSPECIFIED": 0,
-	"TOPO_INFO_META":             1,
-	"TOPO_INFO_WAN":              2,
-	"TOPO_INFO_CLOS":             3,
+func (x TopologyInfoType) Enum() *TopologyInfoType {
+	p := new(TopologyInfoType)
+	*p = x
+	return p
 }
 
 func (x TopologyInfoType) String() string {
-	return proto.EnumName(TopologyInfoType_name, int32(x))
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
+func (TopologyInfoType) Descriptor() protoreflect.EnumDescriptor {
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes[9].Descriptor()
+}
+
+func (TopologyInfoType) Type() protoreflect.EnumType {
+	return &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes[9]
+}
+
+func (x TopologyInfoType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use TopologyInfoType.Descriptor instead.
 func (TopologyInfoType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{9}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{9}
 }
 
 type FabricType int32
@@ -363,24 +570,45 @@ const (
 	FabricType_HUB_SPOKE               FabricType = 2
 )
 
-var FabricType_name = map[int32]string{
-	0: "FABRIC_TYPE_UNSPECIFIED",
-	1: "FULL_MESH",
-	2: "HUB_SPOKE",
-}
+// Enum value maps for FabricType.
+var (
+	FabricType_name = map[int32]string{
+		0: "FABRIC_TYPE_UNSPECIFIED",
+		1: "FULL_MESH",
+		2: "HUB_SPOKE",
+	}
+	FabricType_value = map[string]int32{
+		"FABRIC_TYPE_UNSPECIFIED": 0,
+		"FULL_MESH":               1,
+		"HUB_SPOKE":               2,
+	}
+)
 
-var FabricType_value = map[string]int32{
-	"FABRIC_TYPE_UNSPECIFIED": 0,
-	"FULL_MESH":               1,
-	"HUB_SPOKE":               2,
+func (x FabricType) Enum() *FabricType {
+	p := new(FabricType)
+	*p = x
+	return p
 }
 
 func (x FabricType) String() string {
-	return proto.EnumName(FabricType_name, int32(x))
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
+func (FabricType) Descriptor() protoreflect.EnumDescriptor {
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes[10].Descriptor()
+}
+
+func (FabricType) Type() protoreflect.EnumType {
+	return &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes[10]
+}
+
+func (x FabricType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use FabricType.Descriptor instead.
 func (FabricType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{10}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{10}
 }
 
 type VpcStatusCode int32
@@ -391,417 +619,482 @@ const (
 	VpcStatusCode_VPC_STATUS_ADD_FAILURE VpcStatusCode = 2
 )
 
-var VpcStatusCode_name = map[int32]string{
-	0: "VPC_STATUS_UNSPECIFIED",
-	1: "VPC_STATUS_ADD_SUCCESS",
-	2: "VPC_STATUS_ADD_FAILURE",
-}
+// Enum value maps for VpcStatusCode.
+var (
+	VpcStatusCode_name = map[int32]string{
+		0: "VPC_STATUS_UNSPECIFIED",
+		1: "VPC_STATUS_ADD_SUCCESS",
+		2: "VPC_STATUS_ADD_FAILURE",
+	}
+	VpcStatusCode_value = map[string]int32{
+		"VPC_STATUS_UNSPECIFIED": 0,
+		"VPC_STATUS_ADD_SUCCESS": 1,
+		"VPC_STATUS_ADD_FAILURE": 2,
+	}
+)
 
-var VpcStatusCode_value = map[string]int32{
-	"VPC_STATUS_UNSPECIFIED": 0,
-	"VPC_STATUS_ADD_SUCCESS": 1,
-	"VPC_STATUS_ADD_FAILURE": 2,
+func (x VpcStatusCode) Enum() *VpcStatusCode {
+	p := new(VpcStatusCode)
+	*p = x
+	return p
 }
 
 func (x VpcStatusCode) String() string {
-	return proto.EnumName(VpcStatusCode_name, int32(x))
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
+func (VpcStatusCode) Descriptor() protoreflect.EnumDescriptor {
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes[11].Descriptor()
+}
+
+func (VpcStatusCode) Type() protoreflect.EnumType {
+	return &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes[11]
+}
+
+func (x VpcStatusCode) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use VpcStatusCode.Descriptor instead.
 func (VpcStatusCode) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{11}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{11}
 }
 
 type RouteTableIds struct {
-	Public               []string              `protobuf:"bytes,1,rep,name=public,proto3" json:"public,omitempty"`
-	Private              []string              `protobuf:"bytes,2,rep,name=private,proto3" json:"private,omitempty"`
-	Internal             []string              `protobuf:"bytes,3,rep,name=internal,proto3" json:"internal,omitempty"`
-	FieldMask            *field_mask.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Public    []string               `protobuf:"bytes,1,rep,name=public,proto3" json:"public,omitempty"`
+	Private   []string               `protobuf:"bytes,2,rep,name=private,proto3" json:"private,omitempty"`
+	Internal  []string               `protobuf:"bytes,3,rep,name=internal,proto3" json:"internal,omitempty"`
+	FieldMask *fieldmaskpb.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 }
 
-func (m *RouteTableIds) Reset()         { *m = RouteTableIds{} }
-func (m *RouteTableIds) String() string { return proto.CompactTextString(m) }
-func (*RouteTableIds) ProtoMessage()    {}
+func (x *RouteTableIds) Reset() {
+	*x = RouteTableIds{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[0]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *RouteTableIds) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RouteTableIds) ProtoMessage() {}
+
+func (x *RouteTableIds) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[0]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RouteTableIds.ProtoReflect.Descriptor instead.
 func (*RouteTableIds) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{0}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{0}
 }
 
-func (m *RouteTableIds) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_RouteTableIds.Unmarshal(m, b)
-}
-func (m *RouteTableIds) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_RouteTableIds.Marshal(b, m, deterministic)
-}
-func (m *RouteTableIds) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RouteTableIds.Merge(m, src)
-}
-func (m *RouteTableIds) XXX_Size() int {
-	return xxx_messageInfo_RouteTableIds.Size(m)
-}
-func (m *RouteTableIds) XXX_DiscardUnknown() {
-	xxx_messageInfo_RouteTableIds.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_RouteTableIds proto.InternalMessageInfo
-
-func (m *RouteTableIds) GetPublic() []string {
-	if m != nil {
-		return m.Public
+func (x *RouteTableIds) GetPublic() []string {
+	if x != nil {
+		return x.Public
 	}
 	return nil
 }
 
-func (m *RouteTableIds) GetPrivate() []string {
-	if m != nil {
-		return m.Private
+func (x *RouteTableIds) GetPrivate() []string {
+	if x != nil {
+		return x.Private
 	}
 	return nil
 }
 
-func (m *RouteTableIds) GetInternal() []string {
-	if m != nil {
-		return m.Internal
+func (x *RouteTableIds) GetInternal() []string {
+	if x != nil {
+		return x.Internal
 	}
 	return nil
 }
 
-func (m *RouteTableIds) GetFieldMask() *field_mask.FieldMask {
-	if m != nil {
-		return m.FieldMask
+func (x *RouteTableIds) GetFieldMask() *fieldmaskpb.FieldMask {
+	if x != nil {
+		return x.FieldMask
 	}
 	return nil
 }
 
 type NetworkInterface struct {
-	IntfId               string                `protobuf:"bytes,1,opt,name=intf_id,json=intfId,proto3" json:"intf_id,omitempty"`
-	Name                 string                `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	IntfType             NetworkInterfaceType  `protobuf:"varint,3,opt,name=intf_type,json=intfType,proto3,enum=clouddeploy.NetworkInterfaceType" json:"intf_type,omitempty"`
-	PrivateIpAddr        []string              `protobuf:"bytes,4,rep,name=private_ip_addr,json=privateIpAddr,proto3" json:"private_ip_addr,omitempty"`
-	PublicIpAddr         string                `protobuf:"bytes,5,opt,name=public_ip_addr,json=publicIpAddr,proto3" json:"public_ip_addr,omitempty"`
-	Subnet               string                `protobuf:"bytes,6,opt,name=subnet,proto3" json:"subnet,omitempty"`
-	SecurityGroup        string                `protobuf:"bytes,7,opt,name=security_group,json=securityGroup,proto3" json:"security_group,omitempty"`
-	FieldMask            *field_mask.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	IntfId        string                 `protobuf:"bytes,1,opt,name=intf_id,json=intfId,proto3" json:"intf_id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	IntfType      NetworkInterfaceType   `protobuf:"varint,3,opt,name=intf_type,json=intfType,proto3,enum=clouddeploy.NetworkInterfaceType" json:"intf_type,omitempty"`
+	PrivateIpAddr []string               `protobuf:"bytes,4,rep,name=private_ip_addr,json=privateIpAddr,proto3" json:"private_ip_addr,omitempty"`
+	PublicIpAddr  string                 `protobuf:"bytes,5,opt,name=public_ip_addr,json=publicIpAddr,proto3" json:"public_ip_addr,omitempty"`
+	Subnet        string                 `protobuf:"bytes,6,opt,name=subnet,proto3" json:"subnet,omitempty"`
+	SecurityGroup string                 `protobuf:"bytes,7,opt,name=security_group,json=securityGroup,proto3" json:"security_group,omitempty"`
+	FieldMask     *fieldmaskpb.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 }
 
-func (m *NetworkInterface) Reset()         { *m = NetworkInterface{} }
-func (m *NetworkInterface) String() string { return proto.CompactTextString(m) }
-func (*NetworkInterface) ProtoMessage()    {}
+func (x *NetworkInterface) Reset() {
+	*x = NetworkInterface{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *NetworkInterface) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NetworkInterface) ProtoMessage() {}
+
+func (x *NetworkInterface) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NetworkInterface.ProtoReflect.Descriptor instead.
 func (*NetworkInterface) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{1}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{1}
 }
 
-func (m *NetworkInterface) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_NetworkInterface.Unmarshal(m, b)
-}
-func (m *NetworkInterface) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_NetworkInterface.Marshal(b, m, deterministic)
-}
-func (m *NetworkInterface) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_NetworkInterface.Merge(m, src)
-}
-func (m *NetworkInterface) XXX_Size() int {
-	return xxx_messageInfo_NetworkInterface.Size(m)
-}
-func (m *NetworkInterface) XXX_DiscardUnknown() {
-	xxx_messageInfo_NetworkInterface.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_NetworkInterface proto.InternalMessageInfo
-
-func (m *NetworkInterface) GetIntfId() string {
-	if m != nil {
-		return m.IntfId
+func (x *NetworkInterface) GetIntfId() string {
+	if x != nil {
+		return x.IntfId
 	}
 	return ""
 }
 
-func (m *NetworkInterface) GetName() string {
-	if m != nil {
-		return m.Name
+func (x *NetworkInterface) GetName() string {
+	if x != nil {
+		return x.Name
 	}
 	return ""
 }
 
-func (m *NetworkInterface) GetIntfType() NetworkInterfaceType {
-	if m != nil {
-		return m.IntfType
+func (x *NetworkInterface) GetIntfType() NetworkInterfaceType {
+	if x != nil {
+		return x.IntfType
 	}
 	return NetworkInterfaceType_INTF_TYPE_UNSPECIFIED
 }
 
-func (m *NetworkInterface) GetPrivateIpAddr() []string {
-	if m != nil {
-		return m.PrivateIpAddr
+func (x *NetworkInterface) GetPrivateIpAddr() []string {
+	if x != nil {
+		return x.PrivateIpAddr
 	}
 	return nil
 }
 
-func (m *NetworkInterface) GetPublicIpAddr() string {
-	if m != nil {
-		return m.PublicIpAddr
+func (x *NetworkInterface) GetPublicIpAddr() string {
+	if x != nil {
+		return x.PublicIpAddr
 	}
 	return ""
 }
 
-func (m *NetworkInterface) GetSubnet() string {
-	if m != nil {
-		return m.Subnet
+func (x *NetworkInterface) GetSubnet() string {
+	if x != nil {
+		return x.Subnet
 	}
 	return ""
 }
 
-func (m *NetworkInterface) GetSecurityGroup() string {
-	if m != nil {
-		return m.SecurityGroup
+func (x *NetworkInterface) GetSecurityGroup() string {
+	if x != nil {
+		return x.SecurityGroup
 	}
 	return ""
 }
 
-func (m *NetworkInterface) GetFieldMask() *field_mask.FieldMask {
-	if m != nil {
-		return m.FieldMask
+func (x *NetworkInterface) GetFieldMask() *fieldmaskpb.FieldMask {
+	if x != nil {
+		return x.FieldMask
 	}
 	return nil
 }
 
 type CVInfo struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
 	// CloudVision reports status of the deployment
 	// using this message. This is ReadOnly for the
 	// clients.
-	CvStatusCode              CVStatusCode          `protobuf:"varint,1,opt,name=cv_status_code,json=cvStatusCode,proto3,enum=clouddeploy.CVStatusCode" json:"cv_status_code,omitempty"`
-	BootstrapCfg              string                `protobuf:"bytes,2,opt,name=bootstrap_cfg,json=bootstrapCfg,proto3" json:"bootstrap_cfg,omitempty"`
-	HaRtrId                   string                `protobuf:"bytes,3,opt,name=ha_rtr_id,json=haRtrId,proto3" json:"ha_rtr_id,omitempty"`
-	PeerVpcRtTableId          []string              `protobuf:"bytes,4,rep,name=peer_vpc_rt_table_id,json=peerVpcRtTableId,proto3" json:"peer_vpc_rt_table_id,omitempty"`
-	HaRtTableIds              *RouteTableIds        `protobuf:"bytes,5,opt,name=ha_rt_table_ids,json=haRtTableIds,proto3" json:"ha_rt_table_ids,omitempty"`
-	CvStatusDesc              string                `protobuf:"bytes,6,opt,name=cv_status_desc,json=cvStatusDesc,proto3" json:"cv_status_desc,omitempty"`
-	CvStatusRecommendedAction string                `protobuf:"bytes,7,opt,name=cv_status_recommended_action,json=cvStatusRecommendedAction,proto3" json:"cv_status_recommended_action,omitempty"`
-	DeviceStatus              DeviceStatusCode      `protobuf:"varint,8,opt,name=device_status,json=deviceStatus,proto3,enum=clouddeploy.DeviceStatusCode" json:"device_status,omitempty"`
-	FieldMask                 *field_mask.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
-	XXX_NoUnkeyedLiteral      struct{}              `json:"-"`
-	XXX_unrecognized          []byte                `json:"-"`
-	XXX_sizecache             int32                 `json:"-"`
+	CvStatusCode              CVStatusCode           `protobuf:"varint,1,opt,name=cv_status_code,json=cvStatusCode,proto3,enum=clouddeploy.CVStatusCode" json:"cv_status_code,omitempty"`
+	BootstrapCfg              string                 `protobuf:"bytes,2,opt,name=bootstrap_cfg,json=bootstrapCfg,proto3" json:"bootstrap_cfg,omitempty"`
+	HaRtrId                   string                 `protobuf:"bytes,3,opt,name=ha_rtr_id,json=haRtrId,proto3" json:"ha_rtr_id,omitempty"`
+	PeerVpcRtTableId          []string               `protobuf:"bytes,4,rep,name=peer_vpc_rt_table_id,json=peerVpcRtTableId,proto3" json:"peer_vpc_rt_table_id,omitempty"`
+	HaRtTableIds              *RouteTableIds         `protobuf:"bytes,5,opt,name=ha_rt_table_ids,json=haRtTableIds,proto3" json:"ha_rt_table_ids,omitempty"`
+	CvStatusDesc              string                 `protobuf:"bytes,6,opt,name=cv_status_desc,json=cvStatusDesc,proto3" json:"cv_status_desc,omitempty"`
+	CvStatusRecommendedAction string                 `protobuf:"bytes,7,opt,name=cv_status_recommended_action,json=cvStatusRecommendedAction,proto3" json:"cv_status_recommended_action,omitempty"`
+	DeviceStatus              DeviceStatusCode       `protobuf:"varint,8,opt,name=device_status,json=deviceStatus,proto3,enum=clouddeploy.DeviceStatusCode" json:"device_status,omitempty"`
+	FieldMask                 *fieldmaskpb.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 }
 
-func (m *CVInfo) Reset()         { *m = CVInfo{} }
-func (m *CVInfo) String() string { return proto.CompactTextString(m) }
-func (*CVInfo) ProtoMessage()    {}
+func (x *CVInfo) Reset() {
+	*x = CVInfo{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CVInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CVInfo) ProtoMessage() {}
+
+func (x *CVInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CVInfo.ProtoReflect.Descriptor instead.
 func (*CVInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{2}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{2}
 }
 
-func (m *CVInfo) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_CVInfo.Unmarshal(m, b)
-}
-func (m *CVInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_CVInfo.Marshal(b, m, deterministic)
-}
-func (m *CVInfo) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CVInfo.Merge(m, src)
-}
-func (m *CVInfo) XXX_Size() int {
-	return xxx_messageInfo_CVInfo.Size(m)
-}
-func (m *CVInfo) XXX_DiscardUnknown() {
-	xxx_messageInfo_CVInfo.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_CVInfo proto.InternalMessageInfo
-
-func (m *CVInfo) GetCvStatusCode() CVStatusCode {
-	if m != nil {
-		return m.CvStatusCode
+func (x *CVInfo) GetCvStatusCode() CVStatusCode {
+	if x != nil {
+		return x.CvStatusCode
 	}
 	return CVStatusCode_CV_STATUS_UNSPECIFIED
 }
 
-func (m *CVInfo) GetBootstrapCfg() string {
-	if m != nil {
-		return m.BootstrapCfg
+func (x *CVInfo) GetBootstrapCfg() string {
+	if x != nil {
+		return x.BootstrapCfg
 	}
 	return ""
 }
 
-func (m *CVInfo) GetHaRtrId() string {
-	if m != nil {
-		return m.HaRtrId
+func (x *CVInfo) GetHaRtrId() string {
+	if x != nil {
+		return x.HaRtrId
 	}
 	return ""
 }
 
-func (m *CVInfo) GetPeerVpcRtTableId() []string {
-	if m != nil {
-		return m.PeerVpcRtTableId
+func (x *CVInfo) GetPeerVpcRtTableId() []string {
+	if x != nil {
+		return x.PeerVpcRtTableId
 	}
 	return nil
 }
 
-func (m *CVInfo) GetHaRtTableIds() *RouteTableIds {
-	if m != nil {
-		return m.HaRtTableIds
+func (x *CVInfo) GetHaRtTableIds() *RouteTableIds {
+	if x != nil {
+		return x.HaRtTableIds
 	}
 	return nil
 }
 
-func (m *CVInfo) GetCvStatusDesc() string {
-	if m != nil {
-		return m.CvStatusDesc
+func (x *CVInfo) GetCvStatusDesc() string {
+	if x != nil {
+		return x.CvStatusDesc
 	}
 	return ""
 }
 
-func (m *CVInfo) GetCvStatusRecommendedAction() string {
-	if m != nil {
-		return m.CvStatusRecommendedAction
+func (x *CVInfo) GetCvStatusRecommendedAction() string {
+	if x != nil {
+		return x.CvStatusRecommendedAction
 	}
 	return ""
 }
 
-func (m *CVInfo) GetDeviceStatus() DeviceStatusCode {
-	if m != nil {
-		return m.DeviceStatus
+func (x *CVInfo) GetDeviceStatus() DeviceStatusCode {
+	if x != nil {
+		return x.DeviceStatus
 	}
 	return DeviceStatusCode_DEVICE_STATUS_UNSPECIFIED
 }
 
-func (m *CVInfo) GetFieldMask() *field_mask.FieldMask {
-	if m != nil {
-		return m.FieldMask
+func (x *CVInfo) GetFieldMask() *fieldmaskpb.FieldMask {
+	if x != nil {
+		return x.FieldMask
 	}
 	return nil
 }
 
 type AzureRouterDetail struct {
-	AvailZone            string                `protobuf:"bytes,1,opt,name=avail_zone,json=availZone,proto3" json:"avail_zone,omitempty"`
-	ResGroup             string                `protobuf:"bytes,2,opt,name=res_group,json=resGroup,proto3" json:"res_group,omitempty"`
-	InstanceType         string                `protobuf:"bytes,3,opt,name=instance_type,json=instanceType,proto3" json:"instance_type,omitempty"`
-	AvailSet             string                `protobuf:"bytes,4,opt,name=avail_set,json=availSet,proto3" json:"avail_set,omitempty"`
-	FieldMask            *field_mask.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	AvailZone    string                 `protobuf:"bytes,1,opt,name=avail_zone,json=availZone,proto3" json:"avail_zone,omitempty"`
+	ResGroup     string                 `protobuf:"bytes,2,opt,name=res_group,json=resGroup,proto3" json:"res_group,omitempty"`
+	InstanceType string                 `protobuf:"bytes,3,opt,name=instance_type,json=instanceType,proto3" json:"instance_type,omitempty"`
+	AvailSet     string                 `protobuf:"bytes,4,opt,name=avail_set,json=availSet,proto3" json:"avail_set,omitempty"`
+	FieldMask    *fieldmaskpb.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 }
 
-func (m *AzureRouterDetail) Reset()         { *m = AzureRouterDetail{} }
-func (m *AzureRouterDetail) String() string { return proto.CompactTextString(m) }
-func (*AzureRouterDetail) ProtoMessage()    {}
+func (x *AzureRouterDetail) Reset() {
+	*x = AzureRouterDetail{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AzureRouterDetail) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AzureRouterDetail) ProtoMessage() {}
+
+func (x *AzureRouterDetail) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AzureRouterDetail.ProtoReflect.Descriptor instead.
 func (*AzureRouterDetail) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{3}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{3}
 }
 
-func (m *AzureRouterDetail) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_AzureRouterDetail.Unmarshal(m, b)
-}
-func (m *AzureRouterDetail) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_AzureRouterDetail.Marshal(b, m, deterministic)
-}
-func (m *AzureRouterDetail) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AzureRouterDetail.Merge(m, src)
-}
-func (m *AzureRouterDetail) XXX_Size() int {
-	return xxx_messageInfo_AzureRouterDetail.Size(m)
-}
-func (m *AzureRouterDetail) XXX_DiscardUnknown() {
-	xxx_messageInfo_AzureRouterDetail.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AzureRouterDetail proto.InternalMessageInfo
-
-func (m *AzureRouterDetail) GetAvailZone() string {
-	if m != nil {
-		return m.AvailZone
+func (x *AzureRouterDetail) GetAvailZone() string {
+	if x != nil {
+		return x.AvailZone
 	}
 	return ""
 }
 
-func (m *AzureRouterDetail) GetResGroup() string {
-	if m != nil {
-		return m.ResGroup
+func (x *AzureRouterDetail) GetResGroup() string {
+	if x != nil {
+		return x.ResGroup
 	}
 	return ""
 }
 
-func (m *AzureRouterDetail) GetInstanceType() string {
-	if m != nil {
-		return m.InstanceType
+func (x *AzureRouterDetail) GetInstanceType() string {
+	if x != nil {
+		return x.InstanceType
 	}
 	return ""
 }
 
-func (m *AzureRouterDetail) GetAvailSet() string {
-	if m != nil {
-		return m.AvailSet
+func (x *AzureRouterDetail) GetAvailSet() string {
+	if x != nil {
+		return x.AvailSet
 	}
 	return ""
 }
 
-func (m *AzureRouterDetail) GetFieldMask() *field_mask.FieldMask {
-	if m != nil {
-		return m.FieldMask
+func (x *AzureRouterDetail) GetFieldMask() *fieldmaskpb.FieldMask {
+	if x != nil {
+		return x.FieldMask
 	}
 	return nil
 }
 
 type AwsRouterDetail struct {
-	AvailZone            string                `protobuf:"bytes,1,opt,name=avail_zone,json=availZone,proto3" json:"avail_zone,omitempty"`
-	InstanceType         string                `protobuf:"bytes,2,opt,name=instance_type,json=instanceType,proto3" json:"instance_type,omitempty"`
-	FieldMask            *field_mask.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	AvailZone    string                 `protobuf:"bytes,1,opt,name=avail_zone,json=availZone,proto3" json:"avail_zone,omitempty"`
+	InstanceType string                 `protobuf:"bytes,2,opt,name=instance_type,json=instanceType,proto3" json:"instance_type,omitempty"`
+	FieldMask    *fieldmaskpb.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 }
 
-func (m *AwsRouterDetail) Reset()         { *m = AwsRouterDetail{} }
-func (m *AwsRouterDetail) String() string { return proto.CompactTextString(m) }
-func (*AwsRouterDetail) ProtoMessage()    {}
+func (x *AwsRouterDetail) Reset() {
+	*x = AwsRouterDetail{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AwsRouterDetail) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AwsRouterDetail) ProtoMessage() {}
+
+func (x *AwsRouterDetail) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AwsRouterDetail.ProtoReflect.Descriptor instead.
 func (*AwsRouterDetail) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{4}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{4}
 }
 
-func (m *AwsRouterDetail) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_AwsRouterDetail.Unmarshal(m, b)
-}
-func (m *AwsRouterDetail) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_AwsRouterDetail.Marshal(b, m, deterministic)
-}
-func (m *AwsRouterDetail) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AwsRouterDetail.Merge(m, src)
-}
-func (m *AwsRouterDetail) XXX_Size() int {
-	return xxx_messageInfo_AwsRouterDetail.Size(m)
-}
-func (m *AwsRouterDetail) XXX_DiscardUnknown() {
-	xxx_messageInfo_AwsRouterDetail.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AwsRouterDetail proto.InternalMessageInfo
-
-func (m *AwsRouterDetail) GetAvailZone() string {
-	if m != nil {
-		return m.AvailZone
+func (x *AwsRouterDetail) GetAvailZone() string {
+	if x != nil {
+		return x.AvailZone
 	}
 	return ""
 }
 
-func (m *AwsRouterDetail) GetInstanceType() string {
-	if m != nil {
-		return m.InstanceType
+func (x *AwsRouterDetail) GetInstanceType() string {
+	if x != nil {
+		return x.InstanceType
 	}
 	return ""
 }
 
-func (m *AwsRouterDetail) GetFieldMask() *field_mask.FieldMask {
-	if m != nil {
-		return m.FieldMask
+func (x *AwsRouterDetail) GetFieldMask() *fieldmaskpb.FieldMask {
+	if x != nil {
+		return x.FieldMask
 	}
 	return nil
 }
 
 type Router struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
 	// name + vpc_id + cp_t will be used as primary key
 	Name                  string            `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	VpcId                 string            `protobuf:"bytes,2,opt,name=vpc_id,json=vpcId,proto3" json:"vpc_id,omitempty"`
@@ -809,1645 +1102,1892 @@ type Router struct {
 	Region                string            `protobuf:"bytes,4,opt,name=region,proto3" json:"region,omitempty"`
 	InstanceId            string            `protobuf:"bytes,5,opt,name=instance_id,json=instanceId,proto3" json:"instance_id,omitempty"`
 	HaName                string            `protobuf:"bytes,6,opt,name=ha_name,json=haName,proto3" json:"ha_name,omitempty"`
-	Id                    string            `protobuf:"bytes,7,opt,name=id,proto3" json:"id,omitempty"`
-	Cnps                  string            `protobuf:"bytes,8,opt,name=cnps,proto3" json:"cnps,omitempty"`
-	Tags                  map[string]string `protobuf:"bytes,9,rep,name=tags,proto3" json:"tags,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Id                    string            `protobuf:"bytes,7,opt,name=id,proto3" json:"id,omitempty"`                                                                                             // an ID can be generated by the client to track resource
+	Cnps                  string            `protobuf:"bytes,8,opt,name=cnps,proto3" json:"cnps,omitempty"`                                                                                         // CNPS tag that identifies vrf
+	Tags                  map[string]string `protobuf:"bytes,9,rep,name=tags,proto3" json:"tags,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"` // Other tags that can be used in queries
 	DeviceEnrollmentToken string            `protobuf:"bytes,10,opt,name=device_enrollment_token,json=deviceEnrollmentToken,proto3" json:"device_enrollment_token,omitempty"`
 	RtTableIds            *RouteTableIds    `protobuf:"bytes,11,opt,name=rt_table_ids,json=rtTableIds,proto3" json:"rt_table_ids,omitempty"`
 	RouteReflector        bool              `protobuf:"varint,12,opt,name=route_reflector,json=routeReflector,proto3" json:"route_reflector,omitempty"`
 	// Based upon cp_t, either one of the following two fields will be set
-	AwsRtrDetail         *AwsRouterDetail      `protobuf:"bytes,13,opt,name=aws_rtr_detail,json=awsRtrDetail,proto3" json:"aws_rtr_detail,omitempty"`
-	AzRtrDetail          *AzureRouterDetail    `protobuf:"bytes,14,opt,name=az_rtr_detail,json=azRtrDetail,proto3" json:"az_rtr_detail,omitempty"`
-	Intf                 []*NetworkInterface   `protobuf:"bytes,15,rep,name=intf,proto3" json:"intf,omitempty"`
-	DepStatus            DeploymentStatusCode  `protobuf:"varint,16,opt,name=dep_status,json=depStatus,proto3,enum=clouddeploy.DeploymentStatusCode" json:"dep_status,omitempty"`
-	CvInfo               *CVInfo               `protobuf:"bytes,17,opt,name=cv_info,json=cvInfo,proto3" json:"cv_info,omitempty"`
-	DeviceSerialNum      string                `protobuf:"bytes,18,opt,name=device_serial_num,json=deviceSerialNum,proto3" json:"device_serial_num,omitempty"`
-	FieldMask            *field_mask.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
+	AwsRtrDetail    *AwsRouterDetail     `protobuf:"bytes,13,opt,name=aws_rtr_detail,json=awsRtrDetail,proto3" json:"aws_rtr_detail,omitempty"`
+	AzRtrDetail     *AzureRouterDetail   `protobuf:"bytes,14,opt,name=az_rtr_detail,json=azRtrDetail,proto3" json:"az_rtr_detail,omitempty"`
+	Intf            []*NetworkInterface  `protobuf:"bytes,15,rep,name=intf,proto3" json:"intf,omitempty"`
+	DepStatus       DeploymentStatusCode `protobuf:"varint,16,opt,name=dep_status,json=depStatus,proto3,enum=clouddeploy.DeploymentStatusCode" json:"dep_status,omitempty"`
+	CvInfo          *CVInfo              `protobuf:"bytes,17,opt,name=cv_info,json=cvInfo,proto3" json:"cv_info,omitempty"`                              // Field filled in by CVP. Client should never set this
+	DeviceSerialNum string               `protobuf:"bytes,18,opt,name=device_serial_num,json=deviceSerialNum,proto3" json:"device_serial_num,omitempty"` // Field set by clouddeploy app for UI,
+	//client should never set this
+	BgpAsn     uint32                 `protobuf:"varint,19,opt,name=bgp_asn,json=bgpAsn,proto3" json:"bgp_asn,omitempty"` // Bgp ASN generated by clouddeploy app, client should never set this
+	ManagedBy  string                 `protobuf:"bytes,20,opt,name=managed_by,json=managedBy,proto3" json:"managed_by,omitempty"`
+	DeployMode string                 `protobuf:"bytes,21,opt,name=deploy_mode,json=deployMode,proto3" json:"deploy_mode,omitempty"`
+	FieldMask  *fieldmaskpb.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 }
 
-func (m *Router) Reset()         { *m = Router{} }
-func (m *Router) String() string { return proto.CompactTextString(m) }
-func (*Router) ProtoMessage()    {}
+func (x *Router) Reset() {
+	*x = Router{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Router) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Router) ProtoMessage() {}
+
+func (x *Router) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Router.ProtoReflect.Descriptor instead.
 func (*Router) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{5}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{5}
 }
 
-func (m *Router) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Router.Unmarshal(m, b)
-}
-func (m *Router) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Router.Marshal(b, m, deterministic)
-}
-func (m *Router) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Router.Merge(m, src)
-}
-func (m *Router) XXX_Size() int {
-	return xxx_messageInfo_Router.Size(m)
-}
-func (m *Router) XXX_DiscardUnknown() {
-	xxx_messageInfo_Router.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Router proto.InternalMessageInfo
-
-func (m *Router) GetName() string {
-	if m != nil {
-		return m.Name
+func (x *Router) GetName() string {
+	if x != nil {
+		return x.Name
 	}
 	return ""
 }
 
-func (m *Router) GetVpcId() string {
-	if m != nil {
-		return m.VpcId
+func (x *Router) GetVpcId() string {
+	if x != nil {
+		return x.VpcId
 	}
 	return ""
 }
 
-func (m *Router) GetCpT() CloudProviderType {
-	if m != nil {
-		return m.CpT
+func (x *Router) GetCpT() CloudProviderType {
+	if x != nil {
+		return x.CpT
 	}
 	return CloudProviderType_CP_UNSPECIFIED
 }
 
-func (m *Router) GetRegion() string {
-	if m != nil {
-		return m.Region
+func (x *Router) GetRegion() string {
+	if x != nil {
+		return x.Region
 	}
 	return ""
 }
 
-func (m *Router) GetInstanceId() string {
-	if m != nil {
-		return m.InstanceId
+func (x *Router) GetInstanceId() string {
+	if x != nil {
+		return x.InstanceId
 	}
 	return ""
 }
 
-func (m *Router) GetHaName() string {
-	if m != nil {
-		return m.HaName
+func (x *Router) GetHaName() string {
+	if x != nil {
+		return x.HaName
 	}
 	return ""
 }
 
-func (m *Router) GetId() string {
-	if m != nil {
-		return m.Id
+func (x *Router) GetId() string {
+	if x != nil {
+		return x.Id
 	}
 	return ""
 }
 
-func (m *Router) GetCnps() string {
-	if m != nil {
-		return m.Cnps
+func (x *Router) GetCnps() string {
+	if x != nil {
+		return x.Cnps
 	}
 	return ""
 }
 
-func (m *Router) GetTags() map[string]string {
-	if m != nil {
-		return m.Tags
+func (x *Router) GetTags() map[string]string {
+	if x != nil {
+		return x.Tags
 	}
 	return nil
 }
 
-func (m *Router) GetDeviceEnrollmentToken() string {
-	if m != nil {
-		return m.DeviceEnrollmentToken
+func (x *Router) GetDeviceEnrollmentToken() string {
+	if x != nil {
+		return x.DeviceEnrollmentToken
 	}
 	return ""
 }
 
-func (m *Router) GetRtTableIds() *RouteTableIds {
-	if m != nil {
-		return m.RtTableIds
+func (x *Router) GetRtTableIds() *RouteTableIds {
+	if x != nil {
+		return x.RtTableIds
 	}
 	return nil
 }
 
-func (m *Router) GetRouteReflector() bool {
-	if m != nil {
-		return m.RouteReflector
+func (x *Router) GetRouteReflector() bool {
+	if x != nil {
+		return x.RouteReflector
 	}
 	return false
 }
 
-func (m *Router) GetAwsRtrDetail() *AwsRouterDetail {
-	if m != nil {
-		return m.AwsRtrDetail
+func (x *Router) GetAwsRtrDetail() *AwsRouterDetail {
+	if x != nil {
+		return x.AwsRtrDetail
 	}
 	return nil
 }
 
-func (m *Router) GetAzRtrDetail() *AzureRouterDetail {
-	if m != nil {
-		return m.AzRtrDetail
+func (x *Router) GetAzRtrDetail() *AzureRouterDetail {
+	if x != nil {
+		return x.AzRtrDetail
 	}
 	return nil
 }
 
-func (m *Router) GetIntf() []*NetworkInterface {
-	if m != nil {
-		return m.Intf
+func (x *Router) GetIntf() []*NetworkInterface {
+	if x != nil {
+		return x.Intf
 	}
 	return nil
 }
 
-func (m *Router) GetDepStatus() DeploymentStatusCode {
-	if m != nil {
-		return m.DepStatus
+func (x *Router) GetDepStatus() DeploymentStatusCode {
+	if x != nil {
+		return x.DepStatus
 	}
 	return DeploymentStatusCode_DEP_STATUS_UNSPECIFIED
 }
 
-func (m *Router) GetCvInfo() *CVInfo {
-	if m != nil {
-		return m.CvInfo
+func (x *Router) GetCvInfo() *CVInfo {
+	if x != nil {
+		return x.CvInfo
 	}
 	return nil
 }
 
-func (m *Router) GetDeviceSerialNum() string {
-	if m != nil {
-		return m.DeviceSerialNum
+func (x *Router) GetDeviceSerialNum() string {
+	if x != nil {
+		return x.DeviceSerialNum
 	}
 	return ""
 }
 
-func (m *Router) GetFieldMask() *field_mask.FieldMask {
-	if m != nil {
-		return m.FieldMask
+func (x *Router) GetBgpAsn() uint32 {
+	if x != nil {
+		return x.BgpAsn
+	}
+	return 0
+}
+
+func (x *Router) GetManagedBy() string {
+	if x != nil {
+		return x.ManagedBy
+	}
+	return ""
+}
+
+func (x *Router) GetDeployMode() string {
+	if x != nil {
+		return x.DeployMode
+	}
+	return ""
+}
+
+func (x *Router) GetFieldMask() *fieldmaskpb.FieldMask {
+	if x != nil {
+		return x.FieldMask
 	}
 	return nil
 }
 
 type AddRouterRequest struct {
-	Router               *Router  `protobuf:"bytes,1,opt,name=router,proto3" json:"router,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Router *Router `protobuf:"bytes,1,opt,name=router,proto3" json:"router,omitempty"`
 }
 
-func (m *AddRouterRequest) Reset()         { *m = AddRouterRequest{} }
-func (m *AddRouterRequest) String() string { return proto.CompactTextString(m) }
-func (*AddRouterRequest) ProtoMessage()    {}
+func (x *AddRouterRequest) Reset() {
+	*x = AddRouterRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AddRouterRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddRouterRequest) ProtoMessage() {}
+
+func (x *AddRouterRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddRouterRequest.ProtoReflect.Descriptor instead.
 func (*AddRouterRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{6}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{6}
 }
 
-func (m *AddRouterRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_AddRouterRequest.Unmarshal(m, b)
-}
-func (m *AddRouterRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_AddRouterRequest.Marshal(b, m, deterministic)
-}
-func (m *AddRouterRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AddRouterRequest.Merge(m, src)
-}
-func (m *AddRouterRequest) XXX_Size() int {
-	return xxx_messageInfo_AddRouterRequest.Size(m)
-}
-func (m *AddRouterRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_AddRouterRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AddRouterRequest proto.InternalMessageInfo
-
-func (m *AddRouterRequest) GetRouter() *Router {
-	if m != nil {
-		return m.Router
+func (x *AddRouterRequest) GetRouter() *Router {
+	if x != nil {
+		return x.Router
 	}
 	return nil
 }
 
 type AddRouterResponse struct {
-	Router               *Router              `protobuf:"bytes,1,opt,name=router,proto3" json:"router,omitempty"`
-	CreatedAt            *timestamp.Timestamp `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Router    *Router                `protobuf:"bytes,1,opt,name=router,proto3" json:"router,omitempty"`
+	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 }
 
-func (m *AddRouterResponse) Reset()         { *m = AddRouterResponse{} }
-func (m *AddRouterResponse) String() string { return proto.CompactTextString(m) }
-func (*AddRouterResponse) ProtoMessage()    {}
+func (x *AddRouterResponse) Reset() {
+	*x = AddRouterResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AddRouterResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddRouterResponse) ProtoMessage() {}
+
+func (x *AddRouterResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddRouterResponse.ProtoReflect.Descriptor instead.
 func (*AddRouterResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{7}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{7}
 }
 
-func (m *AddRouterResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_AddRouterResponse.Unmarshal(m, b)
-}
-func (m *AddRouterResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_AddRouterResponse.Marshal(b, m, deterministic)
-}
-func (m *AddRouterResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AddRouterResponse.Merge(m, src)
-}
-func (m *AddRouterResponse) XXX_Size() int {
-	return xxx_messageInfo_AddRouterResponse.Size(m)
-}
-func (m *AddRouterResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_AddRouterResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AddRouterResponse proto.InternalMessageInfo
-
-func (m *AddRouterResponse) GetRouter() *Router {
-	if m != nil {
-		return m.Router
+func (x *AddRouterResponse) GetRouter() *Router {
+	if x != nil {
+		return x.Router
 	}
 	return nil
 }
 
-func (m *AddRouterResponse) GetCreatedAt() *timestamp.Timestamp {
-	if m != nil {
-		return m.CreatedAt
+func (x *AddRouterResponse) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
 	}
 	return nil
 }
 
 type UpdateRouterRequest struct {
-	Router               *Router  `protobuf:"bytes,1,opt,name=router,proto3" json:"router,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Router *Router `protobuf:"bytes,1,opt,name=router,proto3" json:"router,omitempty"`
 }
 
-func (m *UpdateRouterRequest) Reset()         { *m = UpdateRouterRequest{} }
-func (m *UpdateRouterRequest) String() string { return proto.CompactTextString(m) }
-func (*UpdateRouterRequest) ProtoMessage()    {}
+func (x *UpdateRouterRequest) Reset() {
+	*x = UpdateRouterRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateRouterRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateRouterRequest) ProtoMessage() {}
+
+func (x *UpdateRouterRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateRouterRequest.ProtoReflect.Descriptor instead.
 func (*UpdateRouterRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{8}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{8}
 }
 
-func (m *UpdateRouterRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_UpdateRouterRequest.Unmarshal(m, b)
-}
-func (m *UpdateRouterRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_UpdateRouterRequest.Marshal(b, m, deterministic)
-}
-func (m *UpdateRouterRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UpdateRouterRequest.Merge(m, src)
-}
-func (m *UpdateRouterRequest) XXX_Size() int {
-	return xxx_messageInfo_UpdateRouterRequest.Size(m)
-}
-func (m *UpdateRouterRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_UpdateRouterRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_UpdateRouterRequest proto.InternalMessageInfo
-
-func (m *UpdateRouterRequest) GetRouter() *Router {
-	if m != nil {
-		return m.Router
+func (x *UpdateRouterRequest) GetRouter() *Router {
+	if x != nil {
+		return x.Router
 	}
 	return nil
 }
 
 type UpdateRouterResponse struct {
-	Router               *Router              `protobuf:"bytes,1,opt,name=router,proto3" json:"router,omitempty"`
-	AtTime               *timestamp.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Router *Router                `protobuf:"bytes,1,opt,name=router,proto3" json:"router,omitempty"`
+	AtTime *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
 }
 
-func (m *UpdateRouterResponse) Reset()         { *m = UpdateRouterResponse{} }
-func (m *UpdateRouterResponse) String() string { return proto.CompactTextString(m) }
-func (*UpdateRouterResponse) ProtoMessage()    {}
+func (x *UpdateRouterResponse) Reset() {
+	*x = UpdateRouterResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateRouterResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateRouterResponse) ProtoMessage() {}
+
+func (x *UpdateRouterResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateRouterResponse.ProtoReflect.Descriptor instead.
 func (*UpdateRouterResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{9}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{9}
 }
 
-func (m *UpdateRouterResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_UpdateRouterResponse.Unmarshal(m, b)
-}
-func (m *UpdateRouterResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_UpdateRouterResponse.Marshal(b, m, deterministic)
-}
-func (m *UpdateRouterResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UpdateRouterResponse.Merge(m, src)
-}
-func (m *UpdateRouterResponse) XXX_Size() int {
-	return xxx_messageInfo_UpdateRouterResponse.Size(m)
-}
-func (m *UpdateRouterResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_UpdateRouterResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_UpdateRouterResponse proto.InternalMessageInfo
-
-func (m *UpdateRouterResponse) GetRouter() *Router {
-	if m != nil {
-		return m.Router
+func (x *UpdateRouterResponse) GetRouter() *Router {
+	if x != nil {
+		return x.Router
 	}
 	return nil
 }
 
-func (m *UpdateRouterResponse) GetAtTime() *timestamp.Timestamp {
-	if m != nil {
-		return m.AtTime
+func (x *UpdateRouterResponse) GetAtTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.AtTime
 	}
 	return nil
 }
 
 type DeleteRouterRequest struct {
-	Router               *Router  `protobuf:"bytes,1,opt,name=router,proto3" json:"router,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Router *Router `protobuf:"bytes,1,opt,name=router,proto3" json:"router,omitempty"`
 }
 
-func (m *DeleteRouterRequest) Reset()         { *m = DeleteRouterRequest{} }
-func (m *DeleteRouterRequest) String() string { return proto.CompactTextString(m) }
-func (*DeleteRouterRequest) ProtoMessage()    {}
+func (x *DeleteRouterRequest) Reset() {
+	*x = DeleteRouterRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteRouterRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteRouterRequest) ProtoMessage() {}
+
+func (x *DeleteRouterRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteRouterRequest.ProtoReflect.Descriptor instead.
 func (*DeleteRouterRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{10}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{10}
 }
 
-func (m *DeleteRouterRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_DeleteRouterRequest.Unmarshal(m, b)
-}
-func (m *DeleteRouterRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_DeleteRouterRequest.Marshal(b, m, deterministic)
-}
-func (m *DeleteRouterRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DeleteRouterRequest.Merge(m, src)
-}
-func (m *DeleteRouterRequest) XXX_Size() int {
-	return xxx_messageInfo_DeleteRouterRequest.Size(m)
-}
-func (m *DeleteRouterRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_DeleteRouterRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_DeleteRouterRequest proto.InternalMessageInfo
-
-func (m *DeleteRouterRequest) GetRouter() *Router {
-	if m != nil {
-		return m.Router
+func (x *DeleteRouterRequest) GetRouter() *Router {
+	if x != nil {
+		return x.Router
 	}
 	return nil
 }
 
 type DeleteRouterResponse struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
 }
 
-func (m *DeleteRouterResponse) Reset()         { *m = DeleteRouterResponse{} }
-func (m *DeleteRouterResponse) String() string { return proto.CompactTextString(m) }
-func (*DeleteRouterResponse) ProtoMessage()    {}
+func (x *DeleteRouterResponse) Reset() {
+	*x = DeleteRouterResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteRouterResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteRouterResponse) ProtoMessage() {}
+
+func (x *DeleteRouterResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteRouterResponse.ProtoReflect.Descriptor instead.
 func (*DeleteRouterResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{11}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{11}
 }
-
-func (m *DeleteRouterResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_DeleteRouterResponse.Unmarshal(m, b)
-}
-func (m *DeleteRouterResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_DeleteRouterResponse.Marshal(b, m, deterministic)
-}
-func (m *DeleteRouterResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DeleteRouterResponse.Merge(m, src)
-}
-func (m *DeleteRouterResponse) XXX_Size() int {
-	return xxx_messageInfo_DeleteRouterResponse.Size(m)
-}
-func (m *DeleteRouterResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_DeleteRouterResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_DeleteRouterResponse proto.InternalMessageInfo
 
 type GetRouterRequest struct {
-	Router               *Router              `protobuf:"bytes,1,opt,name=router,proto3" json:"router,omitempty"`
-	AtTime               *timestamp.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Router *Router                `protobuf:"bytes,1,opt,name=router,proto3" json:"router,omitempty"`
+	AtTime *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
 }
 
-func (m *GetRouterRequest) Reset()         { *m = GetRouterRequest{} }
-func (m *GetRouterRequest) String() string { return proto.CompactTextString(m) }
-func (*GetRouterRequest) ProtoMessage()    {}
+func (x *GetRouterRequest) Reset() {
+	*x = GetRouterRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetRouterRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetRouterRequest) ProtoMessage() {}
+
+func (x *GetRouterRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetRouterRequest.ProtoReflect.Descriptor instead.
 func (*GetRouterRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{12}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{12}
 }
 
-func (m *GetRouterRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetRouterRequest.Unmarshal(m, b)
-}
-func (m *GetRouterRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetRouterRequest.Marshal(b, m, deterministic)
-}
-func (m *GetRouterRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetRouterRequest.Merge(m, src)
-}
-func (m *GetRouterRequest) XXX_Size() int {
-	return xxx_messageInfo_GetRouterRequest.Size(m)
-}
-func (m *GetRouterRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetRouterRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetRouterRequest proto.InternalMessageInfo
-
-func (m *GetRouterRequest) GetRouter() *Router {
-	if m != nil {
-		return m.Router
+func (x *GetRouterRequest) GetRouter() *Router {
+	if x != nil {
+		return x.Router
 	}
 	return nil
 }
 
-func (m *GetRouterRequest) GetAtTime() *timestamp.Timestamp {
-	if m != nil {
-		return m.AtTime
+func (x *GetRouterRequest) GetAtTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.AtTime
 	}
 	return nil
 }
 
 type GetRouterResponse struct {
-	Router               *Router              `protobuf:"bytes,1,opt,name=router,proto3" json:"router,omitempty"`
-	AtTime               *timestamp.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Router *Router                `protobuf:"bytes,1,opt,name=router,proto3" json:"router,omitempty"`
+	AtTime *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
 }
 
-func (m *GetRouterResponse) Reset()         { *m = GetRouterResponse{} }
-func (m *GetRouterResponse) String() string { return proto.CompactTextString(m) }
-func (*GetRouterResponse) ProtoMessage()    {}
+func (x *GetRouterResponse) Reset() {
+	*x = GetRouterResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[13]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetRouterResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetRouterResponse) ProtoMessage() {}
+
+func (x *GetRouterResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[13]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetRouterResponse.ProtoReflect.Descriptor instead.
 func (*GetRouterResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{13}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{13}
 }
 
-func (m *GetRouterResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetRouterResponse.Unmarshal(m, b)
-}
-func (m *GetRouterResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetRouterResponse.Marshal(b, m, deterministic)
-}
-func (m *GetRouterResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetRouterResponse.Merge(m, src)
-}
-func (m *GetRouterResponse) XXX_Size() int {
-	return xxx_messageInfo_GetRouterResponse.Size(m)
-}
-func (m *GetRouterResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetRouterResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetRouterResponse proto.InternalMessageInfo
-
-func (m *GetRouterResponse) GetRouter() *Router {
-	if m != nil {
-		return m.Router
+func (x *GetRouterResponse) GetRouter() *Router {
+	if x != nil {
+		return x.Router
 	}
 	return nil
 }
 
-func (m *GetRouterResponse) GetAtTime() *timestamp.Timestamp {
-	if m != nil {
-		return m.AtTime
+func (x *GetRouterResponse) GetAtTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.AtTime
 	}
 	return nil
 }
 
 type ListRouterRequest struct {
-	Filter               []*Router             `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
-	AtTime               *time.RequestAtTime   `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
-	Watch                bool                  `protobuf:"varint,3,opt,name=watch,proto3" json:"watch,omitempty"`
-	FieldMask            *field_mask.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Filter    []*Router              `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
+	AtTime    *time.RequestAtTime    `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
+	Watch     bool                   `protobuf:"varint,3,opt,name=watch,proto3" json:"watch,omitempty"`
+	FieldMask *fieldmaskpb.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 }
 
-func (m *ListRouterRequest) Reset()         { *m = ListRouterRequest{} }
-func (m *ListRouterRequest) String() string { return proto.CompactTextString(m) }
-func (*ListRouterRequest) ProtoMessage()    {}
+func (x *ListRouterRequest) Reset() {
+	*x = ListRouterRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[14]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListRouterRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListRouterRequest) ProtoMessage() {}
+
+func (x *ListRouterRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[14]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListRouterRequest.ProtoReflect.Descriptor instead.
 func (*ListRouterRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{14}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{14}
 }
 
-func (m *ListRouterRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ListRouterRequest.Unmarshal(m, b)
-}
-func (m *ListRouterRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ListRouterRequest.Marshal(b, m, deterministic)
-}
-func (m *ListRouterRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ListRouterRequest.Merge(m, src)
-}
-func (m *ListRouterRequest) XXX_Size() int {
-	return xxx_messageInfo_ListRouterRequest.Size(m)
-}
-func (m *ListRouterRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_ListRouterRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ListRouterRequest proto.InternalMessageInfo
-
-func (m *ListRouterRequest) GetFilter() []*Router {
-	if m != nil {
-		return m.Filter
+func (x *ListRouterRequest) GetFilter() []*Router {
+	if x != nil {
+		return x.Filter
 	}
 	return nil
 }
 
-func (m *ListRouterRequest) GetAtTime() *time.RequestAtTime {
-	if m != nil {
-		return m.AtTime
+func (x *ListRouterRequest) GetAtTime() *time.RequestAtTime {
+	if x != nil {
+		return x.AtTime
 	}
 	return nil
 }
 
-func (m *ListRouterRequest) GetWatch() bool {
-	if m != nil {
-		return m.Watch
+func (x *ListRouterRequest) GetWatch() bool {
+	if x != nil {
+		return x.Watch
 	}
 	return false
 }
 
-func (m *ListRouterRequest) GetFieldMask() *field_mask.FieldMask {
-	if m != nil {
-		return m.FieldMask
+func (x *ListRouterRequest) GetFieldMask() *fieldmaskpb.FieldMask {
+	if x != nil {
+		return x.FieldMask
 	}
 	return nil
 }
 
 type ListRouterResponse struct {
-	Router               *Router              `protobuf:"bytes,1,opt,name=router,proto3" json:"router,omitempty"`
-	AtTime               *timestamp.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Router *Router                `protobuf:"bytes,1,opt,name=router,proto3" json:"router,omitempty"`
+	AtTime *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
 }
 
-func (m *ListRouterResponse) Reset()         { *m = ListRouterResponse{} }
-func (m *ListRouterResponse) String() string { return proto.CompactTextString(m) }
-func (*ListRouterResponse) ProtoMessage()    {}
+func (x *ListRouterResponse) Reset() {
+	*x = ListRouterResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[15]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListRouterResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListRouterResponse) ProtoMessage() {}
+
+func (x *ListRouterResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[15]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListRouterResponse.ProtoReflect.Descriptor instead.
 func (*ListRouterResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{15}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{15}
 }
 
-func (m *ListRouterResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ListRouterResponse.Unmarshal(m, b)
-}
-func (m *ListRouterResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ListRouterResponse.Marshal(b, m, deterministic)
-}
-func (m *ListRouterResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ListRouterResponse.Merge(m, src)
-}
-func (m *ListRouterResponse) XXX_Size() int {
-	return xxx_messageInfo_ListRouterResponse.Size(m)
-}
-func (m *ListRouterResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_ListRouterResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ListRouterResponse proto.InternalMessageInfo
-
-func (m *ListRouterResponse) GetRouter() *Router {
-	if m != nil {
-		return m.Router
+func (x *ListRouterResponse) GetRouter() *Router {
+	if x != nil {
+		return x.Router
 	}
 	return nil
 }
 
-func (m *ListRouterResponse) GetAtTime() *timestamp.Timestamp {
-	if m != nil {
-		return m.AtTime
+func (x *ListRouterResponse) GetAtTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.AtTime
 	}
 	return nil
 }
 
 type WanInfo struct {
-	WanName              string                `protobuf:"bytes,1,opt,name=wan_name,json=wanName,proto3" json:"wan_name,omitempty"`
-	CpType               CloudProviderType     `protobuf:"varint,2,opt,name=cp_type,json=cpType,proto3,enum=clouddeploy.CloudProviderType" json:"cp_type,omitempty"`
-	PeerNames            []string              `protobuf:"bytes,3,rep,name=peer_names,json=peerNames,proto3" json:"peer_names,omitempty"`
-	EdgeEdgePeering      bool                  `protobuf:"varint,4,opt,name=edge_edge_peering,json=edgeEdgePeering,proto3" json:"edge_edge_peering,omitempty"`
-	EdgeEdgeIgw          bool                  `protobuf:"varint,5,opt,name=edge_edge_igw,json=edgeEdgeIgw,proto3" json:"edge_edge_igw,omitempty"`
-	EdgeDedicatedConnect bool                  `protobuf:"varint,6,opt,name=edge_dedicated_connect,json=edgeDedicatedConnect,proto3" json:"edge_dedicated_connect,omitempty"`
-	CvpContainerName     string                `protobuf:"bytes,7,opt,name=cvp_container_name,json=cvpContainerName,proto3" json:"cvp_container_name,omitempty"`
-	FieldMask            *field_mask.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	WanName              string                 `protobuf:"bytes,1,opt,name=wan_name,json=wanName,proto3" json:"wan_name,omitempty"`
+	CpType               CloudProviderType      `protobuf:"varint,2,opt,name=cp_type,json=cpType,proto3,enum=clouddeploy.CloudProviderType" json:"cp_type,omitempty"`
+	PeerNames            []string               `protobuf:"bytes,3,rep,name=peer_names,json=peerNames,proto3" json:"peer_names,omitempty"`
+	EdgeEdgePeering      bool                   `protobuf:"varint,4,opt,name=edge_edge_peering,json=edgeEdgePeering,proto3" json:"edge_edge_peering,omitempty"`
+	EdgeEdgeIgw          bool                   `protobuf:"varint,5,opt,name=edge_edge_igw,json=edgeEdgeIgw,proto3" json:"edge_edge_igw,omitempty"`
+	EdgeDedicatedConnect bool                   `protobuf:"varint,6,opt,name=edge_dedicated_connect,json=edgeDedicatedConnect,proto3" json:"edge_dedicated_connect,omitempty"` // DirectConnect
+	CvpContainerName     string                 `protobuf:"bytes,7,opt,name=cvp_container_name,json=cvpContainerName,proto3" json:"cvp_container_name,omitempty"`
+	FieldMask            *fieldmaskpb.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 }
 
-func (m *WanInfo) Reset()         { *m = WanInfo{} }
-func (m *WanInfo) String() string { return proto.CompactTextString(m) }
-func (*WanInfo) ProtoMessage()    {}
+func (x *WanInfo) Reset() {
+	*x = WanInfo{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[16]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *WanInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WanInfo) ProtoMessage() {}
+
+func (x *WanInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[16]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WanInfo.ProtoReflect.Descriptor instead.
 func (*WanInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{16}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{16}
 }
 
-func (m *WanInfo) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_WanInfo.Unmarshal(m, b)
-}
-func (m *WanInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_WanInfo.Marshal(b, m, deterministic)
-}
-func (m *WanInfo) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_WanInfo.Merge(m, src)
-}
-func (m *WanInfo) XXX_Size() int {
-	return xxx_messageInfo_WanInfo.Size(m)
-}
-func (m *WanInfo) XXX_DiscardUnknown() {
-	xxx_messageInfo_WanInfo.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_WanInfo proto.InternalMessageInfo
-
-func (m *WanInfo) GetWanName() string {
-	if m != nil {
-		return m.WanName
+func (x *WanInfo) GetWanName() string {
+	if x != nil {
+		return x.WanName
 	}
 	return ""
 }
 
-func (m *WanInfo) GetCpType() CloudProviderType {
-	if m != nil {
-		return m.CpType
+func (x *WanInfo) GetCpType() CloudProviderType {
+	if x != nil {
+		return x.CpType
 	}
 	return CloudProviderType_CP_UNSPECIFIED
 }
 
-func (m *WanInfo) GetPeerNames() []string {
-	if m != nil {
-		return m.PeerNames
+func (x *WanInfo) GetPeerNames() []string {
+	if x != nil {
+		return x.PeerNames
 	}
 	return nil
 }
 
-func (m *WanInfo) GetEdgeEdgePeering() bool {
-	if m != nil {
-		return m.EdgeEdgePeering
+func (x *WanInfo) GetEdgeEdgePeering() bool {
+	if x != nil {
+		return x.EdgeEdgePeering
 	}
 	return false
 }
 
-func (m *WanInfo) GetEdgeEdgeIgw() bool {
-	if m != nil {
-		return m.EdgeEdgeIgw
+func (x *WanInfo) GetEdgeEdgeIgw() bool {
+	if x != nil {
+		return x.EdgeEdgeIgw
 	}
 	return false
 }
 
-func (m *WanInfo) GetEdgeDedicatedConnect() bool {
-	if m != nil {
-		return m.EdgeDedicatedConnect
+func (x *WanInfo) GetEdgeDedicatedConnect() bool {
+	if x != nil {
+		return x.EdgeDedicatedConnect
 	}
 	return false
 }
 
-func (m *WanInfo) GetCvpContainerName() string {
-	if m != nil {
-		return m.CvpContainerName
+func (x *WanInfo) GetCvpContainerName() string {
+	if x != nil {
+		return x.CvpContainerName
 	}
 	return ""
 }
 
-func (m *WanInfo) GetFieldMask() *field_mask.FieldMask {
-	if m != nil {
-		return m.FieldMask
+func (x *WanInfo) GetFieldMask() *fieldmaskpb.FieldMask {
+	if x != nil {
+		return x.FieldMask
 	}
 	return nil
 }
 
 type ClosInfo struct {
-	ClosName             string                `protobuf:"bytes,1,opt,name=clos_name,json=closName,proto3" json:"clos_name,omitempty"`
-	CpType               CloudProviderType     `protobuf:"varint,2,opt,name=cp_type,json=cpType,proto3,enum=clouddeploy.CloudProviderType" json:"cp_type,omitempty"`
-	Fabric               FabricType            `protobuf:"varint,3,opt,name=fabric,proto3,enum=clouddeploy.FabricType" json:"fabric,omitempty"`
-	LeafEdgePeering      bool                  `protobuf:"varint,4,opt,name=leaf_edge_peering,json=leafEdgePeering,proto3" json:"leaf_edge_peering,omitempty"`
-	LeafEdgeIgw          bool                  `protobuf:"varint,5,opt,name=leaf_edge_igw,json=leafEdgeIgw,proto3" json:"leaf_edge_igw,omitempty"`
-	LeafEncryption       bool                  `protobuf:"varint,6,opt,name=leaf_encryption,json=leafEncryption,proto3" json:"leaf_encryption,omitempty"`
-	CvpContainerName     string                `protobuf:"bytes,7,opt,name=cvp_container_name,json=cvpContainerName,proto3" json:"cvp_container_name,omitempty"`
-	FieldMask            *field_mask.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	ClosName         string                 `protobuf:"bytes,1,opt,name=clos_name,json=closName,proto3" json:"clos_name,omitempty"`
+	CpType           CloudProviderType      `protobuf:"varint,2,opt,name=cp_type,json=cpType,proto3,enum=clouddeploy.CloudProviderType" json:"cp_type,omitempty"`
+	Fabric           FabricType             `protobuf:"varint,3,opt,name=fabric,proto3,enum=clouddeploy.FabricType" json:"fabric,omitempty"`                // for Leaf connectivity
+	LeafEdgePeering  bool                   `protobuf:"varint,4,opt,name=leaf_edge_peering,json=leafEdgePeering,proto3" json:"leaf_edge_peering,omitempty"` // VPC peering b/w leaf and edge
+	LeafEdgeIgw      bool                   `protobuf:"varint,5,opt,name=leaf_edge_igw,json=leafEdgeIgw,proto3" json:"leaf_edge_igw,omitempty"`             // IGW b/w leaf and edge
+	LeafEncryption   bool                   `protobuf:"varint,6,opt,name=leaf_encryption,json=leafEncryption,proto3" json:"leaf_encryption,omitempty"`      // IPSec b/w leaf and edge
+	CvpContainerName string                 `protobuf:"bytes,7,opt,name=cvp_container_name,json=cvpContainerName,proto3" json:"cvp_container_name,omitempty"`
+	FieldMask        *fieldmaskpb.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 }
 
-func (m *ClosInfo) Reset()         { *m = ClosInfo{} }
-func (m *ClosInfo) String() string { return proto.CompactTextString(m) }
-func (*ClosInfo) ProtoMessage()    {}
+func (x *ClosInfo) Reset() {
+	*x = ClosInfo{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[17]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ClosInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ClosInfo) ProtoMessage() {}
+
+func (x *ClosInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[17]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ClosInfo.ProtoReflect.Descriptor instead.
 func (*ClosInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{17}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{17}
 }
 
-func (m *ClosInfo) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ClosInfo.Unmarshal(m, b)
-}
-func (m *ClosInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ClosInfo.Marshal(b, m, deterministic)
-}
-func (m *ClosInfo) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ClosInfo.Merge(m, src)
-}
-func (m *ClosInfo) XXX_Size() int {
-	return xxx_messageInfo_ClosInfo.Size(m)
-}
-func (m *ClosInfo) XXX_DiscardUnknown() {
-	xxx_messageInfo_ClosInfo.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ClosInfo proto.InternalMessageInfo
-
-func (m *ClosInfo) GetClosName() string {
-	if m != nil {
-		return m.ClosName
+func (x *ClosInfo) GetClosName() string {
+	if x != nil {
+		return x.ClosName
 	}
 	return ""
 }
 
-func (m *ClosInfo) GetCpType() CloudProviderType {
-	if m != nil {
-		return m.CpType
+func (x *ClosInfo) GetCpType() CloudProviderType {
+	if x != nil {
+		return x.CpType
 	}
 	return CloudProviderType_CP_UNSPECIFIED
 }
 
-func (m *ClosInfo) GetFabric() FabricType {
-	if m != nil {
-		return m.Fabric
+func (x *ClosInfo) GetFabric() FabricType {
+	if x != nil {
+		return x.Fabric
 	}
 	return FabricType_FABRIC_TYPE_UNSPECIFIED
 }
 
-func (m *ClosInfo) GetLeafEdgePeering() bool {
-	if m != nil {
-		return m.LeafEdgePeering
+func (x *ClosInfo) GetLeafEdgePeering() bool {
+	if x != nil {
+		return x.LeafEdgePeering
 	}
 	return false
 }
 
-func (m *ClosInfo) GetLeafEdgeIgw() bool {
-	if m != nil {
-		return m.LeafEdgeIgw
+func (x *ClosInfo) GetLeafEdgeIgw() bool {
+	if x != nil {
+		return x.LeafEdgeIgw
 	}
 	return false
 }
 
-func (m *ClosInfo) GetLeafEncryption() bool {
-	if m != nil {
-		return m.LeafEncryption
+func (x *ClosInfo) GetLeafEncryption() bool {
+	if x != nil {
+		return x.LeafEncryption
 	}
 	return false
 }
 
-func (m *ClosInfo) GetCvpContainerName() string {
-	if m != nil {
-		return m.CvpContainerName
+func (x *ClosInfo) GetCvpContainerName() string {
+	if x != nil {
+		return x.CvpContainerName
 	}
 	return ""
 }
 
-func (m *ClosInfo) GetFieldMask() *field_mask.FieldMask {
-	if m != nil {
-		return m.FieldMask
+func (x *ClosInfo) GetFieldMask() *fieldmaskpb.FieldMask {
+	if x != nil {
+		return x.FieldMask
 	}
 	return nil
 }
 
 type TopologyInfo struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
 	// Topology meta info
-	Name                 string                `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Id                   string                `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
-	TopoType             TopologyInfoType      `protobuf:"varint,3,opt,name=topo_type,json=topoType,proto3,enum=clouddeploy.TopologyInfoType" json:"topo_type,omitempty"`
-	BgpAsnLow            uint32                `protobuf:"varint,4,opt,name=bgp_asn_low,json=bgpAsnLow,proto3" json:"bgp_asn_low,omitempty"`
-	BgpAsnHigh           uint32                `protobuf:"varint,5,opt,name=bgp_asn_high,json=bgpAsnHigh,proto3" json:"bgp_asn_high,omitempty"`
-	VtepIpCidr           string                `protobuf:"bytes,6,opt,name=vtep_ip_cidr,json=vtepIpCidr,proto3" json:"vtep_ip_cidr,omitempty"`
-	TerminattrIpCidr     string                `protobuf:"bytes,7,opt,name=terminattr_ip_cidr,json=terminattrIpCidr,proto3" json:"terminattr_ip_cidr,omitempty"`
-	DpsControlPlaneCidr  string                `protobuf:"bytes,8,opt,name=dps_control_plane_cidr,json=dpsControlPlaneCidr,proto3" json:"dps_control_plane_cidr,omitempty"`
-	ManagedDevices       []string              `protobuf:"bytes,9,rep,name=managed_devices,json=managedDevices,proto3" json:"managed_devices,omitempty"`
-	CvaasDomain          string                `protobuf:"bytes,10,opt,name=cvaas_domain,json=cvaasDomain,proto3" json:"cvaas_domain,omitempty"`
-	CvaasServer          string                `protobuf:"bytes,11,opt,name=cvaas_server,json=cvaasServer,proto3" json:"cvaas_server,omitempty"`
-	WanInfo              *WanInfo              `protobuf:"bytes,12,opt,name=wan_info,json=wanInfo,proto3" json:"wan_info,omitempty"`
-	ClosInfo             *ClosInfo             `protobuf:"bytes,13,opt,name=clos_info,json=closInfo,proto3" json:"clos_info,omitempty"`
-	Version              string                `protobuf:"bytes,14,opt,name=version,proto3" json:"version,omitempty"`
-	FieldMask            *field_mask.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
+	Name                string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Id                  string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	TopoType            TopologyInfoType       `protobuf:"varint,3,opt,name=topo_type,json=topoType,proto3,enum=clouddeploy.TopologyInfoType" json:"topo_type,omitempty"`
+	BgpAsnLow           uint32                 `protobuf:"varint,4,opt,name=bgp_asn_low,json=bgpAsnLow,proto3" json:"bgp_asn_low,omitempty"`
+	BgpAsnHigh          uint32                 `protobuf:"varint,5,opt,name=bgp_asn_high,json=bgpAsnHigh,proto3" json:"bgp_asn_high,omitempty"`
+	VtepIpCidr          string                 `protobuf:"bytes,6,opt,name=vtep_ip_cidr,json=vtepIpCidr,proto3" json:"vtep_ip_cidr,omitempty"`                              // CIDR block for VTEP IPs on vEOS
+	TerminattrIpCidr    string                 `protobuf:"bytes,7,opt,name=terminattr_ip_cidr,json=terminattrIpCidr,proto3" json:"terminattr_ip_cidr,omitempty"`            // Loopback IP range on vEOS
+	DpsControlPlaneCidr string                 `protobuf:"bytes,8,opt,name=dps_control_plane_cidr,json=dpsControlPlaneCidr,proto3" json:"dps_control_plane_cidr,omitempty"` // Dps Control Plane IP Cidr
+	ManagedDevices      []string               `protobuf:"bytes,9,rep,name=managed_devices,json=managedDevices,proto3" json:"managed_devices,omitempty"`                    // Hostnames of existing vEOS instances
+	CvaasDomain         string                 `protobuf:"bytes,10,opt,name=cvaas_domain,json=cvaasDomain,proto3" json:"cvaas_domain,omitempty"`                            //CVaaS Domain Name
+	CvaasServer         string                 `protobuf:"bytes,11,opt,name=cvaas_server,json=cvaasServer,proto3" json:"cvaas_server,omitempty"`
+	WanInfo             *WanInfo               `protobuf:"bytes,12,opt,name=wan_info,json=wanInfo,proto3" json:"wan_info,omitempty"`
+	ClosInfo            *ClosInfo              `protobuf:"bytes,13,opt,name=clos_info,json=closInfo,proto3" json:"clos_info,omitempty"`
+	Version             string                 `protobuf:"bytes,14,opt,name=version,proto3" json:"version,omitempty"`
+	DeployMode          string                 `protobuf:"bytes,15,opt,name=deploy_mode,json=deployMode,proto3" json:"deploy_mode,omitempty"`
+	FieldMask           *fieldmaskpb.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 }
 
-func (m *TopologyInfo) Reset()         { *m = TopologyInfo{} }
-func (m *TopologyInfo) String() string { return proto.CompactTextString(m) }
-func (*TopologyInfo) ProtoMessage()    {}
+func (x *TopologyInfo) Reset() {
+	*x = TopologyInfo{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[18]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TopologyInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TopologyInfo) ProtoMessage() {}
+
+func (x *TopologyInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[18]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TopologyInfo.ProtoReflect.Descriptor instead.
 func (*TopologyInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{18}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{18}
 }
 
-func (m *TopologyInfo) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_TopologyInfo.Unmarshal(m, b)
-}
-func (m *TopologyInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_TopologyInfo.Marshal(b, m, deterministic)
-}
-func (m *TopologyInfo) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_TopologyInfo.Merge(m, src)
-}
-func (m *TopologyInfo) XXX_Size() int {
-	return xxx_messageInfo_TopologyInfo.Size(m)
-}
-func (m *TopologyInfo) XXX_DiscardUnknown() {
-	xxx_messageInfo_TopologyInfo.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_TopologyInfo proto.InternalMessageInfo
-
-func (m *TopologyInfo) GetName() string {
-	if m != nil {
-		return m.Name
+func (x *TopologyInfo) GetName() string {
+	if x != nil {
+		return x.Name
 	}
 	return ""
 }
 
-func (m *TopologyInfo) GetId() string {
-	if m != nil {
-		return m.Id
+func (x *TopologyInfo) GetId() string {
+	if x != nil {
+		return x.Id
 	}
 	return ""
 }
 
-func (m *TopologyInfo) GetTopoType() TopologyInfoType {
-	if m != nil {
-		return m.TopoType
+func (x *TopologyInfo) GetTopoType() TopologyInfoType {
+	if x != nil {
+		return x.TopoType
 	}
 	return TopologyInfoType_TOPO_INFO_TYPE_UNSPECIFIED
 }
 
-func (m *TopologyInfo) GetBgpAsnLow() uint32 {
-	if m != nil {
-		return m.BgpAsnLow
+func (x *TopologyInfo) GetBgpAsnLow() uint32 {
+	if x != nil {
+		return x.BgpAsnLow
 	}
 	return 0
 }
 
-func (m *TopologyInfo) GetBgpAsnHigh() uint32 {
-	if m != nil {
-		return m.BgpAsnHigh
+func (x *TopologyInfo) GetBgpAsnHigh() uint32 {
+	if x != nil {
+		return x.BgpAsnHigh
 	}
 	return 0
 }
 
-func (m *TopologyInfo) GetVtepIpCidr() string {
-	if m != nil {
-		return m.VtepIpCidr
+func (x *TopologyInfo) GetVtepIpCidr() string {
+	if x != nil {
+		return x.VtepIpCidr
 	}
 	return ""
 }
 
-func (m *TopologyInfo) GetTerminattrIpCidr() string {
-	if m != nil {
-		return m.TerminattrIpCidr
+func (x *TopologyInfo) GetTerminattrIpCidr() string {
+	if x != nil {
+		return x.TerminattrIpCidr
 	}
 	return ""
 }
 
-func (m *TopologyInfo) GetDpsControlPlaneCidr() string {
-	if m != nil {
-		return m.DpsControlPlaneCidr
+func (x *TopologyInfo) GetDpsControlPlaneCidr() string {
+	if x != nil {
+		return x.DpsControlPlaneCidr
 	}
 	return ""
 }
 
-func (m *TopologyInfo) GetManagedDevices() []string {
-	if m != nil {
-		return m.ManagedDevices
+func (x *TopologyInfo) GetManagedDevices() []string {
+	if x != nil {
+		return x.ManagedDevices
 	}
 	return nil
 }
 
-func (m *TopologyInfo) GetCvaasDomain() string {
-	if m != nil {
-		return m.CvaasDomain
+func (x *TopologyInfo) GetCvaasDomain() string {
+	if x != nil {
+		return x.CvaasDomain
 	}
 	return ""
 }
 
-func (m *TopologyInfo) GetCvaasServer() string {
-	if m != nil {
-		return m.CvaasServer
+func (x *TopologyInfo) GetCvaasServer() string {
+	if x != nil {
+		return x.CvaasServer
 	}
 	return ""
 }
 
-func (m *TopologyInfo) GetWanInfo() *WanInfo {
-	if m != nil {
-		return m.WanInfo
+func (x *TopologyInfo) GetWanInfo() *WanInfo {
+	if x != nil {
+		return x.WanInfo
 	}
 	return nil
 }
 
-func (m *TopologyInfo) GetClosInfo() *ClosInfo {
-	if m != nil {
-		return m.ClosInfo
+func (x *TopologyInfo) GetClosInfo() *ClosInfo {
+	if x != nil {
+		return x.ClosInfo
 	}
 	return nil
 }
 
-func (m *TopologyInfo) GetVersion() string {
-	if m != nil {
-		return m.Version
+func (x *TopologyInfo) GetVersion() string {
+	if x != nil {
+		return x.Version
 	}
 	return ""
 }
 
-func (m *TopologyInfo) GetFieldMask() *field_mask.FieldMask {
-	if m != nil {
-		return m.FieldMask
+func (x *TopologyInfo) GetDeployMode() string {
+	if x != nil {
+		return x.DeployMode
+	}
+	return ""
+}
+
+func (x *TopologyInfo) GetFieldMask() *fieldmaskpb.FieldMask {
+	if x != nil {
+		return x.FieldMask
 	}
 	return nil
 }
 
 type AddTopologyInfoRequest struct {
-	TopologyInfo         *TopologyInfo `protobuf:"bytes,1,opt,name=topology_info,json=topologyInfo,proto3" json:"topology_info,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
-	XXX_unrecognized     []byte        `json:"-"`
-	XXX_sizecache        int32         `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	TopologyInfo *TopologyInfo `protobuf:"bytes,1,opt,name=topology_info,json=topologyInfo,proto3" json:"topology_info,omitempty"`
 }
 
-func (m *AddTopologyInfoRequest) Reset()         { *m = AddTopologyInfoRequest{} }
-func (m *AddTopologyInfoRequest) String() string { return proto.CompactTextString(m) }
-func (*AddTopologyInfoRequest) ProtoMessage()    {}
+func (x *AddTopologyInfoRequest) Reset() {
+	*x = AddTopologyInfoRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[19]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AddTopologyInfoRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddTopologyInfoRequest) ProtoMessage() {}
+
+func (x *AddTopologyInfoRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[19]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddTopologyInfoRequest.ProtoReflect.Descriptor instead.
 func (*AddTopologyInfoRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{19}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{19}
 }
 
-func (m *AddTopologyInfoRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_AddTopologyInfoRequest.Unmarshal(m, b)
-}
-func (m *AddTopologyInfoRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_AddTopologyInfoRequest.Marshal(b, m, deterministic)
-}
-func (m *AddTopologyInfoRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AddTopologyInfoRequest.Merge(m, src)
-}
-func (m *AddTopologyInfoRequest) XXX_Size() int {
-	return xxx_messageInfo_AddTopologyInfoRequest.Size(m)
-}
-func (m *AddTopologyInfoRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_AddTopologyInfoRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AddTopologyInfoRequest proto.InternalMessageInfo
-
-func (m *AddTopologyInfoRequest) GetTopologyInfo() *TopologyInfo {
-	if m != nil {
-		return m.TopologyInfo
+func (x *AddTopologyInfoRequest) GetTopologyInfo() *TopologyInfo {
+	if x != nil {
+		return x.TopologyInfo
 	}
 	return nil
 }
 
 type AddTopologyInfoResponse struct {
-	TopologyInfo         *TopologyInfo        `protobuf:"bytes,1,opt,name=topology_info,json=topologyInfo,proto3" json:"topology_info,omitempty"`
-	CreatedAt            *timestamp.Timestamp `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	TopologyInfo *TopologyInfo          `protobuf:"bytes,1,opt,name=topology_info,json=topologyInfo,proto3" json:"topology_info,omitempty"`
+	CreatedAt    *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 }
 
-func (m *AddTopologyInfoResponse) Reset()         { *m = AddTopologyInfoResponse{} }
-func (m *AddTopologyInfoResponse) String() string { return proto.CompactTextString(m) }
-func (*AddTopologyInfoResponse) ProtoMessage()    {}
+func (x *AddTopologyInfoResponse) Reset() {
+	*x = AddTopologyInfoResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[20]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AddTopologyInfoResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddTopologyInfoResponse) ProtoMessage() {}
+
+func (x *AddTopologyInfoResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[20]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddTopologyInfoResponse.ProtoReflect.Descriptor instead.
 func (*AddTopologyInfoResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{20}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{20}
 }
 
-func (m *AddTopologyInfoResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_AddTopologyInfoResponse.Unmarshal(m, b)
-}
-func (m *AddTopologyInfoResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_AddTopologyInfoResponse.Marshal(b, m, deterministic)
-}
-func (m *AddTopologyInfoResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AddTopologyInfoResponse.Merge(m, src)
-}
-func (m *AddTopologyInfoResponse) XXX_Size() int {
-	return xxx_messageInfo_AddTopologyInfoResponse.Size(m)
-}
-func (m *AddTopologyInfoResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_AddTopologyInfoResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AddTopologyInfoResponse proto.InternalMessageInfo
-
-func (m *AddTopologyInfoResponse) GetTopologyInfo() *TopologyInfo {
-	if m != nil {
-		return m.TopologyInfo
+func (x *AddTopologyInfoResponse) GetTopologyInfo() *TopologyInfo {
+	if x != nil {
+		return x.TopologyInfo
 	}
 	return nil
 }
 
-func (m *AddTopologyInfoResponse) GetCreatedAt() *timestamp.Timestamp {
-	if m != nil {
-		return m.CreatedAt
+func (x *AddTopologyInfoResponse) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
 	}
 	return nil
 }
 
 type UpdateTopologyInfoRequest struct {
-	TopologyInfo         *TopologyInfo `protobuf:"bytes,1,opt,name=topology_info,json=topologyInfo,proto3" json:"topology_info,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
-	XXX_unrecognized     []byte        `json:"-"`
-	XXX_sizecache        int32         `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	TopologyInfo *TopologyInfo `protobuf:"bytes,1,opt,name=topology_info,json=topologyInfo,proto3" json:"topology_info,omitempty"`
 }
 
-func (m *UpdateTopologyInfoRequest) Reset()         { *m = UpdateTopologyInfoRequest{} }
-func (m *UpdateTopologyInfoRequest) String() string { return proto.CompactTextString(m) }
-func (*UpdateTopologyInfoRequest) ProtoMessage()    {}
+func (x *UpdateTopologyInfoRequest) Reset() {
+	*x = UpdateTopologyInfoRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[21]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateTopologyInfoRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateTopologyInfoRequest) ProtoMessage() {}
+
+func (x *UpdateTopologyInfoRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[21]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateTopologyInfoRequest.ProtoReflect.Descriptor instead.
 func (*UpdateTopologyInfoRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{21}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{21}
 }
 
-func (m *UpdateTopologyInfoRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_UpdateTopologyInfoRequest.Unmarshal(m, b)
-}
-func (m *UpdateTopologyInfoRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_UpdateTopologyInfoRequest.Marshal(b, m, deterministic)
-}
-func (m *UpdateTopologyInfoRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UpdateTopologyInfoRequest.Merge(m, src)
-}
-func (m *UpdateTopologyInfoRequest) XXX_Size() int {
-	return xxx_messageInfo_UpdateTopologyInfoRequest.Size(m)
-}
-func (m *UpdateTopologyInfoRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_UpdateTopologyInfoRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_UpdateTopologyInfoRequest proto.InternalMessageInfo
-
-func (m *UpdateTopologyInfoRequest) GetTopologyInfo() *TopologyInfo {
-	if m != nil {
-		return m.TopologyInfo
+func (x *UpdateTopologyInfoRequest) GetTopologyInfo() *TopologyInfo {
+	if x != nil {
+		return x.TopologyInfo
 	}
 	return nil
 }
 
 type UpdateTopologyInfoResponse struct {
-	TopologyInfo         *TopologyInfo        `protobuf:"bytes,1,opt,name=topology_info,json=topologyInfo,proto3" json:"topology_info,omitempty"`
-	AtTime               *timestamp.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	TopologyInfo *TopologyInfo          `protobuf:"bytes,1,opt,name=topology_info,json=topologyInfo,proto3" json:"topology_info,omitempty"`
+	AtTime       *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
 }
 
-func (m *UpdateTopologyInfoResponse) Reset()         { *m = UpdateTopologyInfoResponse{} }
-func (m *UpdateTopologyInfoResponse) String() string { return proto.CompactTextString(m) }
-func (*UpdateTopologyInfoResponse) ProtoMessage()    {}
+func (x *UpdateTopologyInfoResponse) Reset() {
+	*x = UpdateTopologyInfoResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[22]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateTopologyInfoResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateTopologyInfoResponse) ProtoMessage() {}
+
+func (x *UpdateTopologyInfoResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[22]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateTopologyInfoResponse.ProtoReflect.Descriptor instead.
 func (*UpdateTopologyInfoResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{22}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{22}
 }
 
-func (m *UpdateTopologyInfoResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_UpdateTopologyInfoResponse.Unmarshal(m, b)
-}
-func (m *UpdateTopologyInfoResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_UpdateTopologyInfoResponse.Marshal(b, m, deterministic)
-}
-func (m *UpdateTopologyInfoResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UpdateTopologyInfoResponse.Merge(m, src)
-}
-func (m *UpdateTopologyInfoResponse) XXX_Size() int {
-	return xxx_messageInfo_UpdateTopologyInfoResponse.Size(m)
-}
-func (m *UpdateTopologyInfoResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_UpdateTopologyInfoResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_UpdateTopologyInfoResponse proto.InternalMessageInfo
-
-func (m *UpdateTopologyInfoResponse) GetTopologyInfo() *TopologyInfo {
-	if m != nil {
-		return m.TopologyInfo
+func (x *UpdateTopologyInfoResponse) GetTopologyInfo() *TopologyInfo {
+	if x != nil {
+		return x.TopologyInfo
 	}
 	return nil
 }
 
-func (m *UpdateTopologyInfoResponse) GetAtTime() *timestamp.Timestamp {
-	if m != nil {
-		return m.AtTime
+func (x *UpdateTopologyInfoResponse) GetAtTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.AtTime
 	}
 	return nil
 }
 
 type DeleteTopologyInfoRequest struct {
-	TopologyInfo         *TopologyInfo `protobuf:"bytes,1,opt,name=topology_info,json=topologyInfo,proto3" json:"topology_info,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
-	XXX_unrecognized     []byte        `json:"-"`
-	XXX_sizecache        int32         `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	TopologyInfo *TopologyInfo `protobuf:"bytes,1,opt,name=topology_info,json=topologyInfo,proto3" json:"topology_info,omitempty"`
 }
 
-func (m *DeleteTopologyInfoRequest) Reset()         { *m = DeleteTopologyInfoRequest{} }
-func (m *DeleteTopologyInfoRequest) String() string { return proto.CompactTextString(m) }
-func (*DeleteTopologyInfoRequest) ProtoMessage()    {}
+func (x *DeleteTopologyInfoRequest) Reset() {
+	*x = DeleteTopologyInfoRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[23]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteTopologyInfoRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteTopologyInfoRequest) ProtoMessage() {}
+
+func (x *DeleteTopologyInfoRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[23]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteTopologyInfoRequest.ProtoReflect.Descriptor instead.
 func (*DeleteTopologyInfoRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{23}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{23}
 }
 
-func (m *DeleteTopologyInfoRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_DeleteTopologyInfoRequest.Unmarshal(m, b)
-}
-func (m *DeleteTopologyInfoRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_DeleteTopologyInfoRequest.Marshal(b, m, deterministic)
-}
-func (m *DeleteTopologyInfoRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DeleteTopologyInfoRequest.Merge(m, src)
-}
-func (m *DeleteTopologyInfoRequest) XXX_Size() int {
-	return xxx_messageInfo_DeleteTopologyInfoRequest.Size(m)
-}
-func (m *DeleteTopologyInfoRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_DeleteTopologyInfoRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_DeleteTopologyInfoRequest proto.InternalMessageInfo
-
-func (m *DeleteTopologyInfoRequest) GetTopologyInfo() *TopologyInfo {
-	if m != nil {
-		return m.TopologyInfo
+func (x *DeleteTopologyInfoRequest) GetTopologyInfo() *TopologyInfo {
+	if x != nil {
+		return x.TopologyInfo
 	}
 	return nil
 }
 
 type DeleteTopologyInfoResponse struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
 }
 
-func (m *DeleteTopologyInfoResponse) Reset()         { *m = DeleteTopologyInfoResponse{} }
-func (m *DeleteTopologyInfoResponse) String() string { return proto.CompactTextString(m) }
-func (*DeleteTopologyInfoResponse) ProtoMessage()    {}
+func (x *DeleteTopologyInfoResponse) Reset() {
+	*x = DeleteTopologyInfoResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[24]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteTopologyInfoResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteTopologyInfoResponse) ProtoMessage() {}
+
+func (x *DeleteTopologyInfoResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[24]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteTopologyInfoResponse.ProtoReflect.Descriptor instead.
 func (*DeleteTopologyInfoResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{24}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{24}
 }
-
-func (m *DeleteTopologyInfoResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_DeleteTopologyInfoResponse.Unmarshal(m, b)
-}
-func (m *DeleteTopologyInfoResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_DeleteTopologyInfoResponse.Marshal(b, m, deterministic)
-}
-func (m *DeleteTopologyInfoResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DeleteTopologyInfoResponse.Merge(m, src)
-}
-func (m *DeleteTopologyInfoResponse) XXX_Size() int {
-	return xxx_messageInfo_DeleteTopologyInfoResponse.Size(m)
-}
-func (m *DeleteTopologyInfoResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_DeleteTopologyInfoResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_DeleteTopologyInfoResponse proto.InternalMessageInfo
 
 type GetTopologyInfoRequest struct {
-	TopologyInfo         *TopologyInfo        `protobuf:"bytes,1,opt,name=topology_info,json=topologyInfo,proto3" json:"topology_info,omitempty"`
-	AtTime               *timestamp.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	TopologyInfo *TopologyInfo          `protobuf:"bytes,1,opt,name=topology_info,json=topologyInfo,proto3" json:"topology_info,omitempty"`
+	AtTime       *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
 }
 
-func (m *GetTopologyInfoRequest) Reset()         { *m = GetTopologyInfoRequest{} }
-func (m *GetTopologyInfoRequest) String() string { return proto.CompactTextString(m) }
-func (*GetTopologyInfoRequest) ProtoMessage()    {}
+func (x *GetTopologyInfoRequest) Reset() {
+	*x = GetTopologyInfoRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[25]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetTopologyInfoRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTopologyInfoRequest) ProtoMessage() {}
+
+func (x *GetTopologyInfoRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[25]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTopologyInfoRequest.ProtoReflect.Descriptor instead.
 func (*GetTopologyInfoRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{25}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{25}
 }
 
-func (m *GetTopologyInfoRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetTopologyInfoRequest.Unmarshal(m, b)
-}
-func (m *GetTopologyInfoRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetTopologyInfoRequest.Marshal(b, m, deterministic)
-}
-func (m *GetTopologyInfoRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetTopologyInfoRequest.Merge(m, src)
-}
-func (m *GetTopologyInfoRequest) XXX_Size() int {
-	return xxx_messageInfo_GetTopologyInfoRequest.Size(m)
-}
-func (m *GetTopologyInfoRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetTopologyInfoRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetTopologyInfoRequest proto.InternalMessageInfo
-
-func (m *GetTopologyInfoRequest) GetTopologyInfo() *TopologyInfo {
-	if m != nil {
-		return m.TopologyInfo
+func (x *GetTopologyInfoRequest) GetTopologyInfo() *TopologyInfo {
+	if x != nil {
+		return x.TopologyInfo
 	}
 	return nil
 }
 
-func (m *GetTopologyInfoRequest) GetAtTime() *timestamp.Timestamp {
-	if m != nil {
-		return m.AtTime
+func (x *GetTopologyInfoRequest) GetAtTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.AtTime
 	}
 	return nil
 }
 
 type GetTopologyInfoResponse struct {
-	TopologyInfo         *TopologyInfo        `protobuf:"bytes,1,opt,name=topology_info,json=topologyInfo,proto3" json:"topology_info,omitempty"`
-	AtTime               *timestamp.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	TopologyInfo *TopologyInfo          `protobuf:"bytes,1,opt,name=topology_info,json=topologyInfo,proto3" json:"topology_info,omitempty"`
+	AtTime       *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
 }
 
-func (m *GetTopologyInfoResponse) Reset()         { *m = GetTopologyInfoResponse{} }
-func (m *GetTopologyInfoResponse) String() string { return proto.CompactTextString(m) }
-func (*GetTopologyInfoResponse) ProtoMessage()    {}
+func (x *GetTopologyInfoResponse) Reset() {
+	*x = GetTopologyInfoResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[26]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetTopologyInfoResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTopologyInfoResponse) ProtoMessage() {}
+
+func (x *GetTopologyInfoResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[26]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTopologyInfoResponse.ProtoReflect.Descriptor instead.
 func (*GetTopologyInfoResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{26}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{26}
 }
 
-func (m *GetTopologyInfoResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetTopologyInfoResponse.Unmarshal(m, b)
-}
-func (m *GetTopologyInfoResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetTopologyInfoResponse.Marshal(b, m, deterministic)
-}
-func (m *GetTopologyInfoResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetTopologyInfoResponse.Merge(m, src)
-}
-func (m *GetTopologyInfoResponse) XXX_Size() int {
-	return xxx_messageInfo_GetTopologyInfoResponse.Size(m)
-}
-func (m *GetTopologyInfoResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetTopologyInfoResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetTopologyInfoResponse proto.InternalMessageInfo
-
-func (m *GetTopologyInfoResponse) GetTopologyInfo() *TopologyInfo {
-	if m != nil {
-		return m.TopologyInfo
+func (x *GetTopologyInfoResponse) GetTopologyInfo() *TopologyInfo {
+	if x != nil {
+		return x.TopologyInfo
 	}
 	return nil
 }
 
-func (m *GetTopologyInfoResponse) GetAtTime() *timestamp.Timestamp {
-	if m != nil {
-		return m.AtTime
+func (x *GetTopologyInfoResponse) GetAtTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.AtTime
 	}
 	return nil
 }
 
 type ListTopologyInfoRequest struct {
-	Filter               []*TopologyInfo       `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
-	AtTime               *time.RequestAtTime   `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
-	Watch                bool                  `protobuf:"varint,3,opt,name=watch,proto3" json:"watch,omitempty"`
-	FieldMask            *field_mask.FieldMask `protobuf:"bytes,4,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Filter    []*TopologyInfo        `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
+	AtTime    *time.RequestAtTime    `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
+	Watch     bool                   `protobuf:"varint,3,opt,name=watch,proto3" json:"watch,omitempty"`
+	FieldMask *fieldmaskpb.FieldMask `protobuf:"bytes,4,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 }
 
-func (m *ListTopologyInfoRequest) Reset()         { *m = ListTopologyInfoRequest{} }
-func (m *ListTopologyInfoRequest) String() string { return proto.CompactTextString(m) }
-func (*ListTopologyInfoRequest) ProtoMessage()    {}
+func (x *ListTopologyInfoRequest) Reset() {
+	*x = ListTopologyInfoRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[27]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListTopologyInfoRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListTopologyInfoRequest) ProtoMessage() {}
+
+func (x *ListTopologyInfoRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[27]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListTopologyInfoRequest.ProtoReflect.Descriptor instead.
 func (*ListTopologyInfoRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{27}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{27}
 }
 
-func (m *ListTopologyInfoRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ListTopologyInfoRequest.Unmarshal(m, b)
-}
-func (m *ListTopologyInfoRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ListTopologyInfoRequest.Marshal(b, m, deterministic)
-}
-func (m *ListTopologyInfoRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ListTopologyInfoRequest.Merge(m, src)
-}
-func (m *ListTopologyInfoRequest) XXX_Size() int {
-	return xxx_messageInfo_ListTopologyInfoRequest.Size(m)
-}
-func (m *ListTopologyInfoRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_ListTopologyInfoRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ListTopologyInfoRequest proto.InternalMessageInfo
-
-func (m *ListTopologyInfoRequest) GetFilter() []*TopologyInfo {
-	if m != nil {
-		return m.Filter
+func (x *ListTopologyInfoRequest) GetFilter() []*TopologyInfo {
+	if x != nil {
+		return x.Filter
 	}
 	return nil
 }
 
-func (m *ListTopologyInfoRequest) GetAtTime() *time.RequestAtTime {
-	if m != nil {
-		return m.AtTime
+func (x *ListTopologyInfoRequest) GetAtTime() *time.RequestAtTime {
+	if x != nil {
+		return x.AtTime
 	}
 	return nil
 }
 
-func (m *ListTopologyInfoRequest) GetWatch() bool {
-	if m != nil {
-		return m.Watch
+func (x *ListTopologyInfoRequest) GetWatch() bool {
+	if x != nil {
+		return x.Watch
 	}
 	return false
 }
 
-func (m *ListTopologyInfoRequest) GetFieldMask() *field_mask.FieldMask {
-	if m != nil {
-		return m.FieldMask
+func (x *ListTopologyInfoRequest) GetFieldMask() *fieldmaskpb.FieldMask {
+	if x != nil {
+		return x.FieldMask
 	}
 	return nil
 }
 
 type ListTopologyInfoResponse struct {
-	TopologyInfo         *TopologyInfo        `protobuf:"bytes,1,opt,name=topology_info,json=topologyInfo,proto3" json:"topology_info,omitempty"`
-	AtTime               *timestamp.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	TopologyInfo *TopologyInfo          `protobuf:"bytes,1,opt,name=topology_info,json=topologyInfo,proto3" json:"topology_info,omitempty"`
+	AtTime       *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
 }
 
-func (m *ListTopologyInfoResponse) Reset()         { *m = ListTopologyInfoResponse{} }
-func (m *ListTopologyInfoResponse) String() string { return proto.CompactTextString(m) }
-func (*ListTopologyInfoResponse) ProtoMessage()    {}
+func (x *ListTopologyInfoResponse) Reset() {
+	*x = ListTopologyInfoResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[28]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListTopologyInfoResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListTopologyInfoResponse) ProtoMessage() {}
+
+func (x *ListTopologyInfoResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[28]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListTopologyInfoResponse.ProtoReflect.Descriptor instead.
 func (*ListTopologyInfoResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{28}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{28}
 }
 
-func (m *ListTopologyInfoResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ListTopologyInfoResponse.Unmarshal(m, b)
-}
-func (m *ListTopologyInfoResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ListTopologyInfoResponse.Marshal(b, m, deterministic)
-}
-func (m *ListTopologyInfoResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ListTopologyInfoResponse.Merge(m, src)
-}
-func (m *ListTopologyInfoResponse) XXX_Size() int {
-	return xxx_messageInfo_ListTopologyInfoResponse.Size(m)
-}
-func (m *ListTopologyInfoResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_ListTopologyInfoResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ListTopologyInfoResponse proto.InternalMessageInfo
-
-func (m *ListTopologyInfoResponse) GetTopologyInfo() *TopologyInfo {
-	if m != nil {
-		return m.TopologyInfo
+func (x *ListTopologyInfoResponse) GetTopologyInfo() *TopologyInfo {
+	if x != nil {
+		return x.TopologyInfo
 	}
 	return nil
 }
 
-func (m *ListTopologyInfoResponse) GetAtTime() *timestamp.Timestamp {
-	if m != nil {
-		return m.AtTime
+func (x *ListTopologyInfoResponse) GetAtTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.AtTime
 	}
 	return nil
 }
 
 type AzureVnetInfo struct {
-	Nsg                  []string              `protobuf:"bytes,1,rep,name=nsg,proto3" json:"nsg,omitempty"`
-	ResourceGroup        string                `protobuf:"bytes,2,opt,name=resource_group,json=resourceGroup,proto3" json:"resource_group,omitempty"`
-	Cidr                 string                `protobuf:"bytes,3,opt,name=cidr,proto3" json:"cidr,omitempty"`
-	AvailSet             []string              `protobuf:"bytes,4,rep,name=avail_set,json=availSet,proto3" json:"avail_set,omitempty"`
-	PeeringConnId        []string              `protobuf:"bytes,5,rep,name=peering_conn_id,json=peeringConnId,proto3" json:"peering_conn_id,omitempty"`
-	FieldMask            *field_mask.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Nsg           []string               `protobuf:"bytes,1,rep,name=nsg,proto3" json:"nsg,omitempty"`
+	ResourceGroup string                 `protobuf:"bytes,2,opt,name=resource_group,json=resourceGroup,proto3" json:"resource_group,omitempty"`
+	Cidr          string                 `protobuf:"bytes,3,opt,name=cidr,proto3" json:"cidr,omitempty"`
+	AvailSet      []string               `protobuf:"bytes,4,rep,name=avail_set,json=availSet,proto3" json:"avail_set,omitempty"`
+	PeeringConnId []string               `protobuf:"bytes,5,rep,name=peering_conn_id,json=peeringConnId,proto3" json:"peering_conn_id,omitempty"`
+	FieldMask     *fieldmaskpb.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 }
 
-func (m *AzureVnetInfo) Reset()         { *m = AzureVnetInfo{} }
-func (m *AzureVnetInfo) String() string { return proto.CompactTextString(m) }
-func (*AzureVnetInfo) ProtoMessage()    {}
+func (x *AzureVnetInfo) Reset() {
+	*x = AzureVnetInfo{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[29]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AzureVnetInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AzureVnetInfo) ProtoMessage() {}
+
+func (x *AzureVnetInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[29]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AzureVnetInfo.ProtoReflect.Descriptor instead.
 func (*AzureVnetInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{29}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{29}
 }
 
-func (m *AzureVnetInfo) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_AzureVnetInfo.Unmarshal(m, b)
-}
-func (m *AzureVnetInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_AzureVnetInfo.Marshal(b, m, deterministic)
-}
-func (m *AzureVnetInfo) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AzureVnetInfo.Merge(m, src)
-}
-func (m *AzureVnetInfo) XXX_Size() int {
-	return xxx_messageInfo_AzureVnetInfo.Size(m)
-}
-func (m *AzureVnetInfo) XXX_DiscardUnknown() {
-	xxx_messageInfo_AzureVnetInfo.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AzureVnetInfo proto.InternalMessageInfo
-
-func (m *AzureVnetInfo) GetNsg() []string {
-	if m != nil {
-		return m.Nsg
+func (x *AzureVnetInfo) GetNsg() []string {
+	if x != nil {
+		return x.Nsg
 	}
 	return nil
 }
 
-func (m *AzureVnetInfo) GetResourceGroup() string {
-	if m != nil {
-		return m.ResourceGroup
+func (x *AzureVnetInfo) GetResourceGroup() string {
+	if x != nil {
+		return x.ResourceGroup
 	}
 	return ""
 }
 
-func (m *AzureVnetInfo) GetCidr() string {
-	if m != nil {
-		return m.Cidr
+func (x *AzureVnetInfo) GetCidr() string {
+	if x != nil {
+		return x.Cidr
 	}
 	return ""
 }
 
-func (m *AzureVnetInfo) GetAvailSet() []string {
-	if m != nil {
-		return m.AvailSet
+func (x *AzureVnetInfo) GetAvailSet() []string {
+	if x != nil {
+		return x.AvailSet
 	}
 	return nil
 }
 
-func (m *AzureVnetInfo) GetPeeringConnId() []string {
-	if m != nil {
-		return m.PeeringConnId
+func (x *AzureVnetInfo) GetPeeringConnId() []string {
+	if x != nil {
+		return x.PeeringConnId
 	}
 	return nil
 }
 
-func (m *AzureVnetInfo) GetFieldMask() *field_mask.FieldMask {
-	if m != nil {
-		return m.FieldMask
+func (x *AzureVnetInfo) GetFieldMask() *fieldmaskpb.FieldMask {
+	if x != nil {
+		return x.FieldMask
 	}
 	return nil
 }
 
 type AwsVpcInfo struct {
-	SecurityGroup        []string              `protobuf:"bytes,1,rep,name=security_group,json=securityGroup,proto3" json:"security_group,omitempty"`
-	Cidr                 string                `protobuf:"bytes,2,opt,name=cidr,proto3" json:"cidr,omitempty"`
-	IgwId                string                `protobuf:"bytes,3,opt,name=igw_id,json=igwId,proto3" json:"igw_id,omitempty"`
-	PeeringConnId        []string              `protobuf:"bytes,4,rep,name=peering_conn_id,json=peeringConnId,proto3" json:"peering_conn_id,omitempty"`
-	FieldMask            *field_mask.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	SecurityGroup []string               `protobuf:"bytes,1,rep,name=security_group,json=securityGroup,proto3" json:"security_group,omitempty"`
+	Cidr          string                 `protobuf:"bytes,2,opt,name=cidr,proto3" json:"cidr,omitempty"`
+	IgwId         string                 `protobuf:"bytes,3,opt,name=igw_id,json=igwId,proto3" json:"igw_id,omitempty"`
+	PeeringConnId []string               `protobuf:"bytes,4,rep,name=peering_conn_id,json=peeringConnId,proto3" json:"peering_conn_id,omitempty"`
+	FieldMask     *fieldmaskpb.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 }
 
-func (m *AwsVpcInfo) Reset()         { *m = AwsVpcInfo{} }
-func (m *AwsVpcInfo) String() string { return proto.CompactTextString(m) }
-func (*AwsVpcInfo) ProtoMessage()    {}
+func (x *AwsVpcInfo) Reset() {
+	*x = AwsVpcInfo{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[30]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AwsVpcInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AwsVpcInfo) ProtoMessage() {}
+
+func (x *AwsVpcInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[30]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AwsVpcInfo.ProtoReflect.Descriptor instead.
 func (*AwsVpcInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{30}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{30}
 }
 
-func (m *AwsVpcInfo) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_AwsVpcInfo.Unmarshal(m, b)
-}
-func (m *AwsVpcInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_AwsVpcInfo.Marshal(b, m, deterministic)
-}
-func (m *AwsVpcInfo) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AwsVpcInfo.Merge(m, src)
-}
-func (m *AwsVpcInfo) XXX_Size() int {
-	return xxx_messageInfo_AwsVpcInfo.Size(m)
-}
-func (m *AwsVpcInfo) XXX_DiscardUnknown() {
-	xxx_messageInfo_AwsVpcInfo.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AwsVpcInfo proto.InternalMessageInfo
-
-func (m *AwsVpcInfo) GetSecurityGroup() []string {
-	if m != nil {
-		return m.SecurityGroup
+func (x *AwsVpcInfo) GetSecurityGroup() []string {
+	if x != nil {
+		return x.SecurityGroup
 	}
 	return nil
 }
 
-func (m *AwsVpcInfo) GetCidr() string {
-	if m != nil {
-		return m.Cidr
+func (x *AwsVpcInfo) GetCidr() string {
+	if x != nil {
+		return x.Cidr
 	}
 	return ""
 }
 
-func (m *AwsVpcInfo) GetIgwId() string {
-	if m != nil {
-		return m.IgwId
+func (x *AwsVpcInfo) GetIgwId() string {
+	if x != nil {
+		return x.IgwId
 	}
 	return ""
 }
 
-func (m *AwsVpcInfo) GetPeeringConnId() []string {
-	if m != nil {
-		return m.PeeringConnId
+func (x *AwsVpcInfo) GetPeeringConnId() []string {
+	if x != nil {
+		return x.PeeringConnId
 	}
 	return nil
 }
 
-func (m *AwsVpcInfo) GetFieldMask() *field_mask.FieldMask {
-	if m != nil {
-		return m.FieldMask
+func (x *AwsVpcInfo) GetFieldMask() *fieldmaskpb.FieldMask {
+	if x != nil {
+		return x.FieldMask
 	}
 	return nil
 }
 
 type PeerVpcInfo struct {
-	PeerVpcCidr          map[string]string     `protobuf:"bytes,1,rep,name=peer_vpc_cidr,json=peerVpcCidr,proto3" json:"peer_vpc_cidr,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	PeerRgName           string                `protobuf:"bytes,2,opt,name=peer_rg_name,json=peerRgName,proto3" json:"peer_rg_name,omitempty"`
-	PeerVnetName         string                `protobuf:"bytes,3,opt,name=peer_vnet_name,json=peerVnetName,proto3" json:"peer_vnet_name,omitempty"`
-	PeerVnetId           string                `protobuf:"bytes,4,opt,name=peer_vnet_id,json=peerVnetId,proto3" json:"peer_vnet_id,omitempty"`
-	FieldMask            *field_mask.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	PeerVpcCidr  map[string]string      `protobuf:"bytes,1,rep,name=peer_vpc_cidr,json=peerVpcCidr,proto3" json:"peer_vpc_cidr,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	PeerRgName   string                 `protobuf:"bytes,2,opt,name=peer_rg_name,json=peerRgName,proto3" json:"peer_rg_name,omitempty"`
+	PeerVnetName string                 `protobuf:"bytes,3,opt,name=peer_vnet_name,json=peerVnetName,proto3" json:"peer_vnet_name,omitempty"`
+	PeerVnetId   string                 `protobuf:"bytes,4,opt,name=peer_vnet_id,json=peerVnetId,proto3" json:"peer_vnet_id,omitempty"`
+	FieldMask    *fieldmaskpb.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 }
 
-func (m *PeerVpcInfo) Reset()         { *m = PeerVpcInfo{} }
-func (m *PeerVpcInfo) String() string { return proto.CompactTextString(m) }
-func (*PeerVpcInfo) ProtoMessage()    {}
+func (x *PeerVpcInfo) Reset() {
+	*x = PeerVpcInfo{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[31]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *PeerVpcInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PeerVpcInfo) ProtoMessage() {}
+
+func (x *PeerVpcInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[31]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PeerVpcInfo.ProtoReflect.Descriptor instead.
 func (*PeerVpcInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{31}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{31}
 }
 
-func (m *PeerVpcInfo) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PeerVpcInfo.Unmarshal(m, b)
-}
-func (m *PeerVpcInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PeerVpcInfo.Marshal(b, m, deterministic)
-}
-func (m *PeerVpcInfo) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PeerVpcInfo.Merge(m, src)
-}
-func (m *PeerVpcInfo) XXX_Size() int {
-	return xxx_messageInfo_PeerVpcInfo.Size(m)
-}
-func (m *PeerVpcInfo) XXX_DiscardUnknown() {
-	xxx_messageInfo_PeerVpcInfo.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_PeerVpcInfo proto.InternalMessageInfo
-
-func (m *PeerVpcInfo) GetPeerVpcCidr() map[string]string {
-	if m != nil {
-		return m.PeerVpcCidr
+func (x *PeerVpcInfo) GetPeerVpcCidr() map[string]string {
+	if x != nil {
+		return x.PeerVpcCidr
 	}
 	return nil
 }
 
-func (m *PeerVpcInfo) GetPeerRgName() string {
-	if m != nil {
-		return m.PeerRgName
+func (x *PeerVpcInfo) GetPeerRgName() string {
+	if x != nil {
+		return x.PeerRgName
 	}
 	return ""
 }
 
-func (m *PeerVpcInfo) GetPeerVnetName() string {
-	if m != nil {
-		return m.PeerVnetName
+func (x *PeerVpcInfo) GetPeerVnetName() string {
+	if x != nil {
+		return x.PeerVnetName
 	}
 	return ""
 }
 
-func (m *PeerVpcInfo) GetPeerVnetId() string {
-	if m != nil {
-		return m.PeerVnetId
+func (x *PeerVpcInfo) GetPeerVnetId() string {
+	if x != nil {
+		return x.PeerVnetId
 	}
 	return ""
 }
 
-func (m *PeerVpcInfo) GetFieldMask() *field_mask.FieldMask {
-	if m != nil {
-		return m.FieldMask
+func (x *PeerVpcInfo) GetFieldMask() *fieldmaskpb.FieldMask {
+	if x != nil {
+		return x.FieldMask
 	}
 	return nil
 }
 
 type Vpc struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
 	// name + vpc_id + cp_t is the primary key
 	Name   string            `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	VpcId  string            `protobuf:"bytes,2,opt,name=vpc_id,json=vpcId,proto3" json:"vpc_id,omitempty"`
 	CpT    CloudProviderType `protobuf:"varint,3,opt,name=cp_t,json=cpT,proto3,enum=clouddeploy.CloudProviderType" json:"cp_t,omitempty"`
 	Region string            `protobuf:"bytes,4,opt,name=region,proto3" json:"region,omitempty"`
-	Id     string            `protobuf:"bytes,5,opt,name=id,proto3" json:"id,omitempty"`
+	Id     string            `protobuf:"bytes,5,opt,name=id,proto3" json:"id,omitempty"` // an ID can be generated by the client to track resource
 	// Topology related attributes
 	RoleType       RoleType          `protobuf:"varint,6,opt,name=role_type,json=roleType,proto3,enum=clouddeploy.RoleType" json:"role_type,omitempty"`
 	TopologyName   string            `protobuf:"bytes,7,opt,name=topology_name,json=topologyName,proto3" json:"topology_name,omitempty"`
@@ -2457,2013 +2997,3894 @@ type Vpc struct {
 	AwsVpcInfo     *AwsVpcInfo       `protobuf:"bytes,11,opt,name=aws_vpc_info,json=awsVpcInfo,proto3" json:"aws_vpc_info,omitempty"`
 	Cnps           string            `protobuf:"bytes,12,opt,name=cnps,proto3" json:"cnps,omitempty"`
 	RouteReflector bool              `protobuf:"varint,13,opt,name=route_reflector,json=routeReflector,proto3" json:"route_reflector,omitempty"`
-	Tags           map[string]string `protobuf:"bytes,14,rep,name=tags,proto3" json:"tags,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Tags           map[string]string `protobuf:"bytes,14,rep,name=tags,proto3" json:"tags,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"` // Other tags that can be used in queries
 	// Client should not set these attributes
-	PeerVpcCidr          map[string]string     `protobuf:"bytes,15,rep,name=peer_vpc_cidr,json=peerVpcCidr,proto3" json:"peer_vpc_cidr,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	StatusCode           VpcStatusCode         `protobuf:"varint,16,opt,name=status_code,json=statusCode,proto3,enum=clouddeploy.VpcStatusCode" json:"status_code,omitempty"`
-	Account              string                `protobuf:"bytes,17,opt,name=account,proto3" json:"account,omitempty"`
-	PeerVpcInfo          *PeerVpcInfo          `protobuf:"bytes,18,opt,name=peer_vpc_info,json=peerVpcInfo,proto3" json:"peer_vpc_info,omitempty"`
-	FieldMask            *field_mask.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
+	PeerVpcCidr  map[string]string      `protobuf:"bytes,15,rep,name=peer_vpc_cidr,json=peerVpcCidr,proto3" json:"peer_vpc_cidr,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"` // mapping between vpc_id -> cidr
+	StatusCode   VpcStatusCode          `protobuf:"varint,16,opt,name=status_code,json=statusCode,proto3,enum=clouddeploy.VpcStatusCode" json:"status_code,omitempty"`                                                              // Vpc creation status
+	Account      string                 `protobuf:"bytes,17,opt,name=account,proto3" json:"account,omitempty"`                                                                                                                      // account information
+	PeerVpcInfo  *PeerVpcInfo           `protobuf:"bytes,18,opt,name=peer_vpc_info,json=peerVpcInfo,proto3" json:"peer_vpc_info,omitempty"`
+	TgwConnected bool                   `protobuf:"varint,19,opt,name=tgw_connected,json=tgwConnected,proto3" json:"tgw_connected,omitempty"`
+	Cloudeos     bool                   `protobuf:"varint,20,opt,name=cloudeos,proto3" json:"cloudeos,omitempty"`
+	ManagedBy    string                 `protobuf:"bytes,21,opt,name=managed_by,json=managedBy,proto3" json:"managed_by,omitempty"`
+	DeployMode   string                 `protobuf:"bytes,22,opt,name=deploy_mode,json=deployMode,proto3" json:"deploy_mode,omitempty"`
+	FieldMask    *fieldmaskpb.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 }
 
-func (m *Vpc) Reset()         { *m = Vpc{} }
-func (m *Vpc) String() string { return proto.CompactTextString(m) }
-func (*Vpc) ProtoMessage()    {}
+func (x *Vpc) Reset() {
+	*x = Vpc{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[32]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Vpc) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Vpc) ProtoMessage() {}
+
+func (x *Vpc) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[32]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Vpc.ProtoReflect.Descriptor instead.
 func (*Vpc) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{32}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{32}
 }
 
-func (m *Vpc) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Vpc.Unmarshal(m, b)
-}
-func (m *Vpc) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Vpc.Marshal(b, m, deterministic)
-}
-func (m *Vpc) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Vpc.Merge(m, src)
-}
-func (m *Vpc) XXX_Size() int {
-	return xxx_messageInfo_Vpc.Size(m)
-}
-func (m *Vpc) XXX_DiscardUnknown() {
-	xxx_messageInfo_Vpc.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Vpc proto.InternalMessageInfo
-
-func (m *Vpc) GetName() string {
-	if m != nil {
-		return m.Name
+func (x *Vpc) GetName() string {
+	if x != nil {
+		return x.Name
 	}
 	return ""
 }
 
-func (m *Vpc) GetVpcId() string {
-	if m != nil {
-		return m.VpcId
+func (x *Vpc) GetVpcId() string {
+	if x != nil {
+		return x.VpcId
 	}
 	return ""
 }
 
-func (m *Vpc) GetCpT() CloudProviderType {
-	if m != nil {
-		return m.CpT
+func (x *Vpc) GetCpT() CloudProviderType {
+	if x != nil {
+		return x.CpT
 	}
 	return CloudProviderType_CP_UNSPECIFIED
 }
 
-func (m *Vpc) GetRegion() string {
-	if m != nil {
-		return m.Region
+func (x *Vpc) GetRegion() string {
+	if x != nil {
+		return x.Region
 	}
 	return ""
 }
 
-func (m *Vpc) GetId() string {
-	if m != nil {
-		return m.Id
+func (x *Vpc) GetId() string {
+	if x != nil {
+		return x.Id
 	}
 	return ""
 }
 
-func (m *Vpc) GetRoleType() RoleType {
-	if m != nil {
-		return m.RoleType
+func (x *Vpc) GetRoleType() RoleType {
+	if x != nil {
+		return x.RoleType
 	}
 	return RoleType_ROLE_UNSPECIFIED
 }
 
-func (m *Vpc) GetTopologyName() string {
-	if m != nil {
-		return m.TopologyName
+func (x *Vpc) GetTopologyName() string {
+	if x != nil {
+		return x.TopologyName
 	}
 	return ""
 }
 
-func (m *Vpc) GetClosName() string {
-	if m != nil {
-		return m.ClosName
+func (x *Vpc) GetClosName() string {
+	if x != nil {
+		return x.ClosName
 	}
 	return ""
 }
 
-func (m *Vpc) GetWanName() string {
-	if m != nil {
-		return m.WanName
+func (x *Vpc) GetWanName() string {
+	if x != nil {
+		return x.WanName
 	}
 	return ""
 }
 
-func (m *Vpc) GetAzVnetInfo() *AzureVnetInfo {
-	if m != nil {
-		return m.AzVnetInfo
+func (x *Vpc) GetAzVnetInfo() *AzureVnetInfo {
+	if x != nil {
+		return x.AzVnetInfo
 	}
 	return nil
 }
 
-func (m *Vpc) GetAwsVpcInfo() *AwsVpcInfo {
-	if m != nil {
-		return m.AwsVpcInfo
+func (x *Vpc) GetAwsVpcInfo() *AwsVpcInfo {
+	if x != nil {
+		return x.AwsVpcInfo
 	}
 	return nil
 }
 
-func (m *Vpc) GetCnps() string {
-	if m != nil {
-		return m.Cnps
+func (x *Vpc) GetCnps() string {
+	if x != nil {
+		return x.Cnps
 	}
 	return ""
 }
 
-func (m *Vpc) GetRouteReflector() bool {
-	if m != nil {
-		return m.RouteReflector
+func (x *Vpc) GetRouteReflector() bool {
+	if x != nil {
+		return x.RouteReflector
 	}
 	return false
 }
 
-func (m *Vpc) GetTags() map[string]string {
-	if m != nil {
-		return m.Tags
+func (x *Vpc) GetTags() map[string]string {
+	if x != nil {
+		return x.Tags
 	}
 	return nil
 }
 
-func (m *Vpc) GetPeerVpcCidr() map[string]string {
-	if m != nil {
-		return m.PeerVpcCidr
+func (x *Vpc) GetPeerVpcCidr() map[string]string {
+	if x != nil {
+		return x.PeerVpcCidr
 	}
 	return nil
 }
 
-func (m *Vpc) GetStatusCode() VpcStatusCode {
-	if m != nil {
-		return m.StatusCode
+func (x *Vpc) GetStatusCode() VpcStatusCode {
+	if x != nil {
+		return x.StatusCode
 	}
 	return VpcStatusCode_VPC_STATUS_UNSPECIFIED
 }
 
-func (m *Vpc) GetAccount() string {
-	if m != nil {
-		return m.Account
+func (x *Vpc) GetAccount() string {
+	if x != nil {
+		return x.Account
 	}
 	return ""
 }
 
-func (m *Vpc) GetPeerVpcInfo() *PeerVpcInfo {
-	if m != nil {
-		return m.PeerVpcInfo
+func (x *Vpc) GetPeerVpcInfo() *PeerVpcInfo {
+	if x != nil {
+		return x.PeerVpcInfo
 	}
 	return nil
 }
 
-func (m *Vpc) GetFieldMask() *field_mask.FieldMask {
-	if m != nil {
-		return m.FieldMask
+func (x *Vpc) GetTgwConnected() bool {
+	if x != nil {
+		return x.TgwConnected
+	}
+	return false
+}
+
+func (x *Vpc) GetCloudeos() bool {
+	if x != nil {
+		return x.Cloudeos
+	}
+	return false
+}
+
+func (x *Vpc) GetManagedBy() string {
+	if x != nil {
+		return x.ManagedBy
+	}
+	return ""
+}
+
+func (x *Vpc) GetDeployMode() string {
+	if x != nil {
+		return x.DeployMode
+	}
+	return ""
+}
+
+func (x *Vpc) GetFieldMask() *fieldmaskpb.FieldMask {
+	if x != nil {
+		return x.FieldMask
 	}
 	return nil
 }
 
 type AddVpcRequest struct {
-	Vpc                  *Vpc     `protobuf:"bytes,1,opt,name=vpc,proto3" json:"vpc,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Vpc *Vpc `protobuf:"bytes,1,opt,name=vpc,proto3" json:"vpc,omitempty"`
 }
 
-func (m *AddVpcRequest) Reset()         { *m = AddVpcRequest{} }
-func (m *AddVpcRequest) String() string { return proto.CompactTextString(m) }
-func (*AddVpcRequest) ProtoMessage()    {}
+func (x *AddVpcRequest) Reset() {
+	*x = AddVpcRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[33]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AddVpcRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddVpcRequest) ProtoMessage() {}
+
+func (x *AddVpcRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[33]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddVpcRequest.ProtoReflect.Descriptor instead.
 func (*AddVpcRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{33}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{33}
 }
 
-func (m *AddVpcRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_AddVpcRequest.Unmarshal(m, b)
-}
-func (m *AddVpcRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_AddVpcRequest.Marshal(b, m, deterministic)
-}
-func (m *AddVpcRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AddVpcRequest.Merge(m, src)
-}
-func (m *AddVpcRequest) XXX_Size() int {
-	return xxx_messageInfo_AddVpcRequest.Size(m)
-}
-func (m *AddVpcRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_AddVpcRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AddVpcRequest proto.InternalMessageInfo
-
-func (m *AddVpcRequest) GetVpc() *Vpc {
-	if m != nil {
-		return m.Vpc
+func (x *AddVpcRequest) GetVpc() *Vpc {
+	if x != nil {
+		return x.Vpc
 	}
 	return nil
 }
 
 type AddVpcResponse struct {
-	Vpc                  *Vpc                 `protobuf:"bytes,1,opt,name=vpc,proto3" json:"vpc,omitempty"`
-	CreatedAt            *timestamp.Timestamp `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Vpc       *Vpc                   `protobuf:"bytes,1,opt,name=vpc,proto3" json:"vpc,omitempty"`
+	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 }
 
-func (m *AddVpcResponse) Reset()         { *m = AddVpcResponse{} }
-func (m *AddVpcResponse) String() string { return proto.CompactTextString(m) }
-func (*AddVpcResponse) ProtoMessage()    {}
+func (x *AddVpcResponse) Reset() {
+	*x = AddVpcResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[34]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AddVpcResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddVpcResponse) ProtoMessage() {}
+
+func (x *AddVpcResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[34]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddVpcResponse.ProtoReflect.Descriptor instead.
 func (*AddVpcResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{34}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{34}
 }
 
-func (m *AddVpcResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_AddVpcResponse.Unmarshal(m, b)
-}
-func (m *AddVpcResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_AddVpcResponse.Marshal(b, m, deterministic)
-}
-func (m *AddVpcResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AddVpcResponse.Merge(m, src)
-}
-func (m *AddVpcResponse) XXX_Size() int {
-	return xxx_messageInfo_AddVpcResponse.Size(m)
-}
-func (m *AddVpcResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_AddVpcResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AddVpcResponse proto.InternalMessageInfo
-
-func (m *AddVpcResponse) GetVpc() *Vpc {
-	if m != nil {
-		return m.Vpc
+func (x *AddVpcResponse) GetVpc() *Vpc {
+	if x != nil {
+		return x.Vpc
 	}
 	return nil
 }
 
-func (m *AddVpcResponse) GetCreatedAt() *timestamp.Timestamp {
-	if m != nil {
-		return m.CreatedAt
+func (x *AddVpcResponse) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
 	}
 	return nil
 }
 
 type UpdateVpcRequest struct {
-	Vpc                  *Vpc     `protobuf:"bytes,1,opt,name=vpc,proto3" json:"vpc,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Vpc *Vpc `protobuf:"bytes,1,opt,name=vpc,proto3" json:"vpc,omitempty"`
 }
 
-func (m *UpdateVpcRequest) Reset()         { *m = UpdateVpcRequest{} }
-func (m *UpdateVpcRequest) String() string { return proto.CompactTextString(m) }
-func (*UpdateVpcRequest) ProtoMessage()    {}
+func (x *UpdateVpcRequest) Reset() {
+	*x = UpdateVpcRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[35]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateVpcRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateVpcRequest) ProtoMessage() {}
+
+func (x *UpdateVpcRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[35]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateVpcRequest.ProtoReflect.Descriptor instead.
 func (*UpdateVpcRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{35}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{35}
 }
 
-func (m *UpdateVpcRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_UpdateVpcRequest.Unmarshal(m, b)
-}
-func (m *UpdateVpcRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_UpdateVpcRequest.Marshal(b, m, deterministic)
-}
-func (m *UpdateVpcRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UpdateVpcRequest.Merge(m, src)
-}
-func (m *UpdateVpcRequest) XXX_Size() int {
-	return xxx_messageInfo_UpdateVpcRequest.Size(m)
-}
-func (m *UpdateVpcRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_UpdateVpcRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_UpdateVpcRequest proto.InternalMessageInfo
-
-func (m *UpdateVpcRequest) GetVpc() *Vpc {
-	if m != nil {
-		return m.Vpc
+func (x *UpdateVpcRequest) GetVpc() *Vpc {
+	if x != nil {
+		return x.Vpc
 	}
 	return nil
 }
 
 type UpdateVpcResponse struct {
-	Vpc                  *Vpc                 `protobuf:"bytes,1,opt,name=vpc,proto3" json:"vpc,omitempty"`
-	AtTime               *timestamp.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Vpc    *Vpc                   `protobuf:"bytes,1,opt,name=vpc,proto3" json:"vpc,omitempty"`
+	AtTime *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
 }
 
-func (m *UpdateVpcResponse) Reset()         { *m = UpdateVpcResponse{} }
-func (m *UpdateVpcResponse) String() string { return proto.CompactTextString(m) }
-func (*UpdateVpcResponse) ProtoMessage()    {}
+func (x *UpdateVpcResponse) Reset() {
+	*x = UpdateVpcResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[36]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateVpcResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateVpcResponse) ProtoMessage() {}
+
+func (x *UpdateVpcResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[36]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateVpcResponse.ProtoReflect.Descriptor instead.
 func (*UpdateVpcResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{36}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{36}
 }
 
-func (m *UpdateVpcResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_UpdateVpcResponse.Unmarshal(m, b)
-}
-func (m *UpdateVpcResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_UpdateVpcResponse.Marshal(b, m, deterministic)
-}
-func (m *UpdateVpcResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UpdateVpcResponse.Merge(m, src)
-}
-func (m *UpdateVpcResponse) XXX_Size() int {
-	return xxx_messageInfo_UpdateVpcResponse.Size(m)
-}
-func (m *UpdateVpcResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_UpdateVpcResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_UpdateVpcResponse proto.InternalMessageInfo
-
-func (m *UpdateVpcResponse) GetVpc() *Vpc {
-	if m != nil {
-		return m.Vpc
+func (x *UpdateVpcResponse) GetVpc() *Vpc {
+	if x != nil {
+		return x.Vpc
 	}
 	return nil
 }
 
-func (m *UpdateVpcResponse) GetAtTime() *timestamp.Timestamp {
-	if m != nil {
-		return m.AtTime
+func (x *UpdateVpcResponse) GetAtTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.AtTime
 	}
 	return nil
 }
 
 type DeleteVpcRequest struct {
-	Vpc                  *Vpc     `protobuf:"bytes,1,opt,name=vpc,proto3" json:"vpc,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Vpc *Vpc `protobuf:"bytes,1,opt,name=vpc,proto3" json:"vpc,omitempty"`
 }
 
-func (m *DeleteVpcRequest) Reset()         { *m = DeleteVpcRequest{} }
-func (m *DeleteVpcRequest) String() string { return proto.CompactTextString(m) }
-func (*DeleteVpcRequest) ProtoMessage()    {}
+func (x *DeleteVpcRequest) Reset() {
+	*x = DeleteVpcRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[37]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteVpcRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteVpcRequest) ProtoMessage() {}
+
+func (x *DeleteVpcRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[37]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteVpcRequest.ProtoReflect.Descriptor instead.
 func (*DeleteVpcRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{37}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{37}
 }
 
-func (m *DeleteVpcRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_DeleteVpcRequest.Unmarshal(m, b)
-}
-func (m *DeleteVpcRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_DeleteVpcRequest.Marshal(b, m, deterministic)
-}
-func (m *DeleteVpcRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DeleteVpcRequest.Merge(m, src)
-}
-func (m *DeleteVpcRequest) XXX_Size() int {
-	return xxx_messageInfo_DeleteVpcRequest.Size(m)
-}
-func (m *DeleteVpcRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_DeleteVpcRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_DeleteVpcRequest proto.InternalMessageInfo
-
-func (m *DeleteVpcRequest) GetVpc() *Vpc {
-	if m != nil {
-		return m.Vpc
+func (x *DeleteVpcRequest) GetVpc() *Vpc {
+	if x != nil {
+		return x.Vpc
 	}
 	return nil
 }
 
 type DeleteVpcResponse struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
 }
 
-func (m *DeleteVpcResponse) Reset()         { *m = DeleteVpcResponse{} }
-func (m *DeleteVpcResponse) String() string { return proto.CompactTextString(m) }
-func (*DeleteVpcResponse) ProtoMessage()    {}
+func (x *DeleteVpcResponse) Reset() {
+	*x = DeleteVpcResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[38]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteVpcResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteVpcResponse) ProtoMessage() {}
+
+func (x *DeleteVpcResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[38]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteVpcResponse.ProtoReflect.Descriptor instead.
 func (*DeleteVpcResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{38}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{38}
 }
-
-func (m *DeleteVpcResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_DeleteVpcResponse.Unmarshal(m, b)
-}
-func (m *DeleteVpcResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_DeleteVpcResponse.Marshal(b, m, deterministic)
-}
-func (m *DeleteVpcResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DeleteVpcResponse.Merge(m, src)
-}
-func (m *DeleteVpcResponse) XXX_Size() int {
-	return xxx_messageInfo_DeleteVpcResponse.Size(m)
-}
-func (m *DeleteVpcResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_DeleteVpcResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_DeleteVpcResponse proto.InternalMessageInfo
 
 type GetVpcRequest struct {
-	Vpc                  *Vpc                 `protobuf:"bytes,1,opt,name=vpc,proto3" json:"vpc,omitempty"`
-	AtTime               *timestamp.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Vpc    *Vpc                   `protobuf:"bytes,1,opt,name=vpc,proto3" json:"vpc,omitempty"`
+	AtTime *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
 }
 
-func (m *GetVpcRequest) Reset()         { *m = GetVpcRequest{} }
-func (m *GetVpcRequest) String() string { return proto.CompactTextString(m) }
-func (*GetVpcRequest) ProtoMessage()    {}
+func (x *GetVpcRequest) Reset() {
+	*x = GetVpcRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[39]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetVpcRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetVpcRequest) ProtoMessage() {}
+
+func (x *GetVpcRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[39]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetVpcRequest.ProtoReflect.Descriptor instead.
 func (*GetVpcRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{39}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{39}
 }
 
-func (m *GetVpcRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetVpcRequest.Unmarshal(m, b)
-}
-func (m *GetVpcRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetVpcRequest.Marshal(b, m, deterministic)
-}
-func (m *GetVpcRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetVpcRequest.Merge(m, src)
-}
-func (m *GetVpcRequest) XXX_Size() int {
-	return xxx_messageInfo_GetVpcRequest.Size(m)
-}
-func (m *GetVpcRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetVpcRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetVpcRequest proto.InternalMessageInfo
-
-func (m *GetVpcRequest) GetVpc() *Vpc {
-	if m != nil {
-		return m.Vpc
+func (x *GetVpcRequest) GetVpc() *Vpc {
+	if x != nil {
+		return x.Vpc
 	}
 	return nil
 }
 
-func (m *GetVpcRequest) GetAtTime() *timestamp.Timestamp {
-	if m != nil {
-		return m.AtTime
+func (x *GetVpcRequest) GetAtTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.AtTime
 	}
 	return nil
 }
 
 type GetVpcResponse struct {
-	Vpc                  *Vpc                 `protobuf:"bytes,1,opt,name=vpc,proto3" json:"vpc,omitempty"`
-	AtTime               *timestamp.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Vpc    *Vpc                   `protobuf:"bytes,1,opt,name=vpc,proto3" json:"vpc,omitempty"`
+	AtTime *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
 }
 
-func (m *GetVpcResponse) Reset()         { *m = GetVpcResponse{} }
-func (m *GetVpcResponse) String() string { return proto.CompactTextString(m) }
-func (*GetVpcResponse) ProtoMessage()    {}
+func (x *GetVpcResponse) Reset() {
+	*x = GetVpcResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[40]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetVpcResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetVpcResponse) ProtoMessage() {}
+
+func (x *GetVpcResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[40]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetVpcResponse.ProtoReflect.Descriptor instead.
 func (*GetVpcResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{40}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{40}
 }
 
-func (m *GetVpcResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetVpcResponse.Unmarshal(m, b)
-}
-func (m *GetVpcResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetVpcResponse.Marshal(b, m, deterministic)
-}
-func (m *GetVpcResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetVpcResponse.Merge(m, src)
-}
-func (m *GetVpcResponse) XXX_Size() int {
-	return xxx_messageInfo_GetVpcResponse.Size(m)
-}
-func (m *GetVpcResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetVpcResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetVpcResponse proto.InternalMessageInfo
-
-func (m *GetVpcResponse) GetVpc() *Vpc {
-	if m != nil {
-		return m.Vpc
+func (x *GetVpcResponse) GetVpc() *Vpc {
+	if x != nil {
+		return x.Vpc
 	}
 	return nil
 }
 
-func (m *GetVpcResponse) GetAtTime() *timestamp.Timestamp {
-	if m != nil {
-		return m.AtTime
+func (x *GetVpcResponse) GetAtTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.AtTime
 	}
 	return nil
 }
 
 type ListVpcRequest struct {
-	Filter               []*Vpc                `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
-	AtTime               *time.RequestAtTime   `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
-	Watch                bool                  `protobuf:"varint,3,opt,name=watch,proto3" json:"watch,omitempty"`
-	FieldMask            *field_mask.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Filter    []*Vpc                 `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
+	AtTime    *time.RequestAtTime    `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
+	Watch     bool                   `protobuf:"varint,3,opt,name=watch,proto3" json:"watch,omitempty"`
+	FieldMask *fieldmaskpb.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 }
 
-func (m *ListVpcRequest) Reset()         { *m = ListVpcRequest{} }
-func (m *ListVpcRequest) String() string { return proto.CompactTextString(m) }
-func (*ListVpcRequest) ProtoMessage()    {}
+func (x *ListVpcRequest) Reset() {
+	*x = ListVpcRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[41]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListVpcRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListVpcRequest) ProtoMessage() {}
+
+func (x *ListVpcRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[41]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListVpcRequest.ProtoReflect.Descriptor instead.
 func (*ListVpcRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{41}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{41}
 }
 
-func (m *ListVpcRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ListVpcRequest.Unmarshal(m, b)
-}
-func (m *ListVpcRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ListVpcRequest.Marshal(b, m, deterministic)
-}
-func (m *ListVpcRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ListVpcRequest.Merge(m, src)
-}
-func (m *ListVpcRequest) XXX_Size() int {
-	return xxx_messageInfo_ListVpcRequest.Size(m)
-}
-func (m *ListVpcRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_ListVpcRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ListVpcRequest proto.InternalMessageInfo
-
-func (m *ListVpcRequest) GetFilter() []*Vpc {
-	if m != nil {
-		return m.Filter
+func (x *ListVpcRequest) GetFilter() []*Vpc {
+	if x != nil {
+		return x.Filter
 	}
 	return nil
 }
 
-func (m *ListVpcRequest) GetAtTime() *time.RequestAtTime {
-	if m != nil {
-		return m.AtTime
+func (x *ListVpcRequest) GetAtTime() *time.RequestAtTime {
+	if x != nil {
+		return x.AtTime
 	}
 	return nil
 }
 
-func (m *ListVpcRequest) GetWatch() bool {
-	if m != nil {
-		return m.Watch
+func (x *ListVpcRequest) GetWatch() bool {
+	if x != nil {
+		return x.Watch
 	}
 	return false
 }
 
-func (m *ListVpcRequest) GetFieldMask() *field_mask.FieldMask {
-	if m != nil {
-		return m.FieldMask
+func (x *ListVpcRequest) GetFieldMask() *fieldmaskpb.FieldMask {
+	if x != nil {
+		return x.FieldMask
 	}
 	return nil
 }
 
 type ListVpcResponse struct {
-	Vpc                  *Vpc                 `protobuf:"bytes,1,opt,name=vpc,proto3" json:"vpc,omitempty"`
-	AtTime               *timestamp.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Vpc    *Vpc                   `protobuf:"bytes,1,opt,name=vpc,proto3" json:"vpc,omitempty"`
+	AtTime *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
 }
 
-func (m *ListVpcResponse) Reset()         { *m = ListVpcResponse{} }
-func (m *ListVpcResponse) String() string { return proto.CompactTextString(m) }
-func (*ListVpcResponse) ProtoMessage()    {}
+func (x *ListVpcResponse) Reset() {
+	*x = ListVpcResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[42]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListVpcResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListVpcResponse) ProtoMessage() {}
+
+func (x *ListVpcResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[42]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListVpcResponse.ProtoReflect.Descriptor instead.
 func (*ListVpcResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{42}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{42}
 }
 
-func (m *ListVpcResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ListVpcResponse.Unmarshal(m, b)
-}
-func (m *ListVpcResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ListVpcResponse.Marshal(b, m, deterministic)
-}
-func (m *ListVpcResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ListVpcResponse.Merge(m, src)
-}
-func (m *ListVpcResponse) XXX_Size() int {
-	return xxx_messageInfo_ListVpcResponse.Size(m)
-}
-func (m *ListVpcResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_ListVpcResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ListVpcResponse proto.InternalMessageInfo
-
-func (m *ListVpcResponse) GetVpc() *Vpc {
-	if m != nil {
-		return m.Vpc
+func (x *ListVpcResponse) GetVpc() *Vpc {
+	if x != nil {
+		return x.Vpc
 	}
 	return nil
 }
 
-func (m *ListVpcResponse) GetAtTime() *timestamp.Timestamp {
-	if m != nil {
-		return m.AtTime
+func (x *ListVpcResponse) GetAtTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.AtTime
 	}
 	return nil
 }
 
 // Resource Subnet
 type Subnet struct {
-	SubnetId             string                `protobuf:"bytes,1,opt,name=subnet_id,json=subnetId,proto3" json:"subnet_id,omitempty"`
-	CpT                  CloudProviderType     `protobuf:"varint,2,opt,name=cp_t,json=cpT,proto3,enum=clouddeploy.CloudProviderType" json:"cp_t,omitempty"`
-	Id                   string                `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
-	Cidr                 string                `protobuf:"bytes,4,opt,name=cidr,proto3" json:"cidr,omitempty"`
-	VpcId                string                `protobuf:"bytes,5,opt,name=vpc_id,json=vpcId,proto3" json:"vpc_id,omitempty"`
-	AvailZone            string                `protobuf:"bytes,6,opt,name=avail_zone,json=availZone,proto3" json:"avail_zone,omitempty"`
-	PrimGw               string                `protobuf:"bytes,7,opt,name=prim_gw,json=primGw,proto3" json:"prim_gw,omitempty"`
-	SecGw                string                `protobuf:"bytes,8,opt,name=sec_gw,json=secGw,proto3" json:"sec_gw,omitempty"`
-	FieldMask            *field_mask.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	SubnetId  string                 `protobuf:"bytes,1,opt,name=subnet_id,json=subnetId,proto3" json:"subnet_id,omitempty"`
+	CpT       CloudProviderType      `protobuf:"varint,2,opt,name=cp_t,json=cpT,proto3,enum=clouddeploy.CloudProviderType" json:"cp_t,omitempty"`
+	Id        string                 `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"` // an ID can be generated by the client to track resource
+	Cidr      string                 `protobuf:"bytes,4,opt,name=cidr,proto3" json:"cidr,omitempty"`
+	VpcId     string                 `protobuf:"bytes,5,opt,name=vpc_id,json=vpcId,proto3" json:"vpc_id,omitempty"`
+	AvailZone string                 `protobuf:"bytes,6,opt,name=avail_zone,json=availZone,proto3" json:"avail_zone,omitempty"`
+	PrimGw    string                 `protobuf:"bytes,7,opt,name=prim_gw,json=primGw,proto3" json:"prim_gw,omitempty"`
+	SecGw     string                 `protobuf:"bytes,8,opt,name=sec_gw,json=secGw,proto3" json:"sec_gw,omitempty"`
+	FieldMask *fieldmaskpb.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 }
 
-func (m *Subnet) Reset()         { *m = Subnet{} }
-func (m *Subnet) String() string { return proto.CompactTextString(m) }
-func (*Subnet) ProtoMessage()    {}
+func (x *Subnet) Reset() {
+	*x = Subnet{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[43]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Subnet) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Subnet) ProtoMessage() {}
+
+func (x *Subnet) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[43]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Subnet.ProtoReflect.Descriptor instead.
 func (*Subnet) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{43}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{43}
 }
 
-func (m *Subnet) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Subnet.Unmarshal(m, b)
-}
-func (m *Subnet) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Subnet.Marshal(b, m, deterministic)
-}
-func (m *Subnet) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Subnet.Merge(m, src)
-}
-func (m *Subnet) XXX_Size() int {
-	return xxx_messageInfo_Subnet.Size(m)
-}
-func (m *Subnet) XXX_DiscardUnknown() {
-	xxx_messageInfo_Subnet.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Subnet proto.InternalMessageInfo
-
-func (m *Subnet) GetSubnetId() string {
-	if m != nil {
-		return m.SubnetId
+func (x *Subnet) GetSubnetId() string {
+	if x != nil {
+		return x.SubnetId
 	}
 	return ""
 }
 
-func (m *Subnet) GetCpT() CloudProviderType {
-	if m != nil {
-		return m.CpT
+func (x *Subnet) GetCpT() CloudProviderType {
+	if x != nil {
+		return x.CpT
 	}
 	return CloudProviderType_CP_UNSPECIFIED
 }
 
-func (m *Subnet) GetId() string {
-	if m != nil {
-		return m.Id
+func (x *Subnet) GetId() string {
+	if x != nil {
+		return x.Id
 	}
 	return ""
 }
 
-func (m *Subnet) GetCidr() string {
-	if m != nil {
-		return m.Cidr
+func (x *Subnet) GetCidr() string {
+	if x != nil {
+		return x.Cidr
 	}
 	return ""
 }
 
-func (m *Subnet) GetVpcId() string {
-	if m != nil {
-		return m.VpcId
+func (x *Subnet) GetVpcId() string {
+	if x != nil {
+		return x.VpcId
 	}
 	return ""
 }
 
-func (m *Subnet) GetAvailZone() string {
-	if m != nil {
-		return m.AvailZone
+func (x *Subnet) GetAvailZone() string {
+	if x != nil {
+		return x.AvailZone
 	}
 	return ""
 }
 
-func (m *Subnet) GetPrimGw() string {
-	if m != nil {
-		return m.PrimGw
+func (x *Subnet) GetPrimGw() string {
+	if x != nil {
+		return x.PrimGw
 	}
 	return ""
 }
 
-func (m *Subnet) GetSecGw() string {
-	if m != nil {
-		return m.SecGw
+func (x *Subnet) GetSecGw() string {
+	if x != nil {
+		return x.SecGw
 	}
 	return ""
 }
 
-func (m *Subnet) GetFieldMask() *field_mask.FieldMask {
-	if m != nil {
-		return m.FieldMask
+func (x *Subnet) GetFieldMask() *fieldmaskpb.FieldMask {
+	if x != nil {
+		return x.FieldMask
 	}
 	return nil
 }
 
 type AddSubnetRequest struct {
-	Subnet               *Subnet  `protobuf:"bytes,1,opt,name=subnet,proto3" json:"subnet,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Subnet *Subnet `protobuf:"bytes,1,opt,name=subnet,proto3" json:"subnet,omitempty"`
 }
 
-func (m *AddSubnetRequest) Reset()         { *m = AddSubnetRequest{} }
-func (m *AddSubnetRequest) String() string { return proto.CompactTextString(m) }
-func (*AddSubnetRequest) ProtoMessage()    {}
+func (x *AddSubnetRequest) Reset() {
+	*x = AddSubnetRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[44]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AddSubnetRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddSubnetRequest) ProtoMessage() {}
+
+func (x *AddSubnetRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[44]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddSubnetRequest.ProtoReflect.Descriptor instead.
 func (*AddSubnetRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{44}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{44}
 }
 
-func (m *AddSubnetRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_AddSubnetRequest.Unmarshal(m, b)
-}
-func (m *AddSubnetRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_AddSubnetRequest.Marshal(b, m, deterministic)
-}
-func (m *AddSubnetRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AddSubnetRequest.Merge(m, src)
-}
-func (m *AddSubnetRequest) XXX_Size() int {
-	return xxx_messageInfo_AddSubnetRequest.Size(m)
-}
-func (m *AddSubnetRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_AddSubnetRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AddSubnetRequest proto.InternalMessageInfo
-
-func (m *AddSubnetRequest) GetSubnet() *Subnet {
-	if m != nil {
-		return m.Subnet
+func (x *AddSubnetRequest) GetSubnet() *Subnet {
+	if x != nil {
+		return x.Subnet
 	}
 	return nil
 }
 
 type AddSubnetResponse struct {
-	Subnet               *Subnet              `protobuf:"bytes,1,opt,name=subnet,proto3" json:"subnet,omitempty"`
-	CreatedAt            *timestamp.Timestamp `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Subnet    *Subnet                `protobuf:"bytes,1,opt,name=subnet,proto3" json:"subnet,omitempty"`
+	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 }
 
-func (m *AddSubnetResponse) Reset()         { *m = AddSubnetResponse{} }
-func (m *AddSubnetResponse) String() string { return proto.CompactTextString(m) }
-func (*AddSubnetResponse) ProtoMessage()    {}
+func (x *AddSubnetResponse) Reset() {
+	*x = AddSubnetResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[45]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AddSubnetResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddSubnetResponse) ProtoMessage() {}
+
+func (x *AddSubnetResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[45]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddSubnetResponse.ProtoReflect.Descriptor instead.
 func (*AddSubnetResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{45}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{45}
 }
 
-func (m *AddSubnetResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_AddSubnetResponse.Unmarshal(m, b)
-}
-func (m *AddSubnetResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_AddSubnetResponse.Marshal(b, m, deterministic)
-}
-func (m *AddSubnetResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AddSubnetResponse.Merge(m, src)
-}
-func (m *AddSubnetResponse) XXX_Size() int {
-	return xxx_messageInfo_AddSubnetResponse.Size(m)
-}
-func (m *AddSubnetResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_AddSubnetResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AddSubnetResponse proto.InternalMessageInfo
-
-func (m *AddSubnetResponse) GetSubnet() *Subnet {
-	if m != nil {
-		return m.Subnet
+func (x *AddSubnetResponse) GetSubnet() *Subnet {
+	if x != nil {
+		return x.Subnet
 	}
 	return nil
 }
 
-func (m *AddSubnetResponse) GetCreatedAt() *timestamp.Timestamp {
-	if m != nil {
-		return m.CreatedAt
+func (x *AddSubnetResponse) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
 	}
 	return nil
 }
 
 type UpdateSubnetRequest struct {
-	Subnet               *Subnet  `protobuf:"bytes,1,opt,name=subnet,proto3" json:"subnet,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Subnet *Subnet `protobuf:"bytes,1,opt,name=subnet,proto3" json:"subnet,omitempty"`
 }
 
-func (m *UpdateSubnetRequest) Reset()         { *m = UpdateSubnetRequest{} }
-func (m *UpdateSubnetRequest) String() string { return proto.CompactTextString(m) }
-func (*UpdateSubnetRequest) ProtoMessage()    {}
+func (x *UpdateSubnetRequest) Reset() {
+	*x = UpdateSubnetRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[46]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateSubnetRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateSubnetRequest) ProtoMessage() {}
+
+func (x *UpdateSubnetRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[46]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateSubnetRequest.ProtoReflect.Descriptor instead.
 func (*UpdateSubnetRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{46}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{46}
 }
 
-func (m *UpdateSubnetRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_UpdateSubnetRequest.Unmarshal(m, b)
-}
-func (m *UpdateSubnetRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_UpdateSubnetRequest.Marshal(b, m, deterministic)
-}
-func (m *UpdateSubnetRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UpdateSubnetRequest.Merge(m, src)
-}
-func (m *UpdateSubnetRequest) XXX_Size() int {
-	return xxx_messageInfo_UpdateSubnetRequest.Size(m)
-}
-func (m *UpdateSubnetRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_UpdateSubnetRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_UpdateSubnetRequest proto.InternalMessageInfo
-
-func (m *UpdateSubnetRequest) GetSubnet() *Subnet {
-	if m != nil {
-		return m.Subnet
+func (x *UpdateSubnetRequest) GetSubnet() *Subnet {
+	if x != nil {
+		return x.Subnet
 	}
 	return nil
 }
 
 type UpdateSubnetResponse struct {
-	Subnet               *Subnet              `protobuf:"bytes,1,opt,name=subnet,proto3" json:"subnet,omitempty"`
-	AtTime               *timestamp.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Subnet *Subnet                `protobuf:"bytes,1,opt,name=subnet,proto3" json:"subnet,omitempty"`
+	AtTime *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
 }
 
-func (m *UpdateSubnetResponse) Reset()         { *m = UpdateSubnetResponse{} }
-func (m *UpdateSubnetResponse) String() string { return proto.CompactTextString(m) }
-func (*UpdateSubnetResponse) ProtoMessage()    {}
+func (x *UpdateSubnetResponse) Reset() {
+	*x = UpdateSubnetResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[47]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateSubnetResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateSubnetResponse) ProtoMessage() {}
+
+func (x *UpdateSubnetResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[47]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateSubnetResponse.ProtoReflect.Descriptor instead.
 func (*UpdateSubnetResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{47}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{47}
 }
 
-func (m *UpdateSubnetResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_UpdateSubnetResponse.Unmarshal(m, b)
-}
-func (m *UpdateSubnetResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_UpdateSubnetResponse.Marshal(b, m, deterministic)
-}
-func (m *UpdateSubnetResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UpdateSubnetResponse.Merge(m, src)
-}
-func (m *UpdateSubnetResponse) XXX_Size() int {
-	return xxx_messageInfo_UpdateSubnetResponse.Size(m)
-}
-func (m *UpdateSubnetResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_UpdateSubnetResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_UpdateSubnetResponse proto.InternalMessageInfo
-
-func (m *UpdateSubnetResponse) GetSubnet() *Subnet {
-	if m != nil {
-		return m.Subnet
+func (x *UpdateSubnetResponse) GetSubnet() *Subnet {
+	if x != nil {
+		return x.Subnet
 	}
 	return nil
 }
 
-func (m *UpdateSubnetResponse) GetAtTime() *timestamp.Timestamp {
-	if m != nil {
-		return m.AtTime
+func (x *UpdateSubnetResponse) GetAtTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.AtTime
 	}
 	return nil
 }
 
 type DeleteSubnetRequest struct {
-	Subnet               *Subnet  `protobuf:"bytes,1,opt,name=subnet,proto3" json:"subnet,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Subnet *Subnet `protobuf:"bytes,1,opt,name=subnet,proto3" json:"subnet,omitempty"`
 }
 
-func (m *DeleteSubnetRequest) Reset()         { *m = DeleteSubnetRequest{} }
-func (m *DeleteSubnetRequest) String() string { return proto.CompactTextString(m) }
-func (*DeleteSubnetRequest) ProtoMessage()    {}
+func (x *DeleteSubnetRequest) Reset() {
+	*x = DeleteSubnetRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[48]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteSubnetRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteSubnetRequest) ProtoMessage() {}
+
+func (x *DeleteSubnetRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[48]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteSubnetRequest.ProtoReflect.Descriptor instead.
 func (*DeleteSubnetRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{48}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{48}
 }
 
-func (m *DeleteSubnetRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_DeleteSubnetRequest.Unmarshal(m, b)
-}
-func (m *DeleteSubnetRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_DeleteSubnetRequest.Marshal(b, m, deterministic)
-}
-func (m *DeleteSubnetRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DeleteSubnetRequest.Merge(m, src)
-}
-func (m *DeleteSubnetRequest) XXX_Size() int {
-	return xxx_messageInfo_DeleteSubnetRequest.Size(m)
-}
-func (m *DeleteSubnetRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_DeleteSubnetRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_DeleteSubnetRequest proto.InternalMessageInfo
-
-func (m *DeleteSubnetRequest) GetSubnet() *Subnet {
-	if m != nil {
-		return m.Subnet
+func (x *DeleteSubnetRequest) GetSubnet() *Subnet {
+	if x != nil {
+		return x.Subnet
 	}
 	return nil
 }
 
 type DeleteSubnetResponse struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
 }
 
-func (m *DeleteSubnetResponse) Reset()         { *m = DeleteSubnetResponse{} }
-func (m *DeleteSubnetResponse) String() string { return proto.CompactTextString(m) }
-func (*DeleteSubnetResponse) ProtoMessage()    {}
+func (x *DeleteSubnetResponse) Reset() {
+	*x = DeleteSubnetResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[49]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteSubnetResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteSubnetResponse) ProtoMessage() {}
+
+func (x *DeleteSubnetResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[49]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteSubnetResponse.ProtoReflect.Descriptor instead.
 func (*DeleteSubnetResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{49}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{49}
 }
-
-func (m *DeleteSubnetResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_DeleteSubnetResponse.Unmarshal(m, b)
-}
-func (m *DeleteSubnetResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_DeleteSubnetResponse.Marshal(b, m, deterministic)
-}
-func (m *DeleteSubnetResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DeleteSubnetResponse.Merge(m, src)
-}
-func (m *DeleteSubnetResponse) XXX_Size() int {
-	return xxx_messageInfo_DeleteSubnetResponse.Size(m)
-}
-func (m *DeleteSubnetResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_DeleteSubnetResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_DeleteSubnetResponse proto.InternalMessageInfo
 
 type GetSubnetRequest struct {
-	Subnet               *Subnet              `protobuf:"bytes,1,opt,name=subnet,proto3" json:"subnet,omitempty"`
-	AtTime               *timestamp.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Subnet *Subnet                `protobuf:"bytes,1,opt,name=subnet,proto3" json:"subnet,omitempty"`
+	AtTime *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
 }
 
-func (m *GetSubnetRequest) Reset()         { *m = GetSubnetRequest{} }
-func (m *GetSubnetRequest) String() string { return proto.CompactTextString(m) }
-func (*GetSubnetRequest) ProtoMessage()    {}
+func (x *GetSubnetRequest) Reset() {
+	*x = GetSubnetRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[50]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetSubnetRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSubnetRequest) ProtoMessage() {}
+
+func (x *GetSubnetRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[50]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSubnetRequest.ProtoReflect.Descriptor instead.
 func (*GetSubnetRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{50}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{50}
 }
 
-func (m *GetSubnetRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetSubnetRequest.Unmarshal(m, b)
-}
-func (m *GetSubnetRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetSubnetRequest.Marshal(b, m, deterministic)
-}
-func (m *GetSubnetRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetSubnetRequest.Merge(m, src)
-}
-func (m *GetSubnetRequest) XXX_Size() int {
-	return xxx_messageInfo_GetSubnetRequest.Size(m)
-}
-func (m *GetSubnetRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetSubnetRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetSubnetRequest proto.InternalMessageInfo
-
-func (m *GetSubnetRequest) GetSubnet() *Subnet {
-	if m != nil {
-		return m.Subnet
+func (x *GetSubnetRequest) GetSubnet() *Subnet {
+	if x != nil {
+		return x.Subnet
 	}
 	return nil
 }
 
-func (m *GetSubnetRequest) GetAtTime() *timestamp.Timestamp {
-	if m != nil {
-		return m.AtTime
+func (x *GetSubnetRequest) GetAtTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.AtTime
 	}
 	return nil
 }
 
 type GetSubnetResponse struct {
-	Subnet               *Subnet              `protobuf:"bytes,1,opt,name=subnet,proto3" json:"subnet,omitempty"`
-	AtTime               *timestamp.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Subnet *Subnet                `protobuf:"bytes,1,opt,name=subnet,proto3" json:"subnet,omitempty"`
+	AtTime *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
 }
 
-func (m *GetSubnetResponse) Reset()         { *m = GetSubnetResponse{} }
-func (m *GetSubnetResponse) String() string { return proto.CompactTextString(m) }
-func (*GetSubnetResponse) ProtoMessage()    {}
+func (x *GetSubnetResponse) Reset() {
+	*x = GetSubnetResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[51]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetSubnetResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSubnetResponse) ProtoMessage() {}
+
+func (x *GetSubnetResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[51]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSubnetResponse.ProtoReflect.Descriptor instead.
 func (*GetSubnetResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{51}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{51}
 }
 
-func (m *GetSubnetResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetSubnetResponse.Unmarshal(m, b)
-}
-func (m *GetSubnetResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetSubnetResponse.Marshal(b, m, deterministic)
-}
-func (m *GetSubnetResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetSubnetResponse.Merge(m, src)
-}
-func (m *GetSubnetResponse) XXX_Size() int {
-	return xxx_messageInfo_GetSubnetResponse.Size(m)
-}
-func (m *GetSubnetResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetSubnetResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetSubnetResponse proto.InternalMessageInfo
-
-func (m *GetSubnetResponse) GetSubnet() *Subnet {
-	if m != nil {
-		return m.Subnet
+func (x *GetSubnetResponse) GetSubnet() *Subnet {
+	if x != nil {
+		return x.Subnet
 	}
 	return nil
 }
 
-func (m *GetSubnetResponse) GetAtTime() *timestamp.Timestamp {
-	if m != nil {
-		return m.AtTime
+func (x *GetSubnetResponse) GetAtTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.AtTime
 	}
 	return nil
 }
 
 type ListSubnetRequest struct {
-	Filter               []*Subnet             `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
-	AtTime               *time.RequestAtTime   `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
-	Watch                bool                  `protobuf:"varint,3,opt,name=watch,proto3" json:"watch,omitempty"`
-	FieldMask            *field_mask.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Filter    []*Subnet              `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
+	AtTime    *time.RequestAtTime    `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
+	Watch     bool                   `protobuf:"varint,3,opt,name=watch,proto3" json:"watch,omitempty"`
+	FieldMask *fieldmaskpb.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 }
 
-func (m *ListSubnetRequest) Reset()         { *m = ListSubnetRequest{} }
-func (m *ListSubnetRequest) String() string { return proto.CompactTextString(m) }
-func (*ListSubnetRequest) ProtoMessage()    {}
+func (x *ListSubnetRequest) Reset() {
+	*x = ListSubnetRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[52]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListSubnetRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListSubnetRequest) ProtoMessage() {}
+
+func (x *ListSubnetRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[52]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListSubnetRequest.ProtoReflect.Descriptor instead.
 func (*ListSubnetRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{52}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{52}
 }
 
-func (m *ListSubnetRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ListSubnetRequest.Unmarshal(m, b)
-}
-func (m *ListSubnetRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ListSubnetRequest.Marshal(b, m, deterministic)
-}
-func (m *ListSubnetRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ListSubnetRequest.Merge(m, src)
-}
-func (m *ListSubnetRequest) XXX_Size() int {
-	return xxx_messageInfo_ListSubnetRequest.Size(m)
-}
-func (m *ListSubnetRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_ListSubnetRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ListSubnetRequest proto.InternalMessageInfo
-
-func (m *ListSubnetRequest) GetFilter() []*Subnet {
-	if m != nil {
-		return m.Filter
+func (x *ListSubnetRequest) GetFilter() []*Subnet {
+	if x != nil {
+		return x.Filter
 	}
 	return nil
 }
 
-func (m *ListSubnetRequest) GetAtTime() *time.RequestAtTime {
-	if m != nil {
-		return m.AtTime
+func (x *ListSubnetRequest) GetAtTime() *time.RequestAtTime {
+	if x != nil {
+		return x.AtTime
 	}
 	return nil
 }
 
-func (m *ListSubnetRequest) GetWatch() bool {
-	if m != nil {
-		return m.Watch
+func (x *ListSubnetRequest) GetWatch() bool {
+	if x != nil {
+		return x.Watch
 	}
 	return false
 }
 
-func (m *ListSubnetRequest) GetFieldMask() *field_mask.FieldMask {
-	if m != nil {
-		return m.FieldMask
+func (x *ListSubnetRequest) GetFieldMask() *fieldmaskpb.FieldMask {
+	if x != nil {
+		return x.FieldMask
 	}
 	return nil
 }
 
 type ListSubnetResponse struct {
-	Subnet               *Subnet              `protobuf:"bytes,1,opt,name=subnet,proto3" json:"subnet,omitempty"`
-	AtTime               *timestamp.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Subnet *Subnet                `protobuf:"bytes,1,opt,name=subnet,proto3" json:"subnet,omitempty"`
+	AtTime *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
 }
 
-func (m *ListSubnetResponse) Reset()         { *m = ListSubnetResponse{} }
-func (m *ListSubnetResponse) String() string { return proto.CompactTextString(m) }
-func (*ListSubnetResponse) ProtoMessage()    {}
+func (x *ListSubnetResponse) Reset() {
+	*x = ListSubnetResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[53]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListSubnetResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListSubnetResponse) ProtoMessage() {}
+
+func (x *ListSubnetResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[53]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListSubnetResponse.ProtoReflect.Descriptor instead.
 func (*ListSubnetResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{53}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{53}
 }
 
-func (m *ListSubnetResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ListSubnetResponse.Unmarshal(m, b)
-}
-func (m *ListSubnetResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ListSubnetResponse.Marshal(b, m, deterministic)
-}
-func (m *ListSubnetResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ListSubnetResponse.Merge(m, src)
-}
-func (m *ListSubnetResponse) XXX_Size() int {
-	return xxx_messageInfo_ListSubnetResponse.Size(m)
-}
-func (m *ListSubnetResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_ListSubnetResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ListSubnetResponse proto.InternalMessageInfo
-
-func (m *ListSubnetResponse) GetSubnet() *Subnet {
-	if m != nil {
-		return m.Subnet
+func (x *ListSubnetResponse) GetSubnet() *Subnet {
+	if x != nil {
+		return x.Subnet
 	}
 	return nil
 }
 
-func (m *ListSubnetResponse) GetAtTime() *timestamp.Timestamp {
-	if m != nil {
-		return m.AtTime
+func (x *ListSubnetResponse) GetAtTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.AtTime
 	}
 	return nil
 }
 
 // Resource Paths
 type PathCharacteristics struct {
-	LatencyMs            uint64                `protobuf:"varint,1,opt,name=latency_ms,json=latencyMs,proto3" json:"latency_ms,omitempty"`
-	JitterMs             uint64                `protobuf:"varint,2,opt,name=jitter_ms,json=jitterMs,proto3" json:"jitter_ms,omitempty"`
-	PktLossPc            uint64                `protobuf:"varint,3,opt,name=pkt_loss_pc,json=pktLossPc,proto3" json:"pkt_loss_pc,omitempty"`
-	BwMbps               uint64                `protobuf:"varint,4,opt,name=bw_mbps,json=bwMbps,proto3" json:"bw_mbps,omitempty"`
-	Up                   bool                  `protobuf:"varint,5,opt,name=up,proto3" json:"up,omitempty"`
-	Uptime               uint64                `protobuf:"varint,6,opt,name=uptime,proto3" json:"uptime,omitempty"`
-	FieldMask            *field_mask.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	LatencyMs uint64                 `protobuf:"varint,1,opt,name=latency_ms,json=latencyMs,proto3" json:"latency_ms,omitempty"`
+	JitterMs  uint64                 `protobuf:"varint,2,opt,name=jitter_ms,json=jitterMs,proto3" json:"jitter_ms,omitempty"`
+	PktLossPc uint64                 `protobuf:"varint,3,opt,name=pkt_loss_pc,json=pktLossPc,proto3" json:"pkt_loss_pc,omitempty"`
+	BwMbps    uint64                 `protobuf:"varint,4,opt,name=bw_mbps,json=bwMbps,proto3" json:"bw_mbps,omitempty"`
+	Up        bool                   `protobuf:"varint,5,opt,name=up,proto3" json:"up,omitempty"`
+	Uptime    uint64                 `protobuf:"varint,6,opt,name=uptime,proto3" json:"uptime,omitempty"`
+	FieldMask *fieldmaskpb.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 }
 
-func (m *PathCharacteristics) Reset()         { *m = PathCharacteristics{} }
-func (m *PathCharacteristics) String() string { return proto.CompactTextString(m) }
-func (*PathCharacteristics) ProtoMessage()    {}
+func (x *PathCharacteristics) Reset() {
+	*x = PathCharacteristics{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[54]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *PathCharacteristics) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PathCharacteristics) ProtoMessage() {}
+
+func (x *PathCharacteristics) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[54]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PathCharacteristics.ProtoReflect.Descriptor instead.
 func (*PathCharacteristics) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{54}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{54}
 }
 
-func (m *PathCharacteristics) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PathCharacteristics.Unmarshal(m, b)
-}
-func (m *PathCharacteristics) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PathCharacteristics.Marshal(b, m, deterministic)
-}
-func (m *PathCharacteristics) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PathCharacteristics.Merge(m, src)
-}
-func (m *PathCharacteristics) XXX_Size() int {
-	return xxx_messageInfo_PathCharacteristics.Size(m)
-}
-func (m *PathCharacteristics) XXX_DiscardUnknown() {
-	xxx_messageInfo_PathCharacteristics.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_PathCharacteristics proto.InternalMessageInfo
-
-func (m *PathCharacteristics) GetLatencyMs() uint64 {
-	if m != nil {
-		return m.LatencyMs
+func (x *PathCharacteristics) GetLatencyMs() uint64 {
+	if x != nil {
+		return x.LatencyMs
 	}
 	return 0
 }
 
-func (m *PathCharacteristics) GetJitterMs() uint64 {
-	if m != nil {
-		return m.JitterMs
+func (x *PathCharacteristics) GetJitterMs() uint64 {
+	if x != nil {
+		return x.JitterMs
 	}
 	return 0
 }
 
-func (m *PathCharacteristics) GetPktLossPc() uint64 {
-	if m != nil {
-		return m.PktLossPc
+func (x *PathCharacteristics) GetPktLossPc() uint64 {
+	if x != nil {
+		return x.PktLossPc
 	}
 	return 0
 }
 
-func (m *PathCharacteristics) GetBwMbps() uint64 {
-	if m != nil {
-		return m.BwMbps
+func (x *PathCharacteristics) GetBwMbps() uint64 {
+	if x != nil {
+		return x.BwMbps
 	}
 	return 0
 }
 
-func (m *PathCharacteristics) GetUp() bool {
-	if m != nil {
-		return m.Up
+func (x *PathCharacteristics) GetUp() bool {
+	if x != nil {
+		return x.Up
 	}
 	return false
 }
 
-func (m *PathCharacteristics) GetUptime() uint64 {
-	if m != nil {
-		return m.Uptime
+func (x *PathCharacteristics) GetUptime() uint64 {
+	if x != nil {
+		return x.Uptime
 	}
 	return 0
 }
 
-func (m *PathCharacteristics) GetFieldMask() *field_mask.FieldMask {
-	if m != nil {
-		return m.FieldMask
+func (x *PathCharacteristics) GetFieldMask() *fieldmaskpb.FieldMask {
+	if x != nil {
+		return x.FieldMask
 	}
 	return nil
 }
 
 type Path struct {
-	SrcVpcCloudId        string                 `protobuf:"bytes,1,opt,name=src_vpc_cloud_id,json=srcVpcCloudId,proto3" json:"src_vpc_cloud_id,omitempty"`
-	SrcVpcName           string                 `protobuf:"bytes,2,opt,name=src_vpc_name,json=srcVpcName,proto3" json:"src_vpc_name,omitempty"`
-	SrcVpcUuid           string                 `protobuf:"bytes,3,opt,name=src_vpc_uuid,json=srcVpcUuid,proto3" json:"src_vpc_uuid,omitempty"`
-	LocalRtrCloudId      string                 `protobuf:"bytes,4,opt,name=local_rtr_cloud_id,json=localRtrCloudId,proto3" json:"local_rtr_cloud_id,omitempty"`
-	LocalRtrName         string                 `protobuf:"bytes,5,opt,name=local_rtr_name,json=localRtrName,proto3" json:"local_rtr_name,omitempty"`
-	LocalRtrUuid         string                 `protobuf:"bytes,6,opt,name=local_rtr_uuid,json=localRtrUuid,proto3" json:"local_rtr_uuid,omitempty"`
-	LocalIntfIpAddr      string                 `protobuf:"bytes,7,opt,name=local_intf_ip_addr,json=localIntfIpAddr,proto3" json:"local_intf_ip_addr,omitempty"`
-	SrcRegion            string                 `protobuf:"bytes,8,opt,name=src_region,json=srcRegion,proto3" json:"src_region,omitempty"`
-	SrcCpT               CloudProviderType      `protobuf:"varint,9,opt,name=src_cp_t,json=srcCpT,proto3,enum=clouddeploy.CloudProviderType" json:"src_cp_t,omitempty"`
-	DstVpcCloudId        string                 `protobuf:"bytes,10,opt,name=dst_vpc_cloud_id,json=dstVpcCloudId,proto3" json:"dst_vpc_cloud_id,omitempty"`
-	DstVpcName           string                 `protobuf:"bytes,11,opt,name=dst_vpc_name,json=dstVpcName,proto3" json:"dst_vpc_name,omitempty"`
-	DstVpcUuid           string                 `protobuf:"bytes,12,opt,name=dst_vpc_uuid,json=dstVpcUuid,proto3" json:"dst_vpc_uuid,omitempty"`
-	RemoteRtrCloudId     string                 `protobuf:"bytes,13,opt,name=remote_rtr_cloud_id,json=remoteRtrCloudId,proto3" json:"remote_rtr_cloud_id,omitempty"`
-	RemoteRtrName        string                 `protobuf:"bytes,14,opt,name=remote_rtr_name,json=remoteRtrName,proto3" json:"remote_rtr_name,omitempty"`
-	RemoteRtrUuid        string                 `protobuf:"bytes,15,opt,name=remote_rtr_uuid,json=remoteRtrUuid,proto3" json:"remote_rtr_uuid,omitempty"`
-	RemoteIntfIpAddr     string                 `protobuf:"bytes,16,opt,name=remote_intf_ip_addr,json=remoteIntfIpAddr,proto3" json:"remote_intf_ip_addr,omitempty"`
-	DstRegion            string                 `protobuf:"bytes,17,opt,name=dst_region,json=dstRegion,proto3" json:"dst_region,omitempty"`
-	DstCpT               CloudProviderType      `protobuf:"varint,18,opt,name=dst_cp_t,json=dstCpT,proto3,enum=clouddeploy.CloudProviderType" json:"dst_cp_t,omitempty"`
-	TopologyName         string                 `protobuf:"bytes,19,opt,name=topology_name,json=topologyName,proto3" json:"topology_name,omitempty"`
-	UlT                  UnderlayConnectionType `protobuf:"varint,20,opt,name=ul_t,json=ulT,proto3,enum=clouddeploy.UnderlayConnectionType" json:"ul_t,omitempty"`
-	PathChar             *PathCharacteristics   `protobuf:"bytes,21,opt,name=path_char,json=pathChar,proto3" json:"path_char,omitempty"`
-	FieldMask            *field_mask.FieldMask  `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}               `json:"-"`
-	XXX_unrecognized     []byte                 `json:"-"`
-	XXX_sizecache        int32                  `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	SrcVpcCloudId    string                 `protobuf:"bytes,1,opt,name=src_vpc_cloud_id,json=srcVpcCloudId,proto3" json:"src_vpc_cloud_id,omitempty"`
+	SrcVpcName       string                 `protobuf:"bytes,2,opt,name=src_vpc_name,json=srcVpcName,proto3" json:"src_vpc_name,omitempty"`
+	SrcVpcUuid       string                 `protobuf:"bytes,3,opt,name=src_vpc_uuid,json=srcVpcUuid,proto3" json:"src_vpc_uuid,omitempty"`
+	LocalRtrCloudId  string                 `protobuf:"bytes,4,opt,name=local_rtr_cloud_id,json=localRtrCloudId,proto3" json:"local_rtr_cloud_id,omitempty"`
+	LocalRtrName     string                 `protobuf:"bytes,5,opt,name=local_rtr_name,json=localRtrName,proto3" json:"local_rtr_name,omitempty"`
+	LocalRtrUuid     string                 `protobuf:"bytes,6,opt,name=local_rtr_uuid,json=localRtrUuid,proto3" json:"local_rtr_uuid,omitempty"`
+	LocalIntfIpAddr  string                 `protobuf:"bytes,7,opt,name=local_intf_ip_addr,json=localIntfIpAddr,proto3" json:"local_intf_ip_addr,omitempty"`
+	SrcRegion        string                 `protobuf:"bytes,8,opt,name=src_region,json=srcRegion,proto3" json:"src_region,omitempty"`
+	SrcCpT           CloudProviderType      `protobuf:"varint,9,opt,name=src_cp_t,json=srcCpT,proto3,enum=clouddeploy.CloudProviderType" json:"src_cp_t,omitempty"`
+	DstVpcCloudId    string                 `protobuf:"bytes,10,opt,name=dst_vpc_cloud_id,json=dstVpcCloudId,proto3" json:"dst_vpc_cloud_id,omitempty"`
+	DstVpcName       string                 `protobuf:"bytes,11,opt,name=dst_vpc_name,json=dstVpcName,proto3" json:"dst_vpc_name,omitempty"`
+	DstVpcUuid       string                 `protobuf:"bytes,12,opt,name=dst_vpc_uuid,json=dstVpcUuid,proto3" json:"dst_vpc_uuid,omitempty"`
+	RemoteRtrCloudId string                 `protobuf:"bytes,13,opt,name=remote_rtr_cloud_id,json=remoteRtrCloudId,proto3" json:"remote_rtr_cloud_id,omitempty"`
+	RemoteRtrName    string                 `protobuf:"bytes,14,opt,name=remote_rtr_name,json=remoteRtrName,proto3" json:"remote_rtr_name,omitempty"`
+	RemoteRtrUuid    string                 `protobuf:"bytes,15,opt,name=remote_rtr_uuid,json=remoteRtrUuid,proto3" json:"remote_rtr_uuid,omitempty"`
+	RemoteIntfIpAddr string                 `protobuf:"bytes,16,opt,name=remote_intf_ip_addr,json=remoteIntfIpAddr,proto3" json:"remote_intf_ip_addr,omitempty"`
+	DstRegion        string                 `protobuf:"bytes,17,opt,name=dst_region,json=dstRegion,proto3" json:"dst_region,omitempty"`
+	DstCpT           CloudProviderType      `protobuf:"varint,18,opt,name=dst_cp_t,json=dstCpT,proto3,enum=clouddeploy.CloudProviderType" json:"dst_cp_t,omitempty"`
+	TopologyName     string                 `protobuf:"bytes,19,opt,name=topology_name,json=topologyName,proto3" json:"topology_name,omitempty"`
+	UlT              UnderlayConnectionType `protobuf:"varint,20,opt,name=ul_t,json=ulT,proto3,enum=clouddeploy.UnderlayConnectionType" json:"ul_t,omitempty"`
+	PathChar         *PathCharacteristics   `protobuf:"bytes,21,opt,name=path_char,json=pathChar,proto3" json:"path_char,omitempty"`
+	FieldMask        *fieldmaskpb.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 }
 
-func (m *Path) Reset()         { *m = Path{} }
-func (m *Path) String() string { return proto.CompactTextString(m) }
-func (*Path) ProtoMessage()    {}
+func (x *Path) Reset() {
+	*x = Path{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[55]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Path) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Path) ProtoMessage() {}
+
+func (x *Path) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[55]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Path.ProtoReflect.Descriptor instead.
 func (*Path) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{55}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{55}
 }
 
-func (m *Path) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Path.Unmarshal(m, b)
-}
-func (m *Path) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Path.Marshal(b, m, deterministic)
-}
-func (m *Path) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Path.Merge(m, src)
-}
-func (m *Path) XXX_Size() int {
-	return xxx_messageInfo_Path.Size(m)
-}
-func (m *Path) XXX_DiscardUnknown() {
-	xxx_messageInfo_Path.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_Path proto.InternalMessageInfo
-
-func (m *Path) GetSrcVpcCloudId() string {
-	if m != nil {
-		return m.SrcVpcCloudId
+func (x *Path) GetSrcVpcCloudId() string {
+	if x != nil {
+		return x.SrcVpcCloudId
 	}
 	return ""
 }
 
-func (m *Path) GetSrcVpcName() string {
-	if m != nil {
-		return m.SrcVpcName
+func (x *Path) GetSrcVpcName() string {
+	if x != nil {
+		return x.SrcVpcName
 	}
 	return ""
 }
 
-func (m *Path) GetSrcVpcUuid() string {
-	if m != nil {
-		return m.SrcVpcUuid
+func (x *Path) GetSrcVpcUuid() string {
+	if x != nil {
+		return x.SrcVpcUuid
 	}
 	return ""
 }
 
-func (m *Path) GetLocalRtrCloudId() string {
-	if m != nil {
-		return m.LocalRtrCloudId
+func (x *Path) GetLocalRtrCloudId() string {
+	if x != nil {
+		return x.LocalRtrCloudId
 	}
 	return ""
 }
 
-func (m *Path) GetLocalRtrName() string {
-	if m != nil {
-		return m.LocalRtrName
+func (x *Path) GetLocalRtrName() string {
+	if x != nil {
+		return x.LocalRtrName
 	}
 	return ""
 }
 
-func (m *Path) GetLocalRtrUuid() string {
-	if m != nil {
-		return m.LocalRtrUuid
+func (x *Path) GetLocalRtrUuid() string {
+	if x != nil {
+		return x.LocalRtrUuid
 	}
 	return ""
 }
 
-func (m *Path) GetLocalIntfIpAddr() string {
-	if m != nil {
-		return m.LocalIntfIpAddr
+func (x *Path) GetLocalIntfIpAddr() string {
+	if x != nil {
+		return x.LocalIntfIpAddr
 	}
 	return ""
 }
 
-func (m *Path) GetSrcRegion() string {
-	if m != nil {
-		return m.SrcRegion
+func (x *Path) GetSrcRegion() string {
+	if x != nil {
+		return x.SrcRegion
 	}
 	return ""
 }
 
-func (m *Path) GetSrcCpT() CloudProviderType {
-	if m != nil {
-		return m.SrcCpT
+func (x *Path) GetSrcCpT() CloudProviderType {
+	if x != nil {
+		return x.SrcCpT
 	}
 	return CloudProviderType_CP_UNSPECIFIED
 }
 
-func (m *Path) GetDstVpcCloudId() string {
-	if m != nil {
-		return m.DstVpcCloudId
+func (x *Path) GetDstVpcCloudId() string {
+	if x != nil {
+		return x.DstVpcCloudId
 	}
 	return ""
 }
 
-func (m *Path) GetDstVpcName() string {
-	if m != nil {
-		return m.DstVpcName
+func (x *Path) GetDstVpcName() string {
+	if x != nil {
+		return x.DstVpcName
 	}
 	return ""
 }
 
-func (m *Path) GetDstVpcUuid() string {
-	if m != nil {
-		return m.DstVpcUuid
+func (x *Path) GetDstVpcUuid() string {
+	if x != nil {
+		return x.DstVpcUuid
 	}
 	return ""
 }
 
-func (m *Path) GetRemoteRtrCloudId() string {
-	if m != nil {
-		return m.RemoteRtrCloudId
+func (x *Path) GetRemoteRtrCloudId() string {
+	if x != nil {
+		return x.RemoteRtrCloudId
 	}
 	return ""
 }
 
-func (m *Path) GetRemoteRtrName() string {
-	if m != nil {
-		return m.RemoteRtrName
+func (x *Path) GetRemoteRtrName() string {
+	if x != nil {
+		return x.RemoteRtrName
 	}
 	return ""
 }
 
-func (m *Path) GetRemoteRtrUuid() string {
-	if m != nil {
-		return m.RemoteRtrUuid
+func (x *Path) GetRemoteRtrUuid() string {
+	if x != nil {
+		return x.RemoteRtrUuid
 	}
 	return ""
 }
 
-func (m *Path) GetRemoteIntfIpAddr() string {
-	if m != nil {
-		return m.RemoteIntfIpAddr
+func (x *Path) GetRemoteIntfIpAddr() string {
+	if x != nil {
+		return x.RemoteIntfIpAddr
 	}
 	return ""
 }
 
-func (m *Path) GetDstRegion() string {
-	if m != nil {
-		return m.DstRegion
+func (x *Path) GetDstRegion() string {
+	if x != nil {
+		return x.DstRegion
 	}
 	return ""
 }
 
-func (m *Path) GetDstCpT() CloudProviderType {
-	if m != nil {
-		return m.DstCpT
+func (x *Path) GetDstCpT() CloudProviderType {
+	if x != nil {
+		return x.DstCpT
 	}
 	return CloudProviderType_CP_UNSPECIFIED
 }
 
-func (m *Path) GetTopologyName() string {
-	if m != nil {
-		return m.TopologyName
+func (x *Path) GetTopologyName() string {
+	if x != nil {
+		return x.TopologyName
 	}
 	return ""
 }
 
-func (m *Path) GetUlT() UnderlayConnectionType {
-	if m != nil {
-		return m.UlT
+func (x *Path) GetUlT() UnderlayConnectionType {
+	if x != nil {
+		return x.UlT
 	}
 	return UnderlayConnectionType_UL_NA
 }
 
-func (m *Path) GetPathChar() *PathCharacteristics {
-	if m != nil {
-		return m.PathChar
+func (x *Path) GetPathChar() *PathCharacteristics {
+	if x != nil {
+		return x.PathChar
 	}
 	return nil
 }
 
-func (m *Path) GetFieldMask() *field_mask.FieldMask {
-	if m != nil {
-		return m.FieldMask
+func (x *Path) GetFieldMask() *fieldmaskpb.FieldMask {
+	if x != nil {
+		return x.FieldMask
 	}
 	return nil
 }
 
 type GetPathRequest struct {
-	Path                 *Path                `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
-	AtTime               *timestamp.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Path   *Path                  `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	AtTime *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
 }
 
-func (m *GetPathRequest) Reset()         { *m = GetPathRequest{} }
-func (m *GetPathRequest) String() string { return proto.CompactTextString(m) }
-func (*GetPathRequest) ProtoMessage()    {}
+func (x *GetPathRequest) Reset() {
+	*x = GetPathRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[56]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetPathRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPathRequest) ProtoMessage() {}
+
+func (x *GetPathRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[56]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPathRequest.ProtoReflect.Descriptor instead.
 func (*GetPathRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{56}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{56}
 }
 
-func (m *GetPathRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetPathRequest.Unmarshal(m, b)
-}
-func (m *GetPathRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetPathRequest.Marshal(b, m, deterministic)
-}
-func (m *GetPathRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetPathRequest.Merge(m, src)
-}
-func (m *GetPathRequest) XXX_Size() int {
-	return xxx_messageInfo_GetPathRequest.Size(m)
-}
-func (m *GetPathRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetPathRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetPathRequest proto.InternalMessageInfo
-
-func (m *GetPathRequest) GetPath() *Path {
-	if m != nil {
-		return m.Path
+func (x *GetPathRequest) GetPath() *Path {
+	if x != nil {
+		return x.Path
 	}
 	return nil
 }
 
-func (m *GetPathRequest) GetAtTime() *timestamp.Timestamp {
-	if m != nil {
-		return m.AtTime
+func (x *GetPathRequest) GetAtTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.AtTime
 	}
 	return nil
 }
 
 type GetPathResponse struct {
-	Path                 *Path                `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
-	AtTime               *timestamp.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Path   *Path                  `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	AtTime *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
 }
 
-func (m *GetPathResponse) Reset()         { *m = GetPathResponse{} }
-func (m *GetPathResponse) String() string { return proto.CompactTextString(m) }
-func (*GetPathResponse) ProtoMessage()    {}
+func (x *GetPathResponse) Reset() {
+	*x = GetPathResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[57]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetPathResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPathResponse) ProtoMessage() {}
+
+func (x *GetPathResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[57]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPathResponse.ProtoReflect.Descriptor instead.
 func (*GetPathResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{57}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{57}
 }
 
-func (m *GetPathResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetPathResponse.Unmarshal(m, b)
-}
-func (m *GetPathResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetPathResponse.Marshal(b, m, deterministic)
-}
-func (m *GetPathResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetPathResponse.Merge(m, src)
-}
-func (m *GetPathResponse) XXX_Size() int {
-	return xxx_messageInfo_GetPathResponse.Size(m)
-}
-func (m *GetPathResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetPathResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetPathResponse proto.InternalMessageInfo
-
-func (m *GetPathResponse) GetPath() *Path {
-	if m != nil {
-		return m.Path
+func (x *GetPathResponse) GetPath() *Path {
+	if x != nil {
+		return x.Path
 	}
 	return nil
 }
 
-func (m *GetPathResponse) GetAtTime() *timestamp.Timestamp {
-	if m != nil {
-		return m.AtTime
+func (x *GetPathResponse) GetAtTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.AtTime
 	}
 	return nil
 }
 
 type ListPathRequest struct {
-	Filter               []*Path               `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
-	AtTime               *time.RequestAtTime   `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
-	Watch                bool                  `protobuf:"varint,3,opt,name=watch,proto3" json:"watch,omitempty"`
-	FieldMask            *field_mask.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Filter    []*Path                `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
+	AtTime    *time.RequestAtTime    `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
+	Watch     bool                   `protobuf:"varint,3,opt,name=watch,proto3" json:"watch,omitempty"`
+	FieldMask *fieldmaskpb.FieldMask `protobuf:"bytes,100,opt,name=field_mask,json=fieldMask,proto3" json:"field_mask,omitempty"`
 }
 
-func (m *ListPathRequest) Reset()         { *m = ListPathRequest{} }
-func (m *ListPathRequest) String() string { return proto.CompactTextString(m) }
-func (*ListPathRequest) ProtoMessage()    {}
+func (x *ListPathRequest) Reset() {
+	*x = ListPathRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[58]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListPathRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPathRequest) ProtoMessage() {}
+
+func (x *ListPathRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[58]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPathRequest.ProtoReflect.Descriptor instead.
 func (*ListPathRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{58}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{58}
 }
 
-func (m *ListPathRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ListPathRequest.Unmarshal(m, b)
-}
-func (m *ListPathRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ListPathRequest.Marshal(b, m, deterministic)
-}
-func (m *ListPathRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ListPathRequest.Merge(m, src)
-}
-func (m *ListPathRequest) XXX_Size() int {
-	return xxx_messageInfo_ListPathRequest.Size(m)
-}
-func (m *ListPathRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_ListPathRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ListPathRequest proto.InternalMessageInfo
-
-func (m *ListPathRequest) GetFilter() []*Path {
-	if m != nil {
-		return m.Filter
+func (x *ListPathRequest) GetFilter() []*Path {
+	if x != nil {
+		return x.Filter
 	}
 	return nil
 }
 
-func (m *ListPathRequest) GetAtTime() *time.RequestAtTime {
-	if m != nil {
-		return m.AtTime
+func (x *ListPathRequest) GetAtTime() *time.RequestAtTime {
+	if x != nil {
+		return x.AtTime
 	}
 	return nil
 }
 
-func (m *ListPathRequest) GetWatch() bool {
-	if m != nil {
-		return m.Watch
+func (x *ListPathRequest) GetWatch() bool {
+	if x != nil {
+		return x.Watch
 	}
 	return false
 }
 
-func (m *ListPathRequest) GetFieldMask() *field_mask.FieldMask {
-	if m != nil {
-		return m.FieldMask
+func (x *ListPathRequest) GetFieldMask() *fieldmaskpb.FieldMask {
+	if x != nil {
+		return x.FieldMask
 	}
 	return nil
 }
 
 type ListPathResponse struct {
-	Path                 *Path                `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
-	AtTime               *timestamp.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Path   *Path                  `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	AtTime *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=at_time,json=atTime,proto3" json:"at_time,omitempty"`
 }
 
-func (m *ListPathResponse) Reset()         { *m = ListPathResponse{} }
-func (m *ListPathResponse) String() string { return proto.CompactTextString(m) }
-func (*ListPathResponse) ProtoMessage()    {}
+func (x *ListPathResponse) Reset() {
+	*x = ListPathResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[59]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListPathResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPathResponse) ProtoMessage() {}
+
+func (x *ListPathResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[59]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPathResponse.ProtoReflect.Descriptor instead.
 func (*ListPathResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_adaaf7ceeb53d211, []int{59}
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP(), []int{59}
 }
 
-func (m *ListPathResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ListPathResponse.Unmarshal(m, b)
-}
-func (m *ListPathResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ListPathResponse.Marshal(b, m, deterministic)
-}
-func (m *ListPathResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ListPathResponse.Merge(m, src)
-}
-func (m *ListPathResponse) XXX_Size() int {
-	return xxx_messageInfo_ListPathResponse.Size(m)
-}
-func (m *ListPathResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_ListPathResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ListPathResponse proto.InternalMessageInfo
-
-func (m *ListPathResponse) GetPath() *Path {
-	if m != nil {
-		return m.Path
+func (x *ListPathResponse) GetPath() *Path {
+	if x != nil {
+		return x.Path
 	}
 	return nil
 }
 
-func (m *ListPathResponse) GetAtTime() *timestamp.Timestamp {
-	if m != nil {
-		return m.AtTime
+func (x *ListPathResponse) GetAtTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.AtTime
 	}
 	return nil
 }
 
-func init() {
-	proto.RegisterEnum("clouddeploy.CloudProviderType", CloudProviderType_name, CloudProviderType_value)
-	proto.RegisterEnum("clouddeploy.TopologyType", TopologyType_name, TopologyType_value)
-	proto.RegisterEnum("clouddeploy.UnderlayConnectionType", UnderlayConnectionType_name, UnderlayConnectionType_value)
-	proto.RegisterEnum("clouddeploy.OverlayConnectionType", OverlayConnectionType_name, OverlayConnectionType_value)
-	proto.RegisterEnum("clouddeploy.RoleType", RoleType_name, RoleType_value)
-	proto.RegisterEnum("clouddeploy.DeploymentStatusCode", DeploymentStatusCode_name, DeploymentStatusCode_value)
-	proto.RegisterEnum("clouddeploy.CVStatusCode", CVStatusCode_name, CVStatusCode_value)
-	proto.RegisterEnum("clouddeploy.DeviceStatusCode", DeviceStatusCode_name, DeviceStatusCode_value)
-	proto.RegisterEnum("clouddeploy.NetworkInterfaceType", NetworkInterfaceType_name, NetworkInterfaceType_value)
-	proto.RegisterEnum("clouddeploy.TopologyInfoType", TopologyInfoType_name, TopologyInfoType_value)
-	proto.RegisterEnum("clouddeploy.FabricType", FabricType_name, FabricType_value)
-	proto.RegisterEnum("clouddeploy.VpcStatusCode", VpcStatusCode_name, VpcStatusCode_value)
-	proto.RegisterType((*RouteTableIds)(nil), "clouddeploy.RouteTableIds")
-	proto.RegisterType((*NetworkInterface)(nil), "clouddeploy.NetworkInterface")
-	proto.RegisterType((*CVInfo)(nil), "clouddeploy.CVInfo")
-	proto.RegisterType((*AzureRouterDetail)(nil), "clouddeploy.AzureRouterDetail")
-	proto.RegisterType((*AwsRouterDetail)(nil), "clouddeploy.AwsRouterDetail")
-	proto.RegisterType((*Router)(nil), "clouddeploy.Router")
-	proto.RegisterMapType((map[string]string)(nil), "clouddeploy.Router.TagsEntry")
-	proto.RegisterType((*AddRouterRequest)(nil), "clouddeploy.AddRouterRequest")
-	proto.RegisterType((*AddRouterResponse)(nil), "clouddeploy.AddRouterResponse")
-	proto.RegisterType((*UpdateRouterRequest)(nil), "clouddeploy.UpdateRouterRequest")
-	proto.RegisterType((*UpdateRouterResponse)(nil), "clouddeploy.UpdateRouterResponse")
-	proto.RegisterType((*DeleteRouterRequest)(nil), "clouddeploy.DeleteRouterRequest")
-	proto.RegisterType((*DeleteRouterResponse)(nil), "clouddeploy.DeleteRouterResponse")
-	proto.RegisterType((*GetRouterRequest)(nil), "clouddeploy.GetRouterRequest")
-	proto.RegisterType((*GetRouterResponse)(nil), "clouddeploy.GetRouterResponse")
-	proto.RegisterType((*ListRouterRequest)(nil), "clouddeploy.ListRouterRequest")
-	proto.RegisterType((*ListRouterResponse)(nil), "clouddeploy.ListRouterResponse")
-	proto.RegisterType((*WanInfo)(nil), "clouddeploy.WanInfo")
-	proto.RegisterType((*ClosInfo)(nil), "clouddeploy.ClosInfo")
-	proto.RegisterType((*TopologyInfo)(nil), "clouddeploy.TopologyInfo")
-	proto.RegisterType((*AddTopologyInfoRequest)(nil), "clouddeploy.AddTopologyInfoRequest")
-	proto.RegisterType((*AddTopologyInfoResponse)(nil), "clouddeploy.AddTopologyInfoResponse")
-	proto.RegisterType((*UpdateTopologyInfoRequest)(nil), "clouddeploy.UpdateTopologyInfoRequest")
-	proto.RegisterType((*UpdateTopologyInfoResponse)(nil), "clouddeploy.UpdateTopologyInfoResponse")
-	proto.RegisterType((*DeleteTopologyInfoRequest)(nil), "clouddeploy.DeleteTopologyInfoRequest")
-	proto.RegisterType((*DeleteTopologyInfoResponse)(nil), "clouddeploy.DeleteTopologyInfoResponse")
-	proto.RegisterType((*GetTopologyInfoRequest)(nil), "clouddeploy.GetTopologyInfoRequest")
-	proto.RegisterType((*GetTopologyInfoResponse)(nil), "clouddeploy.GetTopologyInfoResponse")
-	proto.RegisterType((*ListTopologyInfoRequest)(nil), "clouddeploy.ListTopologyInfoRequest")
-	proto.RegisterType((*ListTopologyInfoResponse)(nil), "clouddeploy.ListTopologyInfoResponse")
-	proto.RegisterType((*AzureVnetInfo)(nil), "clouddeploy.AzureVnetInfo")
-	proto.RegisterType((*AwsVpcInfo)(nil), "clouddeploy.AwsVpcInfo")
-	proto.RegisterType((*PeerVpcInfo)(nil), "clouddeploy.PeerVpcInfo")
-	proto.RegisterMapType((map[string]string)(nil), "clouddeploy.PeerVpcInfo.PeerVpcCidrEntry")
-	proto.RegisterType((*Vpc)(nil), "clouddeploy.Vpc")
-	proto.RegisterMapType((map[string]string)(nil), "clouddeploy.Vpc.PeerVpcCidrEntry")
-	proto.RegisterMapType((map[string]string)(nil), "clouddeploy.Vpc.TagsEntry")
-	proto.RegisterType((*AddVpcRequest)(nil), "clouddeploy.AddVpcRequest")
-	proto.RegisterType((*AddVpcResponse)(nil), "clouddeploy.AddVpcResponse")
-	proto.RegisterType((*UpdateVpcRequest)(nil), "clouddeploy.UpdateVpcRequest")
-	proto.RegisterType((*UpdateVpcResponse)(nil), "clouddeploy.UpdateVpcResponse")
-	proto.RegisterType((*DeleteVpcRequest)(nil), "clouddeploy.DeleteVpcRequest")
-	proto.RegisterType((*DeleteVpcResponse)(nil), "clouddeploy.DeleteVpcResponse")
-	proto.RegisterType((*GetVpcRequest)(nil), "clouddeploy.GetVpcRequest")
-	proto.RegisterType((*GetVpcResponse)(nil), "clouddeploy.GetVpcResponse")
-	proto.RegisterType((*ListVpcRequest)(nil), "clouddeploy.ListVpcRequest")
-	proto.RegisterType((*ListVpcResponse)(nil), "clouddeploy.ListVpcResponse")
-	proto.RegisterType((*Subnet)(nil), "clouddeploy.Subnet")
-	proto.RegisterType((*AddSubnetRequest)(nil), "clouddeploy.AddSubnetRequest")
-	proto.RegisterType((*AddSubnetResponse)(nil), "clouddeploy.AddSubnetResponse")
-	proto.RegisterType((*UpdateSubnetRequest)(nil), "clouddeploy.UpdateSubnetRequest")
-	proto.RegisterType((*UpdateSubnetResponse)(nil), "clouddeploy.UpdateSubnetResponse")
-	proto.RegisterType((*DeleteSubnetRequest)(nil), "clouddeploy.DeleteSubnetRequest")
-	proto.RegisterType((*DeleteSubnetResponse)(nil), "clouddeploy.DeleteSubnetResponse")
-	proto.RegisterType((*GetSubnetRequest)(nil), "clouddeploy.GetSubnetRequest")
-	proto.RegisterType((*GetSubnetResponse)(nil), "clouddeploy.GetSubnetResponse")
-	proto.RegisterType((*ListSubnetRequest)(nil), "clouddeploy.ListSubnetRequest")
-	proto.RegisterType((*ListSubnetResponse)(nil), "clouddeploy.ListSubnetResponse")
-	proto.RegisterType((*PathCharacteristics)(nil), "clouddeploy.PathCharacteristics")
-	proto.RegisterType((*Path)(nil), "clouddeploy.Path")
-	proto.RegisterType((*GetPathRequest)(nil), "clouddeploy.GetPathRequest")
-	proto.RegisterType((*GetPathResponse)(nil), "clouddeploy.GetPathResponse")
-	proto.RegisterType((*ListPathRequest)(nil), "clouddeploy.ListPathRequest")
-	proto.RegisterType((*ListPathResponse)(nil), "clouddeploy.ListPathResponse")
+var File_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto protoreflect.FileDescriptor
+
+var file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDesc = []byte{
+	0x0a, 0x45, 0x61, 0x72, 0x69, 0x73, 0x74, 0x61, 0x2f, 0x61, 0x65, 0x72, 0x69, 0x73, 0x2f, 0x73,
+	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c,
+	0x6f, 0x79, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c,
+	0x6f, 0x79, 0x2e, 0x76, 0x31, 0x2f, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f,
+	0x79, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x0b, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65,
+	0x70, 0x6c, 0x6f, 0x79, 0x1a, 0x20, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x5f, 0x6d, 0x61, 0x73, 0x6b,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x29, 0x61, 0x72, 0x69, 0x73, 0x74, 0x61, 0x2f, 0x72,
+	0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x73, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
+	0x66, 0x2f, 0x74, 0x69, 0x6d, 0x65, 0x2f, 0x74, 0x69, 0x6d, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x1a, 0x1f, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62,
+	0x75, 0x66, 0x2f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x22, 0x98, 0x01, 0x0a, 0x0d, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x54, 0x61, 0x62, 0x6c,
+	0x65, 0x49, 0x64, 0x73, 0x12, 0x16, 0x0a, 0x06, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x18, 0x01,
+	0x20, 0x03, 0x28, 0x09, 0x52, 0x06, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x12, 0x18, 0x0a, 0x07,
+	0x70, 0x72, 0x69, 0x76, 0x61, 0x74, 0x65, 0x18, 0x02, 0x20, 0x03, 0x28, 0x09, 0x52, 0x07, 0x70,
+	0x72, 0x69, 0x76, 0x61, 0x74, 0x65, 0x12, 0x1a, 0x0a, 0x08, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x6e,
+	0x61, 0x6c, 0x18, 0x03, 0x20, 0x03, 0x28, 0x09, 0x52, 0x08, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x6e,
+	0x61, 0x6c, 0x12, 0x39, 0x0a, 0x0a, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x5f, 0x6d, 0x61, 0x73, 0x6b,
+	0x18, 0x64, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61,
+	0x73, 0x6b, 0x52, 0x09, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x22, 0xc7, 0x02,
+	0x0a, 0x10, 0x4e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x49, 0x6e, 0x74, 0x65, 0x72, 0x66, 0x61,
+	0x63, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x69, 0x6e, 0x74, 0x66, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x06, 0x69, 0x6e, 0x74, 0x66, 0x49, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e,
+	0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12,
+	0x3e, 0x0a, 0x09, 0x69, 0x6e, 0x74, 0x66, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x0e, 0x32, 0x21, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79,
+	0x2e, 0x4e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x49, 0x6e, 0x74, 0x65, 0x72, 0x66, 0x61, 0x63,
+	0x65, 0x54, 0x79, 0x70, 0x65, 0x52, 0x08, 0x69, 0x6e, 0x74, 0x66, 0x54, 0x79, 0x70, 0x65, 0x12,
+	0x26, 0x0a, 0x0f, 0x70, 0x72, 0x69, 0x76, 0x61, 0x74, 0x65, 0x5f, 0x69, 0x70, 0x5f, 0x61, 0x64,
+	0x64, 0x72, 0x18, 0x04, 0x20, 0x03, 0x28, 0x09, 0x52, 0x0d, 0x70, 0x72, 0x69, 0x76, 0x61, 0x74,
+	0x65, 0x49, 0x70, 0x41, 0x64, 0x64, 0x72, 0x12, 0x24, 0x0a, 0x0e, 0x70, 0x75, 0x62, 0x6c, 0x69,
+	0x63, 0x5f, 0x69, 0x70, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x0c, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x63, 0x49, 0x70, 0x41, 0x64, 0x64, 0x72, 0x12, 0x16, 0x0a,
+	0x06, 0x73, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73,
+	0x75, 0x62, 0x6e, 0x65, 0x74, 0x12, 0x25, 0x0a, 0x0e, 0x73, 0x65, 0x63, 0x75, 0x72, 0x69, 0x74,
+	0x79, 0x5f, 0x67, 0x72, 0x6f, 0x75, 0x70, 0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0d, 0x73,
+	0x65, 0x63, 0x75, 0x72, 0x69, 0x74, 0x79, 0x47, 0x72, 0x6f, 0x75, 0x70, 0x12, 0x39, 0x0a, 0x0a,
+	0x66, 0x69, 0x65, 0x6c, 0x64, 0x5f, 0x6d, 0x61, 0x73, 0x6b, 0x18, 0x64, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62,
+	0x75, 0x66, 0x2e, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x52, 0x09, 0x66, 0x69,
+	0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x22, 0xe3, 0x03, 0x0a, 0x06, 0x43, 0x56, 0x49, 0x6e,
+	0x66, 0x6f, 0x12, 0x3f, 0x0a, 0x0e, 0x63, 0x76, 0x5f, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x5f,
+	0x63, 0x6f, 0x64, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x19, 0x2e, 0x63, 0x6c, 0x6f,
+	0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x43, 0x56, 0x53, 0x74, 0x61, 0x74, 0x75,
+	0x73, 0x43, 0x6f, 0x64, 0x65, 0x52, 0x0c, 0x63, 0x76, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x43,
+	0x6f, 0x64, 0x65, 0x12, 0x23, 0x0a, 0x0d, 0x62, 0x6f, 0x6f, 0x74, 0x73, 0x74, 0x72, 0x61, 0x70,
+	0x5f, 0x63, 0x66, 0x67, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x62, 0x6f, 0x6f, 0x74,
+	0x73, 0x74, 0x72, 0x61, 0x70, 0x43, 0x66, 0x67, 0x12, 0x1a, 0x0a, 0x09, 0x68, 0x61, 0x5f, 0x72,
+	0x74, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x68, 0x61, 0x52,
+	0x74, 0x72, 0x49, 0x64, 0x12, 0x2e, 0x0a, 0x14, 0x70, 0x65, 0x65, 0x72, 0x5f, 0x76, 0x70, 0x63,
+	0x5f, 0x72, 0x74, 0x5f, 0x74, 0x61, 0x62, 0x6c, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x04, 0x20, 0x03,
+	0x28, 0x09, 0x52, 0x10, 0x70, 0x65, 0x65, 0x72, 0x56, 0x70, 0x63, 0x52, 0x74, 0x54, 0x61, 0x62,
+	0x6c, 0x65, 0x49, 0x64, 0x12, 0x41, 0x0a, 0x0f, 0x68, 0x61, 0x5f, 0x72, 0x74, 0x5f, 0x74, 0x61,
+	0x62, 0x6c, 0x65, 0x5f, 0x69, 0x64, 0x73, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e,
+	0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x52, 0x6f, 0x75, 0x74,
+	0x65, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x49, 0x64, 0x73, 0x52, 0x0c, 0x68, 0x61, 0x52, 0x74, 0x54,
+	0x61, 0x62, 0x6c, 0x65, 0x49, 0x64, 0x73, 0x12, 0x24, 0x0a, 0x0e, 0x63, 0x76, 0x5f, 0x73, 0x74,
+	0x61, 0x74, 0x75, 0x73, 0x5f, 0x64, 0x65, 0x73, 0x63, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x0c, 0x63, 0x76, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x44, 0x65, 0x73, 0x63, 0x12, 0x3f, 0x0a,
+	0x1c, 0x63, 0x76, 0x5f, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x5f, 0x72, 0x65, 0x63, 0x6f, 0x6d,
+	0x6d, 0x65, 0x6e, 0x64, 0x65, 0x64, 0x5f, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x07, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x19, 0x63, 0x76, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x65, 0x63,
+	0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x64, 0x65, 0x64, 0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x42,
+	0x0a, 0x0d, 0x64, 0x65, 0x76, 0x69, 0x63, 0x65, 0x5f, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18,
+	0x08, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x1d, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70,
+	0x6c, 0x6f, 0x79, 0x2e, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73,
+	0x43, 0x6f, 0x64, 0x65, 0x52, 0x0c, 0x64, 0x65, 0x76, 0x69, 0x63, 0x65, 0x53, 0x74, 0x61, 0x74,
+	0x75, 0x73, 0x12, 0x39, 0x0a, 0x0a, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x5f, 0x6d, 0x61, 0x73, 0x6b,
+	0x18, 0x64, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61,
+	0x73, 0x6b, 0x52, 0x09, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x22, 0xcc, 0x01,
+	0x0a, 0x11, 0x41, 0x7a, 0x75, 0x72, 0x65, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x44, 0x65, 0x74,
+	0x61, 0x69, 0x6c, 0x12, 0x1d, 0x0a, 0x0a, 0x61, 0x76, 0x61, 0x69, 0x6c, 0x5f, 0x7a, 0x6f, 0x6e,
+	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x61, 0x76, 0x61, 0x69, 0x6c, 0x5a, 0x6f,
+	0x6e, 0x65, 0x12, 0x1b, 0x0a, 0x09, 0x72, 0x65, 0x73, 0x5f, 0x67, 0x72, 0x6f, 0x75, 0x70, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x72, 0x65, 0x73, 0x47, 0x72, 0x6f, 0x75, 0x70, 0x12,
+	0x23, 0x0a, 0x0d, 0x69, 0x6e, 0x73, 0x74, 0x61, 0x6e, 0x63, 0x65, 0x5f, 0x74, 0x79, 0x70, 0x65,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x69, 0x6e, 0x73, 0x74, 0x61, 0x6e, 0x63, 0x65,
+	0x54, 0x79, 0x70, 0x65, 0x12, 0x1b, 0x0a, 0x09, 0x61, 0x76, 0x61, 0x69, 0x6c, 0x5f, 0x73, 0x65,
+	0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x61, 0x76, 0x61, 0x69, 0x6c, 0x53, 0x65,
+	0x74, 0x12, 0x39, 0x0a, 0x0a, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x5f, 0x6d, 0x61, 0x73, 0x6b, 0x18,
+	0x64, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73,
+	0x6b, 0x52, 0x09, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x22, 0x90, 0x01, 0x0a,
+	0x0f, 0x41, 0x77, 0x73, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c,
+	0x12, 0x1d, 0x0a, 0x0a, 0x61, 0x76, 0x61, 0x69, 0x6c, 0x5f, 0x7a, 0x6f, 0x6e, 0x65, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x61, 0x76, 0x61, 0x69, 0x6c, 0x5a, 0x6f, 0x6e, 0x65, 0x12,
+	0x23, 0x0a, 0x0d, 0x69, 0x6e, 0x73, 0x74, 0x61, 0x6e, 0x63, 0x65, 0x5f, 0x74, 0x79, 0x70, 0x65,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x69, 0x6e, 0x73, 0x74, 0x61, 0x6e, 0x63, 0x65,
+	0x54, 0x79, 0x70, 0x65, 0x12, 0x39, 0x0a, 0x0a, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x5f, 0x6d, 0x61,
+	0x73, 0x6b, 0x18, 0x64, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c,
+	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x46, 0x69, 0x65, 0x6c, 0x64,
+	0x4d, 0x61, 0x73, 0x6b, 0x52, 0x09, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x22,
+	0xd2, 0x07, 0x0a, 0x06, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61,
+	0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x15,
+	0x0a, 0x06, 0x76, 0x70, 0x63, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05,
+	0x76, 0x70, 0x63, 0x49, 0x64, 0x12, 0x31, 0x0a, 0x04, 0x63, 0x70, 0x5f, 0x74, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x0e, 0x32, 0x1e, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f,
+	0x79, 0x2e, 0x43, 0x6c, 0x6f, 0x75, 0x64, 0x50, 0x72, 0x6f, 0x76, 0x69, 0x64, 0x65, 0x72, 0x54,
+	0x79, 0x70, 0x65, 0x52, 0x03, 0x63, 0x70, 0x54, 0x12, 0x16, 0x0a, 0x06, 0x72, 0x65, 0x67, 0x69,
+	0x6f, 0x6e, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x72, 0x65, 0x67, 0x69, 0x6f, 0x6e,
+	0x12, 0x1f, 0x0a, 0x0b, 0x69, 0x6e, 0x73, 0x74, 0x61, 0x6e, 0x63, 0x65, 0x5f, 0x69, 0x64, 0x18,
+	0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x69, 0x6e, 0x73, 0x74, 0x61, 0x6e, 0x63, 0x65, 0x49,
+	0x64, 0x12, 0x17, 0x0a, 0x07, 0x68, 0x61, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x06, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x06, 0x68, 0x61, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64,
+	0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6e,
+	0x70, 0x73, 0x18, 0x08, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x63, 0x6e, 0x70, 0x73, 0x12, 0x31,
+	0x0a, 0x04, 0x74, 0x61, 0x67, 0x73, 0x18, 0x09, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x63,
+	0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x52, 0x6f, 0x75, 0x74, 0x65,
+	0x72, 0x2e, 0x54, 0x61, 0x67, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52, 0x04, 0x74, 0x61, 0x67,
+	0x73, 0x12, 0x36, 0x0a, 0x17, 0x64, 0x65, 0x76, 0x69, 0x63, 0x65, 0x5f, 0x65, 0x6e, 0x72, 0x6f,
+	0x6c, 0x6c, 0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x0a, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x15, 0x64, 0x65, 0x76, 0x69, 0x63, 0x65, 0x45, 0x6e, 0x72, 0x6f, 0x6c, 0x6c,
+	0x6d, 0x65, 0x6e, 0x74, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x12, 0x3c, 0x0a, 0x0c, 0x72, 0x74, 0x5f,
+	0x74, 0x61, 0x62, 0x6c, 0x65, 0x5f, 0x69, 0x64, 0x73, 0x18, 0x0b, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x1a, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x52, 0x6f,
+	0x75, 0x74, 0x65, 0x54, 0x61, 0x62, 0x6c, 0x65, 0x49, 0x64, 0x73, 0x52, 0x0a, 0x72, 0x74, 0x54,
+	0x61, 0x62, 0x6c, 0x65, 0x49, 0x64, 0x73, 0x12, 0x27, 0x0a, 0x0f, 0x72, 0x6f, 0x75, 0x74, 0x65,
+	0x5f, 0x72, 0x65, 0x66, 0x6c, 0x65, 0x63, 0x74, 0x6f, 0x72, 0x18, 0x0c, 0x20, 0x01, 0x28, 0x08,
+	0x52, 0x0e, 0x72, 0x6f, 0x75, 0x74, 0x65, 0x52, 0x65, 0x66, 0x6c, 0x65, 0x63, 0x74, 0x6f, 0x72,
+	0x12, 0x42, 0x0a, 0x0e, 0x61, 0x77, 0x73, 0x5f, 0x72, 0x74, 0x72, 0x5f, 0x64, 0x65, 0x74, 0x61,
+	0x69, 0x6c, 0x18, 0x0d, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1c, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64,
+	0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x41, 0x77, 0x73, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x72,
+	0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x52, 0x0c, 0x61, 0x77, 0x73, 0x52, 0x74, 0x72, 0x44, 0x65,
+	0x74, 0x61, 0x69, 0x6c, 0x12, 0x42, 0x0a, 0x0d, 0x61, 0x7a, 0x5f, 0x72, 0x74, 0x72, 0x5f, 0x64,
+	0x65, 0x74, 0x61, 0x69, 0x6c, 0x18, 0x0e, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1e, 0x2e, 0x63, 0x6c,
+	0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x41, 0x7a, 0x75, 0x72, 0x65, 0x52,
+	0x6f, 0x75, 0x74, 0x65, 0x72, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x52, 0x0b, 0x61, 0x7a, 0x52,
+	0x74, 0x72, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x12, 0x31, 0x0a, 0x04, 0x69, 0x6e, 0x74, 0x66,
+	0x18, 0x0f, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65,
+	0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x4e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x49, 0x6e, 0x74, 0x65,
+	0x72, 0x66, 0x61, 0x63, 0x65, 0x52, 0x04, 0x69, 0x6e, 0x74, 0x66, 0x12, 0x40, 0x0a, 0x0a, 0x64,
+	0x65, 0x70, 0x5f, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x10, 0x20, 0x01, 0x28, 0x0e, 0x32,
+	0x21, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x44, 0x65,
+	0x70, 0x6c, 0x6f, 0x79, 0x6d, 0x65, 0x6e, 0x74, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x43, 0x6f,
+	0x64, 0x65, 0x52, 0x09, 0x64, 0x65, 0x70, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x2c, 0x0a,
+	0x07, 0x63, 0x76, 0x5f, 0x69, 0x6e, 0x66, 0x6f, 0x18, 0x11, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13,
+	0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x43, 0x56, 0x49,
+	0x6e, 0x66, 0x6f, 0x52, 0x06, 0x63, 0x76, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x2a, 0x0a, 0x11, 0x64,
+	0x65, 0x76, 0x69, 0x63, 0x65, 0x5f, 0x73, 0x65, 0x72, 0x69, 0x61, 0x6c, 0x5f, 0x6e, 0x75, 0x6d,
+	0x18, 0x12, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0f, 0x64, 0x65, 0x76, 0x69, 0x63, 0x65, 0x53, 0x65,
+	0x72, 0x69, 0x61, 0x6c, 0x4e, 0x75, 0x6d, 0x12, 0x17, 0x0a, 0x07, 0x62, 0x67, 0x70, 0x5f, 0x61,
+	0x73, 0x6e, 0x18, 0x13, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x06, 0x62, 0x67, 0x70, 0x41, 0x73, 0x6e,
+	0x12, 0x1d, 0x0a, 0x0a, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x64, 0x5f, 0x62, 0x79, 0x18, 0x14,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x64, 0x42, 0x79, 0x12,
+	0x1f, 0x0a, 0x0b, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x5f, 0x6d, 0x6f, 0x64, 0x65, 0x18, 0x15,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x4d, 0x6f, 0x64, 0x65,
+	0x12, 0x39, 0x0a, 0x0a, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x5f, 0x6d, 0x61, 0x73, 0x6b, 0x18, 0x64,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b,
+	0x52, 0x09, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x1a, 0x37, 0x0a, 0x09, 0x54,
+	0x61, 0x67, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61,
+	0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65,
+	0x3a, 0x02, 0x38, 0x01, 0x22, 0x3f, 0x0a, 0x10, 0x41, 0x64, 0x64, 0x52, 0x6f, 0x75, 0x74, 0x65,
+	0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x2b, 0x0a, 0x06, 0x72, 0x6f, 0x75, 0x74,
+	0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64,
+	0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x52, 0x06, 0x72,
+	0x6f, 0x75, 0x74, 0x65, 0x72, 0x22, 0x7b, 0x0a, 0x11, 0x41, 0x64, 0x64, 0x52, 0x6f, 0x75, 0x74,
+	0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2b, 0x0a, 0x06, 0x72, 0x6f,
+	0x75, 0x74, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x63, 0x6c, 0x6f,
+	0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x52,
+	0x06, 0x72, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x12, 0x39, 0x0a, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74,
+	0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f,
+	0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69,
+	0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64,
+	0x41, 0x74, 0x22, 0x42, 0x0a, 0x13, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x52, 0x6f, 0x75, 0x74,
+	0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x2b, 0x0a, 0x06, 0x72, 0x6f, 0x75,
+	0x74, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x63, 0x6c, 0x6f, 0x75,
+	0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x52, 0x06,
+	0x72, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x22, 0x78, 0x0a, 0x14, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65,
+	0x52, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2b,
+	0x0a, 0x06, 0x72, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13,
+	0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x52, 0x6f, 0x75,
+	0x74, 0x65, 0x72, 0x52, 0x06, 0x72, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x12, 0x33, 0x0a, 0x07, 0x61,
+	0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67,
+	0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54,
+	0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x06, 0x61, 0x74, 0x54, 0x69, 0x6d, 0x65,
+	0x22, 0x42, 0x0a, 0x13, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x72,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x2b, 0x0a, 0x06, 0x72, 0x6f, 0x75, 0x74, 0x65,
+	0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64,
+	0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x52, 0x06, 0x72, 0x6f,
+	0x75, 0x74, 0x65, 0x72, 0x22, 0x16, 0x0a, 0x14, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x52, 0x6f,
+	0x75, 0x74, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x74, 0x0a, 0x10,
+	0x47, 0x65, 0x74, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x12, 0x2b, 0x0a, 0x06, 0x72, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x13, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x52,
+	0x6f, 0x75, 0x74, 0x65, 0x72, 0x52, 0x06, 0x72, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x12, 0x33, 0x0a,
+	0x07, 0x61, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a,
+	0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66,
+	0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x06, 0x61, 0x74, 0x54, 0x69,
+	0x6d, 0x65, 0x22, 0x75, 0x0a, 0x11, 0x47, 0x65, 0x74, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2b, 0x0a, 0x06, 0x72, 0x6f, 0x75, 0x74, 0x65,
+	0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64,
+	0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x52, 0x06, 0x72, 0x6f,
+	0x75, 0x74, 0x65, 0x72, 0x12, 0x33, 0x0a, 0x07, 0x61, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d,
+	0x70, 0x52, 0x06, 0x61, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x22, 0xbf, 0x01, 0x0a, 0x11, 0x4c, 0x69,
+	0x73, 0x74, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
+	0x2b, 0x0a, 0x06, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32,
+	0x13, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x52, 0x6f,
+	0x75, 0x74, 0x65, 0x72, 0x52, 0x06, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x12, 0x2c, 0x0a, 0x07,
+	0x61, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e,
+	0x74, 0x69, 0x6d, 0x65, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x41, 0x74, 0x54, 0x69,
+	0x6d, 0x65, 0x52, 0x06, 0x61, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x77, 0x61,
+	0x74, 0x63, 0x68, 0x18, 0x03, 0x20, 0x01, 0x28, 0x08, 0x52, 0x05, 0x77, 0x61, 0x74, 0x63, 0x68,
+	0x12, 0x39, 0x0a, 0x0a, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x5f, 0x6d, 0x61, 0x73, 0x6b, 0x18, 0x64,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b,
+	0x52, 0x09, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x22, 0x76, 0x0a, 0x12, 0x4c,
+	0x69, 0x73, 0x74, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x2b, 0x0a, 0x06, 0x72, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x0b, 0x32, 0x13, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e,
+	0x52, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x52, 0x06, 0x72, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x12, 0x33,
+	0x0a, 0x07, 0x61, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
+	0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x06, 0x61, 0x74, 0x54,
+	0x69, 0x6d, 0x65, 0x22, 0xeb, 0x02, 0x0a, 0x07, 0x57, 0x61, 0x6e, 0x49, 0x6e, 0x66, 0x6f, 0x12,
+	0x19, 0x0a, 0x08, 0x77, 0x61, 0x6e, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x07, 0x77, 0x61, 0x6e, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x37, 0x0a, 0x07, 0x63, 0x70,
+	0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x1e, 0x2e, 0x63, 0x6c,
+	0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x43, 0x6c, 0x6f, 0x75, 0x64, 0x50,
+	0x72, 0x6f, 0x76, 0x69, 0x64, 0x65, 0x72, 0x54, 0x79, 0x70, 0x65, 0x52, 0x06, 0x63, 0x70, 0x54,
+	0x79, 0x70, 0x65, 0x12, 0x1d, 0x0a, 0x0a, 0x70, 0x65, 0x65, 0x72, 0x5f, 0x6e, 0x61, 0x6d, 0x65,
+	0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x09, 0x52, 0x09, 0x70, 0x65, 0x65, 0x72, 0x4e, 0x61, 0x6d,
+	0x65, 0x73, 0x12, 0x2a, 0x0a, 0x11, 0x65, 0x64, 0x67, 0x65, 0x5f, 0x65, 0x64, 0x67, 0x65, 0x5f,
+	0x70, 0x65, 0x65, 0x72, 0x69, 0x6e, 0x67, 0x18, 0x04, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0f, 0x65,
+	0x64, 0x67, 0x65, 0x45, 0x64, 0x67, 0x65, 0x50, 0x65, 0x65, 0x72, 0x69, 0x6e, 0x67, 0x12, 0x22,
+	0x0a, 0x0d, 0x65, 0x64, 0x67, 0x65, 0x5f, 0x65, 0x64, 0x67, 0x65, 0x5f, 0x69, 0x67, 0x77, 0x18,
+	0x05, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0b, 0x65, 0x64, 0x67, 0x65, 0x45, 0x64, 0x67, 0x65, 0x49,
+	0x67, 0x77, 0x12, 0x34, 0x0a, 0x16, 0x65, 0x64, 0x67, 0x65, 0x5f, 0x64, 0x65, 0x64, 0x69, 0x63,
+	0x61, 0x74, 0x65, 0x64, 0x5f, 0x63, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x18, 0x06, 0x20, 0x01,
+	0x28, 0x08, 0x52, 0x14, 0x65, 0x64, 0x67, 0x65, 0x44, 0x65, 0x64, 0x69, 0x63, 0x61, 0x74, 0x65,
+	0x64, 0x43, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x12, 0x2c, 0x0a, 0x12, 0x63, 0x76, 0x70, 0x5f,
+	0x63, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x07,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x10, 0x63, 0x76, 0x70, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e,
+	0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x39, 0x0a, 0x0a, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x5f,
+	0x6d, 0x61, 0x73, 0x6b, 0x18, 0x64, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f,
+	0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x46, 0x69, 0x65,
+	0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x52, 0x09, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73,
+	0x6b, 0x22, 0xf3, 0x02, 0x0a, 0x08, 0x43, 0x6c, 0x6f, 0x73, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x1b,
+	0x0a, 0x09, 0x63, 0x6c, 0x6f, 0x73, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x08, 0x63, 0x6c, 0x6f, 0x73, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x37, 0x0a, 0x07, 0x63,
+	0x70, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x1e, 0x2e, 0x63,
+	0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x43, 0x6c, 0x6f, 0x75, 0x64,
+	0x50, 0x72, 0x6f, 0x76, 0x69, 0x64, 0x65, 0x72, 0x54, 0x79, 0x70, 0x65, 0x52, 0x06, 0x63, 0x70,
+	0x54, 0x79, 0x70, 0x65, 0x12, 0x2f, 0x0a, 0x06, 0x66, 0x61, 0x62, 0x72, 0x69, 0x63, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x0e, 0x32, 0x17, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c,
+	0x6f, 0x79, 0x2e, 0x46, 0x61, 0x62, 0x72, 0x69, 0x63, 0x54, 0x79, 0x70, 0x65, 0x52, 0x06, 0x66,
+	0x61, 0x62, 0x72, 0x69, 0x63, 0x12, 0x2a, 0x0a, 0x11, 0x6c, 0x65, 0x61, 0x66, 0x5f, 0x65, 0x64,
+	0x67, 0x65, 0x5f, 0x70, 0x65, 0x65, 0x72, 0x69, 0x6e, 0x67, 0x18, 0x04, 0x20, 0x01, 0x28, 0x08,
+	0x52, 0x0f, 0x6c, 0x65, 0x61, 0x66, 0x45, 0x64, 0x67, 0x65, 0x50, 0x65, 0x65, 0x72, 0x69, 0x6e,
+	0x67, 0x12, 0x22, 0x0a, 0x0d, 0x6c, 0x65, 0x61, 0x66, 0x5f, 0x65, 0x64, 0x67, 0x65, 0x5f, 0x69,
+	0x67, 0x77, 0x18, 0x05, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0b, 0x6c, 0x65, 0x61, 0x66, 0x45, 0x64,
+	0x67, 0x65, 0x49, 0x67, 0x77, 0x12, 0x27, 0x0a, 0x0f, 0x6c, 0x65, 0x61, 0x66, 0x5f, 0x65, 0x6e,
+	0x63, 0x72, 0x79, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x06, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0e,
+	0x6c, 0x65, 0x61, 0x66, 0x45, 0x6e, 0x63, 0x72, 0x79, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x2c,
+	0x0a, 0x12, 0x63, 0x76, 0x70, 0x5f, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x5f,
+	0x6e, 0x61, 0x6d, 0x65, 0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x10, 0x63, 0x76, 0x70, 0x43,
+	0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x39, 0x0a, 0x0a,
+	0x66, 0x69, 0x65, 0x6c, 0x64, 0x5f, 0x6d, 0x61, 0x73, 0x6b, 0x18, 0x64, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62,
+	0x75, 0x66, 0x2e, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x52, 0x09, 0x66, 0x69,
+	0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x22, 0xff, 0x04, 0x0a, 0x0c, 0x54, 0x6f, 0x70, 0x6f,
+	0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x0e, 0x0a, 0x02,
+	0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x3a, 0x0a, 0x09,
+	0x74, 0x6f, 0x70, 0x6f, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0e, 0x32,
+	0x1d, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x54, 0x6f,
+	0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x54, 0x79, 0x70, 0x65, 0x52, 0x08,
+	0x74, 0x6f, 0x70, 0x6f, 0x54, 0x79, 0x70, 0x65, 0x12, 0x1e, 0x0a, 0x0b, 0x62, 0x67, 0x70, 0x5f,
+	0x61, 0x73, 0x6e, 0x5f, 0x6c, 0x6f, 0x77, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x09, 0x62,
+	0x67, 0x70, 0x41, 0x73, 0x6e, 0x4c, 0x6f, 0x77, 0x12, 0x20, 0x0a, 0x0c, 0x62, 0x67, 0x70, 0x5f,
+	0x61, 0x73, 0x6e, 0x5f, 0x68, 0x69, 0x67, 0x68, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x0a,
+	0x62, 0x67, 0x70, 0x41, 0x73, 0x6e, 0x48, 0x69, 0x67, 0x68, 0x12, 0x20, 0x0a, 0x0c, 0x76, 0x74,
+	0x65, 0x70, 0x5f, 0x69, 0x70, 0x5f, 0x63, 0x69, 0x64, 0x72, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x0a, 0x76, 0x74, 0x65, 0x70, 0x49, 0x70, 0x43, 0x69, 0x64, 0x72, 0x12, 0x2c, 0x0a, 0x12,
+	0x74, 0x65, 0x72, 0x6d, 0x69, 0x6e, 0x61, 0x74, 0x74, 0x72, 0x5f, 0x69, 0x70, 0x5f, 0x63, 0x69,
+	0x64, 0x72, 0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x10, 0x74, 0x65, 0x72, 0x6d, 0x69, 0x6e,
+	0x61, 0x74, 0x74, 0x72, 0x49, 0x70, 0x43, 0x69, 0x64, 0x72, 0x12, 0x33, 0x0a, 0x16, 0x64, 0x70,
+	0x73, 0x5f, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x5f, 0x70, 0x6c, 0x61, 0x6e, 0x65, 0x5f,
+	0x63, 0x69, 0x64, 0x72, 0x18, 0x08, 0x20, 0x01, 0x28, 0x09, 0x52, 0x13, 0x64, 0x70, 0x73, 0x43,
+	0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x50, 0x6c, 0x61, 0x6e, 0x65, 0x43, 0x69, 0x64, 0x72, 0x12,
+	0x27, 0x0a, 0x0f, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x64, 0x5f, 0x64, 0x65, 0x76, 0x69, 0x63,
+	0x65, 0x73, 0x18, 0x09, 0x20, 0x03, 0x28, 0x09, 0x52, 0x0e, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65,
+	0x64, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65, 0x73, 0x12, 0x21, 0x0a, 0x0c, 0x63, 0x76, 0x61, 0x61,
+	0x73, 0x5f, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b,
+	0x63, 0x76, 0x61, 0x61, 0x73, 0x44, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x12, 0x21, 0x0a, 0x0c, 0x63,
+	0x76, 0x61, 0x61, 0x73, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x18, 0x0b, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x0b, 0x63, 0x76, 0x61, 0x61, 0x73, 0x53, 0x65, 0x72, 0x76, 0x65, 0x72, 0x12, 0x2f,
+	0x0a, 0x08, 0x77, 0x61, 0x6e, 0x5f, 0x69, 0x6e, 0x66, 0x6f, 0x18, 0x0c, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x14, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x57,
+	0x61, 0x6e, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x07, 0x77, 0x61, 0x6e, 0x49, 0x6e, 0x66, 0x6f, 0x12,
+	0x32, 0x0a, 0x09, 0x63, 0x6c, 0x6f, 0x73, 0x5f, 0x69, 0x6e, 0x66, 0x6f, 0x18, 0x0d, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x15, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79,
+	0x2e, 0x43, 0x6c, 0x6f, 0x73, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x08, 0x63, 0x6c, 0x6f, 0x73, 0x49,
+	0x6e, 0x66, 0x6f, 0x12, 0x18, 0x0a, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x0e,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x1f, 0x0a,
+	0x0b, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x5f, 0x6d, 0x6f, 0x64, 0x65, 0x18, 0x0f, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x0a, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x4d, 0x6f, 0x64, 0x65, 0x12, 0x39,
+	0x0a, 0x0a, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x5f, 0x6d, 0x61, 0x73, 0x6b, 0x18, 0x64, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x62, 0x75, 0x66, 0x2e, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x52, 0x09,
+	0x66, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x22, 0x58, 0x0a, 0x16, 0x41, 0x64, 0x64,
+	0x54, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x12, 0x3e, 0x0a, 0x0d, 0x74, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x5f,
+	0x69, 0x6e, 0x66, 0x6f, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6c, 0x6f,
+	0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x54, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67,
+	0x79, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x0c, 0x74, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49,
+	0x6e, 0x66, 0x6f, 0x22, 0x94, 0x01, 0x0a, 0x17, 0x41, 0x64, 0x64, 0x54, 0x6f, 0x70, 0x6f, 0x6c,
+	0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
+	0x3e, 0x0a, 0x0d, 0x74, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x5f, 0x69, 0x6e, 0x66, 0x6f,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65,
+	0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x54, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66,
+	0x6f, 0x52, 0x0c, 0x74, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x12,
+	0x39, 0x0a, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52,
+	0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x41, 0x74, 0x22, 0x5b, 0x0a, 0x19, 0x55, 0x70,
+	0x64, 0x61, 0x74, 0x65, 0x54, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x3e, 0x0a, 0x0d, 0x74, 0x6f, 0x70, 0x6f, 0x6c,
+	0x6f, 0x67, 0x79, 0x5f, 0x69, 0x6e, 0x66, 0x6f, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19,
+	0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x54, 0x6f, 0x70,
+	0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x0c, 0x74, 0x6f, 0x70, 0x6f, 0x6c,
+	0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x22, 0x91, 0x01, 0x0a, 0x1a, 0x55, 0x70, 0x64, 0x61,
+	0x74, 0x65, 0x54, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3e, 0x0a, 0x0d, 0x74, 0x6f, 0x70, 0x6f, 0x6c, 0x6f,
+	0x67, 0x79, 0x5f, 0x69, 0x6e, 0x66, 0x6f, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e,
+	0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x54, 0x6f, 0x70, 0x6f,
+	0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x0c, 0x74, 0x6f, 0x70, 0x6f, 0x6c, 0x6f,
+	0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x33, 0x0a, 0x07, 0x61, 0x74, 0x5f, 0x74, 0x69, 0x6d,
+	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74,
+	0x61, 0x6d, 0x70, 0x52, 0x06, 0x61, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x22, 0x5b, 0x0a, 0x19, 0x44,
+	0x65, 0x6c, 0x65, 0x74, 0x65, 0x54, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66,
+	0x6f, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x3e, 0x0a, 0x0d, 0x74, 0x6f, 0x70, 0x6f,
+	0x6c, 0x6f, 0x67, 0x79, 0x5f, 0x69, 0x6e, 0x66, 0x6f, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x19, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x54, 0x6f,
+	0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x0c, 0x74, 0x6f, 0x70, 0x6f,
+	0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x22, 0x1c, 0x0a, 0x1a, 0x44, 0x65, 0x6c, 0x65,
+	0x74, 0x65, 0x54, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x8d, 0x01, 0x0a, 0x16, 0x47, 0x65, 0x74, 0x54, 0x6f,
+	0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x12, 0x3e, 0x0a, 0x0d, 0x74, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x5f, 0x69, 0x6e,
+	0x66, 0x6f, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64,
+	0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x54, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49,
+	0x6e, 0x66, 0x6f, 0x52, 0x0c, 0x74, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66,
+	0x6f, 0x12, 0x33, 0x0a, 0x07, 0x61, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x06,
+	0x61, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x22, 0x8e, 0x01, 0x0a, 0x17, 0x47, 0x65, 0x74, 0x54, 0x6f,
+	0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x3e, 0x0a, 0x0d, 0x74, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x5f, 0x69,
+	0x6e, 0x66, 0x6f, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6c, 0x6f, 0x75,
+	0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x54, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79,
+	0x49, 0x6e, 0x66, 0x6f, 0x52, 0x0c, 0x74, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e,
+	0x66, 0x6f, 0x12, 0x33, 0x0a, 0x07, 0x61, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52,
+	0x06, 0x61, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x22, 0xcb, 0x01, 0x0a, 0x17, 0x4c, 0x69, 0x73, 0x74,
+	0x54, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x12, 0x31, 0x0a, 0x06, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x18, 0x01, 0x20,
+	0x03, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f,
+	0x79, 0x2e, 0x54, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x06,
+	0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x12, 0x2c, 0x0a, 0x07, 0x61, 0x74, 0x5f, 0x74, 0x69, 0x6d,
+	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x74, 0x69, 0x6d, 0x65, 0x2e, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x41, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x52, 0x06, 0x61, 0x74,
+	0x54, 0x69, 0x6d, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x77, 0x61, 0x74, 0x63, 0x68, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x08, 0x52, 0x05, 0x77, 0x61, 0x74, 0x63, 0x68, 0x12, 0x39, 0x0a, 0x0a, 0x66, 0x69,
+	0x65, 0x6c, 0x64, 0x5f, 0x6d, 0x61, 0x73, 0x6b, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a,
+	0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66,
+	0x2e, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x52, 0x09, 0x66, 0x69, 0x65, 0x6c,
+	0x64, 0x4d, 0x61, 0x73, 0x6b, 0x22, 0x8f, 0x01, 0x0a, 0x18, 0x4c, 0x69, 0x73, 0x74, 0x54, 0x6f,
+	0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x3e, 0x0a, 0x0d, 0x74, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x5f, 0x69,
+	0x6e, 0x66, 0x6f, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6c, 0x6f, 0x75,
+	0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x54, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79,
+	0x49, 0x6e, 0x66, 0x6f, 0x52, 0x0c, 0x74, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e,
+	0x66, 0x6f, 0x12, 0x33, 0x0a, 0x07, 0x61, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52,
+	0x06, 0x61, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x22, 0xdc, 0x01, 0x0a, 0x0d, 0x41, 0x7a, 0x75, 0x72,
+	0x65, 0x56, 0x6e, 0x65, 0x74, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x10, 0x0a, 0x03, 0x6e, 0x73, 0x67,
+	0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x03, 0x6e, 0x73, 0x67, 0x12, 0x25, 0x0a, 0x0e, 0x72,
+	0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x5f, 0x67, 0x72, 0x6f, 0x75, 0x70, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x0d, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x47, 0x72, 0x6f,
+	0x75, 0x70, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x69, 0x64, 0x72, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x04, 0x63, 0x69, 0x64, 0x72, 0x12, 0x1b, 0x0a, 0x09, 0x61, 0x76, 0x61, 0x69, 0x6c, 0x5f,
+	0x73, 0x65, 0x74, 0x18, 0x04, 0x20, 0x03, 0x28, 0x09, 0x52, 0x08, 0x61, 0x76, 0x61, 0x69, 0x6c,
+	0x53, 0x65, 0x74, 0x12, 0x26, 0x0a, 0x0f, 0x70, 0x65, 0x65, 0x72, 0x69, 0x6e, 0x67, 0x5f, 0x63,
+	0x6f, 0x6e, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x05, 0x20, 0x03, 0x28, 0x09, 0x52, 0x0d, 0x70, 0x65,
+	0x65, 0x72, 0x69, 0x6e, 0x67, 0x43, 0x6f, 0x6e, 0x6e, 0x49, 0x64, 0x12, 0x39, 0x0a, 0x0a, 0x66,
+	0x69, 0x65, 0x6c, 0x64, 0x5f, 0x6d, 0x61, 0x73, 0x6b, 0x18, 0x64, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75,
+	0x66, 0x2e, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x52, 0x09, 0x66, 0x69, 0x65,
+	0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x22, 0xc1, 0x01, 0x0a, 0x0a, 0x41, 0x77, 0x73, 0x56, 0x70,
+	0x63, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x25, 0x0a, 0x0e, 0x73, 0x65, 0x63, 0x75, 0x72, 0x69, 0x74,
+	0x79, 0x5f, 0x67, 0x72, 0x6f, 0x75, 0x70, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x0d, 0x73,
+	0x65, 0x63, 0x75, 0x72, 0x69, 0x74, 0x79, 0x47, 0x72, 0x6f, 0x75, 0x70, 0x12, 0x12, 0x0a, 0x04,
+	0x63, 0x69, 0x64, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x63, 0x69, 0x64, 0x72,
+	0x12, 0x15, 0x0a, 0x06, 0x69, 0x67, 0x77, 0x5f, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x05, 0x69, 0x67, 0x77, 0x49, 0x64, 0x12, 0x26, 0x0a, 0x0f, 0x70, 0x65, 0x65, 0x72, 0x69,
+	0x6e, 0x67, 0x5f, 0x63, 0x6f, 0x6e, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x04, 0x20, 0x03, 0x28, 0x09,
+	0x52, 0x0d, 0x70, 0x65, 0x65, 0x72, 0x69, 0x6e, 0x67, 0x43, 0x6f, 0x6e, 0x6e, 0x49, 0x64, 0x12,
+	0x39, 0x0a, 0x0a, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x5f, 0x6d, 0x61, 0x73, 0x6b, 0x18, 0x64, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x52,
+	0x09, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x22, 0xc1, 0x02, 0x0a, 0x0b, 0x50,
+	0x65, 0x65, 0x72, 0x56, 0x70, 0x63, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x4d, 0x0a, 0x0d, 0x70, 0x65,
+	0x65, 0x72, 0x5f, 0x76, 0x70, 0x63, 0x5f, 0x63, 0x69, 0x64, 0x72, 0x18, 0x01, 0x20, 0x03, 0x28,
+	0x0b, 0x32, 0x29, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e,
+	0x50, 0x65, 0x65, 0x72, 0x56, 0x70, 0x63, 0x49, 0x6e, 0x66, 0x6f, 0x2e, 0x50, 0x65, 0x65, 0x72,
+	0x56, 0x70, 0x63, 0x43, 0x69, 0x64, 0x72, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52, 0x0b, 0x70, 0x65,
+	0x65, 0x72, 0x56, 0x70, 0x63, 0x43, 0x69, 0x64, 0x72, 0x12, 0x20, 0x0a, 0x0c, 0x70, 0x65, 0x65,
+	0x72, 0x5f, 0x72, 0x67, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x0a, 0x70, 0x65, 0x65, 0x72, 0x52, 0x67, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x24, 0x0a, 0x0e, 0x70,
+	0x65, 0x65, 0x72, 0x5f, 0x76, 0x6e, 0x65, 0x74, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x0c, 0x70, 0x65, 0x65, 0x72, 0x56, 0x6e, 0x65, 0x74, 0x4e, 0x61, 0x6d,
+	0x65, 0x12, 0x20, 0x0a, 0x0c, 0x70, 0x65, 0x65, 0x72, 0x5f, 0x76, 0x6e, 0x65, 0x74, 0x5f, 0x69,
+	0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x65, 0x65, 0x72, 0x56, 0x6e, 0x65,
+	0x74, 0x49, 0x64, 0x12, 0x39, 0x0a, 0x0a, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x5f, 0x6d, 0x61, 0x73,
+	0x6b, 0x18, 0x64, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x4d,
+	0x61, 0x73, 0x6b, 0x52, 0x09, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x1a, 0x3e,
+	0x0a, 0x10, 0x50, 0x65, 0x65, 0x72, 0x56, 0x70, 0x63, 0x43, 0x69, 0x64, 0x72, 0x45, 0x6e, 0x74,
+	0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a, 0x02, 0x38, 0x01, 0x22, 0x93,
+	0x08, 0x0a, 0x03, 0x56, 0x70, 0x63, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x15, 0x0a, 0x06, 0x76, 0x70,
+	0x63, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x70, 0x63, 0x49,
+	0x64, 0x12, 0x31, 0x0a, 0x04, 0x63, 0x70, 0x5f, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0e, 0x32,
+	0x1e, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x43, 0x6c,
+	0x6f, 0x75, 0x64, 0x50, 0x72, 0x6f, 0x76, 0x69, 0x64, 0x65, 0x72, 0x54, 0x79, 0x70, 0x65, 0x52,
+	0x03, 0x63, 0x70, 0x54, 0x12, 0x16, 0x0a, 0x06, 0x72, 0x65, 0x67, 0x69, 0x6f, 0x6e, 0x18, 0x04,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x72, 0x65, 0x67, 0x69, 0x6f, 0x6e, 0x12, 0x0e, 0x0a, 0x02,
+	0x69, 0x64, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x32, 0x0a, 0x09,
+	0x72, 0x6f, 0x6c, 0x65, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0e, 0x32,
+	0x15, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x52, 0x6f,
+	0x6c, 0x65, 0x54, 0x79, 0x70, 0x65, 0x52, 0x08, 0x72, 0x6f, 0x6c, 0x65, 0x54, 0x79, 0x70, 0x65,
+	0x12, 0x23, 0x0a, 0x0d, 0x74, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x5f, 0x6e, 0x61, 0x6d,
+	0x65, 0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x74, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67,
+	0x79, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x1b, 0x0a, 0x09, 0x63, 0x6c, 0x6f, 0x73, 0x5f, 0x6e, 0x61,
+	0x6d, 0x65, 0x18, 0x08, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x63, 0x6c, 0x6f, 0x73, 0x4e, 0x61,
+	0x6d, 0x65, 0x12, 0x19, 0x0a, 0x08, 0x77, 0x61, 0x6e, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x09,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x77, 0x61, 0x6e, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x3c, 0x0a,
+	0x0c, 0x61, 0x7a, 0x5f, 0x76, 0x6e, 0x65, 0x74, 0x5f, 0x69, 0x6e, 0x66, 0x6f, 0x18, 0x0a, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f,
+	0x79, 0x2e, 0x41, 0x7a, 0x75, 0x72, 0x65, 0x56, 0x6e, 0x65, 0x74, 0x49, 0x6e, 0x66, 0x6f, 0x52,
+	0x0a, 0x61, 0x7a, 0x56, 0x6e, 0x65, 0x74, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x39, 0x0a, 0x0c, 0x61,
+	0x77, 0x73, 0x5f, 0x76, 0x70, 0x63, 0x5f, 0x69, 0x6e, 0x66, 0x6f, 0x18, 0x0b, 0x20, 0x01, 0x28,
+	0x0b, 0x32, 0x17, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e,
+	0x41, 0x77, 0x73, 0x56, 0x70, 0x63, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x0a, 0x61, 0x77, 0x73, 0x56,
+	0x70, 0x63, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6e, 0x70, 0x73, 0x18, 0x0c,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x63, 0x6e, 0x70, 0x73, 0x12, 0x27, 0x0a, 0x0f, 0x72, 0x6f,
+	0x75, 0x74, 0x65, 0x5f, 0x72, 0x65, 0x66, 0x6c, 0x65, 0x63, 0x74, 0x6f, 0x72, 0x18, 0x0d, 0x20,
+	0x01, 0x28, 0x08, 0x52, 0x0e, 0x72, 0x6f, 0x75, 0x74, 0x65, 0x52, 0x65, 0x66, 0x6c, 0x65, 0x63,
+	0x74, 0x6f, 0x72, 0x12, 0x2e, 0x0a, 0x04, 0x74, 0x61, 0x67, 0x73, 0x18, 0x0e, 0x20, 0x03, 0x28,
+	0x0b, 0x32, 0x1a, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e,
+	0x56, 0x70, 0x63, 0x2e, 0x54, 0x61, 0x67, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52, 0x04, 0x74,
+	0x61, 0x67, 0x73, 0x12, 0x45, 0x0a, 0x0d, 0x70, 0x65, 0x65, 0x72, 0x5f, 0x76, 0x70, 0x63, 0x5f,
+	0x63, 0x69, 0x64, 0x72, 0x18, 0x0f, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x21, 0x2e, 0x63, 0x6c, 0x6f,
+	0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x56, 0x70, 0x63, 0x2e, 0x50, 0x65, 0x65,
+	0x72, 0x56, 0x70, 0x63, 0x43, 0x69, 0x64, 0x72, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x52, 0x0b, 0x70,
+	0x65, 0x65, 0x72, 0x56, 0x70, 0x63, 0x43, 0x69, 0x64, 0x72, 0x12, 0x3b, 0x0a, 0x0b, 0x73, 0x74,
+	0x61, 0x74, 0x75, 0x73, 0x5f, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x10, 0x20, 0x01, 0x28, 0x0e, 0x32,
+	0x1a, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x56, 0x70,
+	0x63, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x43, 0x6f, 0x64, 0x65, 0x52, 0x0a, 0x73, 0x74, 0x61,
+	0x74, 0x75, 0x73, 0x43, 0x6f, 0x64, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x61, 0x63, 0x63, 0x6f, 0x75,
+	0x6e, 0x74, 0x18, 0x11, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x61, 0x63, 0x63, 0x6f, 0x75, 0x6e,
+	0x74, 0x12, 0x3c, 0x0a, 0x0d, 0x70, 0x65, 0x65, 0x72, 0x5f, 0x76, 0x70, 0x63, 0x5f, 0x69, 0x6e,
+	0x66, 0x6f, 0x18, 0x12, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64,
+	0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x50, 0x65, 0x65, 0x72, 0x56, 0x70, 0x63, 0x49, 0x6e,
+	0x66, 0x6f, 0x52, 0x0b, 0x70, 0x65, 0x65, 0x72, 0x56, 0x70, 0x63, 0x49, 0x6e, 0x66, 0x6f, 0x12,
+	0x23, 0x0a, 0x0d, 0x74, 0x67, 0x77, 0x5f, 0x63, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x65, 0x64,
+	0x18, 0x13, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0c, 0x74, 0x67, 0x77, 0x43, 0x6f, 0x6e, 0x6e, 0x65,
+	0x63, 0x74, 0x65, 0x64, 0x12, 0x1a, 0x0a, 0x08, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x65, 0x6f, 0x73,
+	0x18, 0x14, 0x20, 0x01, 0x28, 0x08, 0x52, 0x08, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x65, 0x6f, 0x73,
+	0x12, 0x1d, 0x0a, 0x0a, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x64, 0x5f, 0x62, 0x79, 0x18, 0x15,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6d, 0x61, 0x6e, 0x61, 0x67, 0x65, 0x64, 0x42, 0x79, 0x12,
+	0x1f, 0x0a, 0x0b, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x5f, 0x6d, 0x6f, 0x64, 0x65, 0x18, 0x16,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x4d, 0x6f, 0x64, 0x65,
+	0x12, 0x39, 0x0a, 0x0a, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x5f, 0x6d, 0x61, 0x73, 0x6b, 0x18, 0x64,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b,
+	0x52, 0x09, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x1a, 0x37, 0x0a, 0x09, 0x54,
+	0x61, 0x67, 0x73, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61,
+	0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65,
+	0x3a, 0x02, 0x38, 0x01, 0x1a, 0x3e, 0x0a, 0x10, 0x50, 0x65, 0x65, 0x72, 0x56, 0x70, 0x63, 0x43,
+	0x69, 0x64, 0x72, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61,
+	0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65,
+	0x3a, 0x02, 0x38, 0x01, 0x22, 0x33, 0x0a, 0x0d, 0x41, 0x64, 0x64, 0x56, 0x70, 0x63, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x22, 0x0a, 0x03, 0x76, 0x70, 0x63, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x10, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79,
+	0x2e, 0x56, 0x70, 0x63, 0x52, 0x03, 0x76, 0x70, 0x63, 0x22, 0x6f, 0x0a, 0x0e, 0x41, 0x64, 0x64,
+	0x56, 0x70, 0x63, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x22, 0x0a, 0x03, 0x76,
+	0x70, 0x63, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64,
+	0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x56, 0x70, 0x63, 0x52, 0x03, 0x76, 0x70, 0x63, 0x12,
+	0x39, 0x0a, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52,
+	0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x41, 0x74, 0x22, 0x36, 0x0a, 0x10, 0x55, 0x70,
+	0x64, 0x61, 0x74, 0x65, 0x56, 0x70, 0x63, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x22,
+	0x0a, 0x03, 0x76, 0x70, 0x63, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x63, 0x6c,
+	0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x56, 0x70, 0x63, 0x52, 0x03, 0x76,
+	0x70, 0x63, 0x22, 0x6c, 0x0a, 0x11, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x56, 0x70, 0x63, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x22, 0x0a, 0x03, 0x76, 0x70, 0x63, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c,
+	0x6f, 0x79, 0x2e, 0x56, 0x70, 0x63, 0x52, 0x03, 0x76, 0x70, 0x63, 0x12, 0x33, 0x0a, 0x07, 0x61,
+	0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67,
+	0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54,
+	0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x06, 0x61, 0x74, 0x54, 0x69, 0x6d, 0x65,
+	0x22, 0x36, 0x0a, 0x10, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x56, 0x70, 0x63, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x22, 0x0a, 0x03, 0x76, 0x70, 0x63, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x0b, 0x32, 0x10, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e,
+	0x56, 0x70, 0x63, 0x52, 0x03, 0x76, 0x70, 0x63, 0x22, 0x13, 0x0a, 0x11, 0x44, 0x65, 0x6c, 0x65,
+	0x74, 0x65, 0x56, 0x70, 0x63, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x68, 0x0a,
+	0x0d, 0x47, 0x65, 0x74, 0x56, 0x70, 0x63, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x22,
+	0x0a, 0x03, 0x76, 0x70, 0x63, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x63, 0x6c,
+	0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x56, 0x70, 0x63, 0x52, 0x03, 0x76,
+	0x70, 0x63, 0x12, 0x33, 0x0a, 0x07, 0x61, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52,
+	0x06, 0x61, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x22, 0x69, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x56, 0x70,
+	0x63, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x22, 0x0a, 0x03, 0x76, 0x70, 0x63,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65,
+	0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x56, 0x70, 0x63, 0x52, 0x03, 0x76, 0x70, 0x63, 0x12, 0x33, 0x0a,
+	0x07, 0x61, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a,
+	0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66,
+	0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x06, 0x61, 0x74, 0x54, 0x69,
+	0x6d, 0x65, 0x22, 0xb9, 0x01, 0x0a, 0x0e, 0x4c, 0x69, 0x73, 0x74, 0x56, 0x70, 0x63, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x28, 0x0a, 0x06, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x18,
+	0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70,
+	0x6c, 0x6f, 0x79, 0x2e, 0x56, 0x70, 0x63, 0x52, 0x06, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x12,
+	0x2c, 0x0a, 0x07, 0x61, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x13, 0x2e, 0x74, 0x69, 0x6d, 0x65, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x41,
+	0x74, 0x54, 0x69, 0x6d, 0x65, 0x52, 0x06, 0x61, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x12, 0x14, 0x0a,
+	0x05, 0x77, 0x61, 0x74, 0x63, 0x68, 0x18, 0x03, 0x20, 0x01, 0x28, 0x08, 0x52, 0x05, 0x77, 0x61,
+	0x74, 0x63, 0x68, 0x12, 0x39, 0x0a, 0x0a, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x5f, 0x6d, 0x61, 0x73,
+	0x6b, 0x18, 0x64, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x4d,
+	0x61, 0x73, 0x6b, 0x52, 0x09, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x22, 0x6a,
+	0x0a, 0x0f, 0x4c, 0x69, 0x73, 0x74, 0x56, 0x70, 0x63, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x22, 0x0a, 0x03, 0x76, 0x70, 0x63, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10,
+	0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x56, 0x70, 0x63,
+	0x52, 0x03, 0x76, 0x70, 0x63, 0x12, 0x33, 0x0a, 0x07, 0x61, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61,
+	0x6d, 0x70, 0x52, 0x06, 0x61, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x22, 0x9d, 0x02, 0x0a, 0x06, 0x53,
+	0x75, 0x62, 0x6e, 0x65, 0x74, 0x12, 0x1b, 0x0a, 0x09, 0x73, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x5f,
+	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x73, 0x75, 0x62, 0x6e, 0x65, 0x74,
+	0x49, 0x64, 0x12, 0x31, 0x0a, 0x04, 0x63, 0x70, 0x5f, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e,
+	0x32, 0x1e, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x43,
+	0x6c, 0x6f, 0x75, 0x64, 0x50, 0x72, 0x6f, 0x76, 0x69, 0x64, 0x65, 0x72, 0x54, 0x79, 0x70, 0x65,
+	0x52, 0x03, 0x63, 0x70, 0x54, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x69, 0x64, 0x72, 0x18, 0x04, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x04, 0x63, 0x69, 0x64, 0x72, 0x12, 0x15, 0x0a, 0x06, 0x76, 0x70, 0x63,
+	0x5f, 0x69, 0x64, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x76, 0x70, 0x63, 0x49, 0x64,
+	0x12, 0x1d, 0x0a, 0x0a, 0x61, 0x76, 0x61, 0x69, 0x6c, 0x5f, 0x7a, 0x6f, 0x6e, 0x65, 0x18, 0x06,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x61, 0x76, 0x61, 0x69, 0x6c, 0x5a, 0x6f, 0x6e, 0x65, 0x12,
+	0x17, 0x0a, 0x07, 0x70, 0x72, 0x69, 0x6d, 0x5f, 0x67, 0x77, 0x18, 0x07, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x06, 0x70, 0x72, 0x69, 0x6d, 0x47, 0x77, 0x12, 0x15, 0x0a, 0x06, 0x73, 0x65, 0x63, 0x5f,
+	0x67, 0x77, 0x18, 0x08, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x73, 0x65, 0x63, 0x47, 0x77, 0x12,
+	0x39, 0x0a, 0x0a, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x5f, 0x6d, 0x61, 0x73, 0x6b, 0x18, 0x64, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x52,
+	0x09, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x22, 0x3f, 0x0a, 0x10, 0x41, 0x64,
+	0x64, 0x53, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x2b,
+	0x0a, 0x06, 0x73, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13,
+	0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x53, 0x75, 0x62,
+	0x6e, 0x65, 0x74, 0x52, 0x06, 0x73, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x22, 0x7b, 0x0a, 0x11, 0x41,
+	0x64, 0x64, 0x53, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x12, 0x2b, 0x0a, 0x06, 0x73, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x13, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x53,
+	0x75, 0x62, 0x6e, 0x65, 0x74, 0x52, 0x06, 0x73, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x12, 0x39, 0x0a,
+	0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x09, 0x63,
+	0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x41, 0x74, 0x22, 0x42, 0x0a, 0x13, 0x55, 0x70, 0x64, 0x61,
+	0x74, 0x65, 0x53, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
+	0x2b, 0x0a, 0x06, 0x73, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x13, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x53, 0x75,
+	0x62, 0x6e, 0x65, 0x74, 0x52, 0x06, 0x73, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x22, 0x78, 0x0a, 0x14,
+	0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x53, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2b, 0x0a, 0x06, 0x73, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c,
+	0x6f, 0x79, 0x2e, 0x53, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x52, 0x06, 0x73, 0x75, 0x62, 0x6e, 0x65,
+	0x74, 0x12, 0x33, 0x0a, 0x07, 0x61, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x06,
+	0x61, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x22, 0x42, 0x0a, 0x13, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65,
+	0x53, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x2b, 0x0a,
+	0x06, 0x73, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e,
+	0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x53, 0x75, 0x62, 0x6e,
+	0x65, 0x74, 0x52, 0x06, 0x73, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x22, 0x16, 0x0a, 0x14, 0x44, 0x65,
+	0x6c, 0x65, 0x74, 0x65, 0x53, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x22, 0x74, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x53, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x2b, 0x0a, 0x06, 0x73, 0x75, 0x62, 0x6e, 0x65, 0x74,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65,
+	0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x53, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x52, 0x06, 0x73, 0x75, 0x62,
+	0x6e, 0x65, 0x74, 0x12, 0x33, 0x0a, 0x07, 0x61, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70,
+	0x52, 0x06, 0x61, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x22, 0x75, 0x0a, 0x11, 0x47, 0x65, 0x74, 0x53,
+	0x75, 0x62, 0x6e, 0x65, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2b, 0x0a,
+	0x06, 0x73, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e,
+	0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x53, 0x75, 0x62, 0x6e,
+	0x65, 0x74, 0x52, 0x06, 0x73, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x12, 0x33, 0x0a, 0x07, 0x61, 0x74,
+	0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f,
+	0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69,
+	0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x06, 0x61, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x22,
+	0xbf, 0x01, 0x0a, 0x11, 0x4c, 0x69, 0x73, 0x74, 0x53, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x2b, 0x0a, 0x06, 0x66, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x18,
+	0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70,
+	0x6c, 0x6f, 0x79, 0x2e, 0x53, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x52, 0x06, 0x66, 0x69, 0x6c, 0x74,
+	0x65, 0x72, 0x12, 0x2c, 0x0a, 0x07, 0x61, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x74, 0x69, 0x6d, 0x65, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x41, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x52, 0x06, 0x61, 0x74, 0x54, 0x69, 0x6d, 0x65,
+	0x12, 0x14, 0x0a, 0x05, 0x77, 0x61, 0x74, 0x63, 0x68, 0x18, 0x03, 0x20, 0x01, 0x28, 0x08, 0x52,
+	0x05, 0x77, 0x61, 0x74, 0x63, 0x68, 0x12, 0x39, 0x0a, 0x0a, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x5f,
+	0x6d, 0x61, 0x73, 0x6b, 0x18, 0x64, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f,
+	0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x46, 0x69, 0x65,
+	0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x52, 0x09, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73,
+	0x6b, 0x22, 0x76, 0x0a, 0x12, 0x4c, 0x69, 0x73, 0x74, 0x53, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2b, 0x0a, 0x06, 0x73, 0x75, 0x62, 0x6e, 0x65,
+	0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64,
+	0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x53, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x52, 0x06, 0x73, 0x75,
+	0x62, 0x6e, 0x65, 0x74, 0x12, 0x33, 0x0a, 0x07, 0x61, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d,
+	0x70, 0x52, 0x06, 0x61, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x22, 0xed, 0x01, 0x0a, 0x13, 0x50, 0x61,
+	0x74, 0x68, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x69, 0x73, 0x74, 0x69, 0x63,
+	0x73, 0x12, 0x1d, 0x0a, 0x0a, 0x6c, 0x61, 0x74, 0x65, 0x6e, 0x63, 0x79, 0x5f, 0x6d, 0x73, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x09, 0x6c, 0x61, 0x74, 0x65, 0x6e, 0x63, 0x79, 0x4d, 0x73,
+	0x12, 0x1b, 0x0a, 0x09, 0x6a, 0x69, 0x74, 0x74, 0x65, 0x72, 0x5f, 0x6d, 0x73, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x04, 0x52, 0x08, 0x6a, 0x69, 0x74, 0x74, 0x65, 0x72, 0x4d, 0x73, 0x12, 0x1e, 0x0a,
+	0x0b, 0x70, 0x6b, 0x74, 0x5f, 0x6c, 0x6f, 0x73, 0x73, 0x5f, 0x70, 0x63, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x04, 0x52, 0x09, 0x70, 0x6b, 0x74, 0x4c, 0x6f, 0x73, 0x73, 0x50, 0x63, 0x12, 0x17, 0x0a,
+	0x07, 0x62, 0x77, 0x5f, 0x6d, 0x62, 0x70, 0x73, 0x18, 0x04, 0x20, 0x01, 0x28, 0x04, 0x52, 0x06,
+	0x62, 0x77, 0x4d, 0x62, 0x70, 0x73, 0x12, 0x0e, 0x0a, 0x02, 0x75, 0x70, 0x18, 0x05, 0x20, 0x01,
+	0x28, 0x08, 0x52, 0x02, 0x75, 0x70, 0x12, 0x16, 0x0a, 0x06, 0x75, 0x70, 0x74, 0x69, 0x6d, 0x65,
+	0x18, 0x06, 0x20, 0x01, 0x28, 0x04, 0x52, 0x06, 0x75, 0x70, 0x74, 0x69, 0x6d, 0x65, 0x12, 0x39,
+	0x0a, 0x0a, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x5f, 0x6d, 0x61, 0x73, 0x6b, 0x18, 0x64, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x62, 0x75, 0x66, 0x2e, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x52, 0x09,
+	0x66, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x22, 0xbd, 0x07, 0x0a, 0x04, 0x50, 0x61,
+	0x74, 0x68, 0x12, 0x27, 0x0a, 0x10, 0x73, 0x72, 0x63, 0x5f, 0x76, 0x70, 0x63, 0x5f, 0x63, 0x6c,
+	0x6f, 0x75, 0x64, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0d, 0x73, 0x72,
+	0x63, 0x56, 0x70, 0x63, 0x43, 0x6c, 0x6f, 0x75, 0x64, 0x49, 0x64, 0x12, 0x20, 0x0a, 0x0c, 0x73,
+	0x72, 0x63, 0x5f, 0x76, 0x70, 0x63, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x0a, 0x73, 0x72, 0x63, 0x56, 0x70, 0x63, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x20, 0x0a,
+	0x0c, 0x73, 0x72, 0x63, 0x5f, 0x76, 0x70, 0x63, 0x5f, 0x75, 0x75, 0x69, 0x64, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x0a, 0x73, 0x72, 0x63, 0x56, 0x70, 0x63, 0x55, 0x75, 0x69, 0x64, 0x12,
+	0x2b, 0x0a, 0x12, 0x6c, 0x6f, 0x63, 0x61, 0x6c, 0x5f, 0x72, 0x74, 0x72, 0x5f, 0x63, 0x6c, 0x6f,
+	0x75, 0x64, 0x5f, 0x69, 0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0f, 0x6c, 0x6f, 0x63,
+	0x61, 0x6c, 0x52, 0x74, 0x72, 0x43, 0x6c, 0x6f, 0x75, 0x64, 0x49, 0x64, 0x12, 0x24, 0x0a, 0x0e,
+	0x6c, 0x6f, 0x63, 0x61, 0x6c, 0x5f, 0x72, 0x74, 0x72, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x05,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x6c, 0x6f, 0x63, 0x61, 0x6c, 0x52, 0x74, 0x72, 0x4e, 0x61,
+	0x6d, 0x65, 0x12, 0x24, 0x0a, 0x0e, 0x6c, 0x6f, 0x63, 0x61, 0x6c, 0x5f, 0x72, 0x74, 0x72, 0x5f,
+	0x75, 0x75, 0x69, 0x64, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x6c, 0x6f, 0x63, 0x61,
+	0x6c, 0x52, 0x74, 0x72, 0x55, 0x75, 0x69, 0x64, 0x12, 0x2b, 0x0a, 0x12, 0x6c, 0x6f, 0x63, 0x61,
+	0x6c, 0x5f, 0x69, 0x6e, 0x74, 0x66, 0x5f, 0x69, 0x70, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x18, 0x07,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x0f, 0x6c, 0x6f, 0x63, 0x61, 0x6c, 0x49, 0x6e, 0x74, 0x66, 0x49,
+	0x70, 0x41, 0x64, 0x64, 0x72, 0x12, 0x1d, 0x0a, 0x0a, 0x73, 0x72, 0x63, 0x5f, 0x72, 0x65, 0x67,
+	0x69, 0x6f, 0x6e, 0x18, 0x08, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x73, 0x72, 0x63, 0x52, 0x65,
+	0x67, 0x69, 0x6f, 0x6e, 0x12, 0x38, 0x0a, 0x08, 0x73, 0x72, 0x63, 0x5f, 0x63, 0x70, 0x5f, 0x74,
+	0x18, 0x09, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x1e, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65,
+	0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x43, 0x6c, 0x6f, 0x75, 0x64, 0x50, 0x72, 0x6f, 0x76, 0x69, 0x64,
+	0x65, 0x72, 0x54, 0x79, 0x70, 0x65, 0x52, 0x06, 0x73, 0x72, 0x63, 0x43, 0x70, 0x54, 0x12, 0x27,
+	0x0a, 0x10, 0x64, 0x73, 0x74, 0x5f, 0x76, 0x70, 0x63, 0x5f, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x5f,
+	0x69, 0x64, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0d, 0x64, 0x73, 0x74, 0x56, 0x70, 0x63,
+	0x43, 0x6c, 0x6f, 0x75, 0x64, 0x49, 0x64, 0x12, 0x20, 0x0a, 0x0c, 0x64, 0x73, 0x74, 0x5f, 0x76,
+	0x70, 0x63, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x0b, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x64,
+	0x73, 0x74, 0x56, 0x70, 0x63, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x20, 0x0a, 0x0c, 0x64, 0x73, 0x74,
+	0x5f, 0x76, 0x70, 0x63, 0x5f, 0x75, 0x75, 0x69, 0x64, 0x18, 0x0c, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x0a, 0x64, 0x73, 0x74, 0x56, 0x70, 0x63, 0x55, 0x75, 0x69, 0x64, 0x12, 0x2d, 0x0a, 0x13, 0x72,
+	0x65, 0x6d, 0x6f, 0x74, 0x65, 0x5f, 0x72, 0x74, 0x72, 0x5f, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x5f,
+	0x69, 0x64, 0x18, 0x0d, 0x20, 0x01, 0x28, 0x09, 0x52, 0x10, 0x72, 0x65, 0x6d, 0x6f, 0x74, 0x65,
+	0x52, 0x74, 0x72, 0x43, 0x6c, 0x6f, 0x75, 0x64, 0x49, 0x64, 0x12, 0x26, 0x0a, 0x0f, 0x72, 0x65,
+	0x6d, 0x6f, 0x74, 0x65, 0x5f, 0x72, 0x74, 0x72, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x0e, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x0d, 0x72, 0x65, 0x6d, 0x6f, 0x74, 0x65, 0x52, 0x74, 0x72, 0x4e, 0x61,
+	0x6d, 0x65, 0x12, 0x26, 0x0a, 0x0f, 0x72, 0x65, 0x6d, 0x6f, 0x74, 0x65, 0x5f, 0x72, 0x74, 0x72,
+	0x5f, 0x75, 0x75, 0x69, 0x64, 0x18, 0x0f, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0d, 0x72, 0x65, 0x6d,
+	0x6f, 0x74, 0x65, 0x52, 0x74, 0x72, 0x55, 0x75, 0x69, 0x64, 0x12, 0x2d, 0x0a, 0x13, 0x72, 0x65,
+	0x6d, 0x6f, 0x74, 0x65, 0x5f, 0x69, 0x6e, 0x74, 0x66, 0x5f, 0x69, 0x70, 0x5f, 0x61, 0x64, 0x64,
+	0x72, 0x18, 0x10, 0x20, 0x01, 0x28, 0x09, 0x52, 0x10, 0x72, 0x65, 0x6d, 0x6f, 0x74, 0x65, 0x49,
+	0x6e, 0x74, 0x66, 0x49, 0x70, 0x41, 0x64, 0x64, 0x72, 0x12, 0x1d, 0x0a, 0x0a, 0x64, 0x73, 0x74,
+	0x5f, 0x72, 0x65, 0x67, 0x69, 0x6f, 0x6e, 0x18, 0x11, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x64,
+	0x73, 0x74, 0x52, 0x65, 0x67, 0x69, 0x6f, 0x6e, 0x12, 0x38, 0x0a, 0x08, 0x64, 0x73, 0x74, 0x5f,
+	0x63, 0x70, 0x5f, 0x74, 0x18, 0x12, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x1e, 0x2e, 0x63, 0x6c, 0x6f,
+	0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x43, 0x6c, 0x6f, 0x75, 0x64, 0x50, 0x72,
+	0x6f, 0x76, 0x69, 0x64, 0x65, 0x72, 0x54, 0x79, 0x70, 0x65, 0x52, 0x06, 0x64, 0x73, 0x74, 0x43,
+	0x70, 0x54, 0x12, 0x23, 0x0a, 0x0d, 0x74, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x5f, 0x6e,
+	0x61, 0x6d, 0x65, 0x18, 0x13, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x74, 0x6f, 0x70, 0x6f, 0x6c,
+	0x6f, 0x67, 0x79, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x36, 0x0a, 0x04, 0x75, 0x6c, 0x5f, 0x74, 0x18,
+	0x14, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x23, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70,
+	0x6c, 0x6f, 0x79, 0x2e, 0x55, 0x6e, 0x64, 0x65, 0x72, 0x6c, 0x61, 0x79, 0x43, 0x6f, 0x6e, 0x6e,
+	0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x54, 0x79, 0x70, 0x65, 0x52, 0x03, 0x75, 0x6c, 0x54, 0x12,
+	0x3d, 0x0a, 0x09, 0x70, 0x61, 0x74, 0x68, 0x5f, 0x63, 0x68, 0x61, 0x72, 0x18, 0x15, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x20, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79,
+	0x2e, 0x50, 0x61, 0x74, 0x68, 0x43, 0x68, 0x61, 0x72, 0x61, 0x63, 0x74, 0x65, 0x72, 0x69, 0x73,
+	0x74, 0x69, 0x63, 0x73, 0x52, 0x08, 0x70, 0x61, 0x74, 0x68, 0x43, 0x68, 0x61, 0x72, 0x12, 0x39,
+	0x0a, 0x0a, 0x66, 0x69, 0x65, 0x6c, 0x64, 0x5f, 0x6d, 0x61, 0x73, 0x6b, 0x18, 0x64, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x62, 0x75, 0x66, 0x2e, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x52, 0x09,
+	0x66, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x22, 0x6c, 0x0a, 0x0e, 0x47, 0x65, 0x74,
+	0x50, 0x61, 0x74, 0x68, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x25, 0x0a, 0x04, 0x70,
+	0x61, 0x74, 0x68, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x63, 0x6c, 0x6f, 0x75,
+	0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x50, 0x61, 0x74, 0x68, 0x52, 0x04, 0x70, 0x61,
+	0x74, 0x68, 0x12, 0x33, 0x0a, 0x07, 0x61, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52,
+	0x06, 0x61, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x22, 0x6d, 0x0a, 0x0f, 0x47, 0x65, 0x74, 0x50, 0x61,
+	0x74, 0x68, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x25, 0x0a, 0x04, 0x70, 0x61,
+	0x74, 0x68, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64,
+	0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x50, 0x61, 0x74, 0x68, 0x52, 0x04, 0x70, 0x61, 0x74,
+	0x68, 0x12, 0x33, 0x0a, 0x07, 0x61, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x06,
+	0x61, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x22, 0xbb, 0x01, 0x0a, 0x0f, 0x4c, 0x69, 0x73, 0x74, 0x50,
+	0x61, 0x74, 0x68, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x29, 0x0a, 0x06, 0x66, 0x69,
+	0x6c, 0x74, 0x65, 0x72, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x63, 0x6c, 0x6f,
+	0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x50, 0x61, 0x74, 0x68, 0x52, 0x06, 0x66,
+	0x69, 0x6c, 0x74, 0x65, 0x72, 0x12, 0x2c, 0x0a, 0x07, 0x61, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x74, 0x69, 0x6d, 0x65, 0x2e, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x41, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x52, 0x06, 0x61, 0x74, 0x54,
+	0x69, 0x6d, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x77, 0x61, 0x74, 0x63, 0x68, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x08, 0x52, 0x05, 0x77, 0x61, 0x74, 0x63, 0x68, 0x12, 0x39, 0x0a, 0x0a, 0x66, 0x69, 0x65,
+	0x6c, 0x64, 0x5f, 0x6d, 0x61, 0x73, 0x6b, 0x18, 0x64, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e,
+	0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e,
+	0x46, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x52, 0x09, 0x66, 0x69, 0x65, 0x6c, 0x64,
+	0x4d, 0x61, 0x73, 0x6b, 0x22, 0x6e, 0x0a, 0x10, 0x4c, 0x69, 0x73, 0x74, 0x50, 0x61, 0x74, 0x68,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x25, 0x0a, 0x04, 0x70, 0x61, 0x74, 0x68,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65,
+	0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x50, 0x61, 0x74, 0x68, 0x52, 0x04, 0x70, 0x61, 0x74, 0x68, 0x12,
+	0x33, 0x0a, 0x07, 0x61, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62,
+	0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x06, 0x61, 0x74,
+	0x54, 0x69, 0x6d, 0x65, 0x2a, 0x4d, 0x0a, 0x11, 0x43, 0x6c, 0x6f, 0x75, 0x64, 0x50, 0x72, 0x6f,
+	0x76, 0x69, 0x64, 0x65, 0x72, 0x54, 0x79, 0x70, 0x65, 0x12, 0x12, 0x0a, 0x0e, 0x43, 0x50, 0x5f,
+	0x55, 0x4e, 0x53, 0x50, 0x45, 0x43, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10, 0x00, 0x12, 0x0a, 0x0a,
+	0x06, 0x43, 0x50, 0x5f, 0x41, 0x57, 0x53, 0x10, 0x01, 0x12, 0x0c, 0x0a, 0x08, 0x43, 0x50, 0x5f,
+	0x41, 0x5a, 0x55, 0x52, 0x45, 0x10, 0x02, 0x12, 0x0a, 0x0a, 0x06, 0x43, 0x50, 0x5f, 0x47, 0x43,
+	0x50, 0x10, 0x03, 0x2a, 0x41, 0x0a, 0x0c, 0x54, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x54,
+	0x79, 0x70, 0x65, 0x12, 0x14, 0x0a, 0x10, 0x54, 0x4f, 0x50, 0x4f, 0x5f, 0x55, 0x4e, 0x53, 0x50,
+	0x45, 0x43, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10, 0x00, 0x12, 0x0d, 0x0a, 0x09, 0x54, 0x4f, 0x50,
+	0x4f, 0x5f, 0x43, 0x4c, 0x4f, 0x53, 0x10, 0x01, 0x12, 0x0c, 0x0a, 0x08, 0x54, 0x4f, 0x50, 0x4f,
+	0x5f, 0x57, 0x41, 0x4e, 0x10, 0x02, 0x2a, 0x4b, 0x0a, 0x16, 0x55, 0x6e, 0x64, 0x65, 0x72, 0x6c,
+	0x61, 0x79, 0x43, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x54, 0x79, 0x70, 0x65,
+	0x12, 0x09, 0x0a, 0x05, 0x55, 0x4c, 0x5f, 0x4e, 0x41, 0x10, 0x00, 0x12, 0x0a, 0x0a, 0x06, 0x55,
+	0x4c, 0x5f, 0x49, 0x47, 0x57, 0x10, 0x01, 0x12, 0x0e, 0x0a, 0x0a, 0x55, 0x4c, 0x5f, 0x50, 0x45,
+	0x45, 0x52, 0x49, 0x4e, 0x47, 0x10, 0x02, 0x12, 0x0a, 0x0a, 0x06, 0x55, 0x4c, 0x5f, 0x54, 0x47,
+	0x57, 0x10, 0x03, 0x2a, 0x4a, 0x0a, 0x15, 0x4f, 0x76, 0x65, 0x72, 0x6c, 0x61, 0x79, 0x43, 0x6f,
+	0x6e, 0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x54, 0x79, 0x70, 0x65, 0x12, 0x09, 0x0a, 0x05,
+	0x4f, 0x4c, 0x5f, 0x4e, 0x41, 0x10, 0x00, 0x12, 0x0a, 0x0a, 0x06, 0x4f, 0x4c, 0x5f, 0x44, 0x50,
+	0x53, 0x10, 0x01, 0x12, 0x0c, 0x0a, 0x08, 0x4f, 0x4c, 0x5f, 0x56, 0x58, 0x4c, 0x41, 0x4e, 0x10,
+	0x02, 0x12, 0x0c, 0x0a, 0x08, 0x4f, 0x4c, 0x5f, 0x49, 0x50, 0x53, 0x45, 0x43, 0x10, 0x03, 0x2a,
+	0x4e, 0x0a, 0x08, 0x52, 0x6f, 0x6c, 0x65, 0x54, 0x79, 0x70, 0x65, 0x12, 0x14, 0x0a, 0x10, 0x52,
+	0x4f, 0x4c, 0x45, 0x5f, 0x55, 0x4e, 0x53, 0x50, 0x45, 0x43, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10,
+	0x00, 0x12, 0x0d, 0x0a, 0x09, 0x52, 0x4f, 0x4c, 0x45, 0x5f, 0x45, 0x44, 0x47, 0x45, 0x10, 0x01,
+	0x12, 0x0e, 0x0a, 0x0a, 0x52, 0x4f, 0x4c, 0x45, 0x5f, 0x53, 0x50, 0x49, 0x4e, 0x45, 0x10, 0x02,
+	0x12, 0x0d, 0x0a, 0x09, 0x52, 0x4f, 0x4c, 0x45, 0x5f, 0x4c, 0x45, 0x41, 0x46, 0x10, 0x03, 0x2a,
+	0x7a, 0x0a, 0x14, 0x44, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x6d, 0x65, 0x6e, 0x74, 0x53, 0x74, 0x61,
+	0x74, 0x75, 0x73, 0x43, 0x6f, 0x64, 0x65, 0x12, 0x1a, 0x0a, 0x16, 0x44, 0x45, 0x50, 0x5f, 0x53,
+	0x54, 0x41, 0x54, 0x55, 0x53, 0x5f, 0x55, 0x4e, 0x53, 0x50, 0x45, 0x43, 0x49, 0x46, 0x49, 0x45,
+	0x44, 0x10, 0x00, 0x12, 0x1a, 0x0a, 0x16, 0x44, 0x45, 0x50, 0x5f, 0x53, 0x54, 0x41, 0x54, 0x55,
+	0x53, 0x5f, 0x49, 0x4e, 0x5f, 0x50, 0x52, 0x4f, 0x47, 0x52, 0x45, 0x53, 0x53, 0x10, 0x01, 0x12,
+	0x16, 0x0a, 0x12, 0x44, 0x45, 0x50, 0x5f, 0x53, 0x54, 0x41, 0x54, 0x55, 0x53, 0x5f, 0x53, 0x55,
+	0x43, 0x43, 0x45, 0x53, 0x53, 0x10, 0x02, 0x12, 0x12, 0x0a, 0x0e, 0x44, 0x45, 0x50, 0x5f, 0x53,
+	0x54, 0x41, 0x54, 0x55, 0x53, 0x5f, 0x45, 0x52, 0x52, 0x10, 0x03, 0x2a, 0xee, 0x01, 0x0a, 0x0c,
+	0x43, 0x56, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x43, 0x6f, 0x64, 0x65, 0x12, 0x19, 0x0a, 0x15,
+	0x43, 0x56, 0x5f, 0x53, 0x54, 0x41, 0x54, 0x55, 0x53, 0x5f, 0x55, 0x4e, 0x53, 0x50, 0x45, 0x43,
+	0x49, 0x46, 0x49, 0x45, 0x44, 0x10, 0x00, 0x12, 0x19, 0x0a, 0x15, 0x43, 0x56, 0x5f, 0x53, 0x54,
+	0x41, 0x54, 0x55, 0x53, 0x5f, 0x52, 0x54, 0x52, 0x5f, 0x43, 0x52, 0x45, 0x41, 0x54, 0x45, 0x44,
+	0x10, 0x01, 0x12, 0x1c, 0x0a, 0x18, 0x43, 0x56, 0x5f, 0x53, 0x54, 0x41, 0x54, 0x55, 0x53, 0x5f,
+	0x52, 0x54, 0x52, 0x5f, 0x44, 0x49, 0x53, 0x43, 0x4f, 0x56, 0x45, 0x52, 0x45, 0x44, 0x10, 0x02,
+	0x12, 0x1d, 0x0a, 0x19, 0x43, 0x56, 0x5f, 0x53, 0x54, 0x41, 0x54, 0x55, 0x53, 0x5f, 0x52, 0x54,
+	0x52, 0x5f, 0x50, 0x52, 0x4f, 0x56, 0x49, 0x53, 0x49, 0x4f, 0x4e, 0x45, 0x44, 0x10, 0x03, 0x12,
+	0x1c, 0x0a, 0x18, 0x43, 0x56, 0x5f, 0x53, 0x54, 0x41, 0x54, 0x55, 0x53, 0x5f, 0x52, 0x54, 0x52,
+	0x5f, 0x43, 0x4f, 0x4e, 0x46, 0x49, 0x47, 0x5f, 0x57, 0x49, 0x50, 0x10, 0x04, 0x12, 0x17, 0x0a,
+	0x13, 0x43, 0x56, 0x5f, 0x53, 0x54, 0x41, 0x54, 0x55, 0x53, 0x5f, 0x52, 0x54, 0x52, 0x5f, 0x52,
+	0x45, 0x41, 0x44, 0x59, 0x10, 0x05, 0x12, 0x18, 0x0a, 0x14, 0x43, 0x56, 0x5f, 0x53, 0x54, 0x41,
+	0x54, 0x55, 0x53, 0x5f, 0x52, 0x54, 0x52, 0x5f, 0x46, 0x41, 0x49, 0x4c, 0x45, 0x44, 0x10, 0x06,
+	0x12, 0x1a, 0x0a, 0x16, 0x43, 0x56, 0x5f, 0x53, 0x54, 0x41, 0x54, 0x55, 0x53, 0x5f, 0x52, 0x54,
+	0x52, 0x5f, 0x49, 0x4e, 0x41, 0x43, 0x54, 0x49, 0x56, 0x45, 0x10, 0x07, 0x2a, 0x89, 0x01, 0x0a,
+	0x10, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x43, 0x6f, 0x64,
+	0x65, 0x12, 0x1d, 0x0a, 0x19, 0x44, 0x45, 0x56, 0x49, 0x43, 0x45, 0x5f, 0x53, 0x54, 0x41, 0x54,
+	0x55, 0x53, 0x5f, 0x55, 0x4e, 0x53, 0x50, 0x45, 0x43, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10, 0x00,
+	0x12, 0x22, 0x0a, 0x1e, 0x44, 0x45, 0x56, 0x49, 0x43, 0x45, 0x5f, 0x53, 0x54, 0x41, 0x54, 0x55,
+	0x53, 0x5f, 0x57, 0x4f, 0x52, 0x4b, 0x5f, 0x49, 0x4e, 0x5f, 0x50, 0x52, 0x4f, 0x47, 0x52, 0x45,
+	0x53, 0x53, 0x10, 0x01, 0x12, 0x19, 0x0a, 0x15, 0x44, 0x45, 0x56, 0x49, 0x43, 0x45, 0x5f, 0x53,
+	0x54, 0x41, 0x54, 0x55, 0x53, 0x5f, 0x53, 0x55, 0x43, 0x43, 0x45, 0x53, 0x53, 0x10, 0x02, 0x12,
+	0x17, 0x0a, 0x13, 0x44, 0x45, 0x56, 0x49, 0x43, 0x45, 0x5f, 0x53, 0x54, 0x41, 0x54, 0x55, 0x53,
+	0x5f, 0x45, 0x52, 0x52, 0x4f, 0x52, 0x10, 0x03, 0x2a, 0x76, 0x0a, 0x14, 0x4e, 0x65, 0x74, 0x77,
+	0x6f, 0x72, 0x6b, 0x49, 0x6e, 0x74, 0x65, 0x72, 0x66, 0x61, 0x63, 0x65, 0x54, 0x79, 0x70, 0x65,
+	0x12, 0x19, 0x0a, 0x15, 0x49, 0x4e, 0x54, 0x46, 0x5f, 0x54, 0x59, 0x50, 0x45, 0x5f, 0x55, 0x4e,
+	0x53, 0x50, 0x45, 0x43, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10, 0x00, 0x12, 0x15, 0x0a, 0x11, 0x49,
+	0x4e, 0x54, 0x46, 0x5f, 0x54, 0x59, 0x50, 0x45, 0x5f, 0x50, 0x52, 0x49, 0x56, 0x41, 0x54, 0x45,
+	0x10, 0x01, 0x12, 0x14, 0x0a, 0x10, 0x49, 0x4e, 0x54, 0x46, 0x5f, 0x54, 0x59, 0x50, 0x45, 0x5f,
+	0x50, 0x55, 0x42, 0x4c, 0x49, 0x43, 0x10, 0x02, 0x12, 0x16, 0x0a, 0x12, 0x49, 0x4e, 0x54, 0x46,
+	0x5f, 0x54, 0x59, 0x50, 0x45, 0x5f, 0x49, 0x4e, 0x54, 0x45, 0x52, 0x4e, 0x41, 0x4c, 0x10, 0x03,
+	0x2a, 0x6d, 0x0a, 0x10, 0x54, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f,
+	0x54, 0x79, 0x70, 0x65, 0x12, 0x1e, 0x0a, 0x1a, 0x54, 0x4f, 0x50, 0x4f, 0x5f, 0x49, 0x4e, 0x46,
+	0x4f, 0x5f, 0x54, 0x59, 0x50, 0x45, 0x5f, 0x55, 0x4e, 0x53, 0x50, 0x45, 0x43, 0x49, 0x46, 0x49,
+	0x45, 0x44, 0x10, 0x00, 0x12, 0x12, 0x0a, 0x0e, 0x54, 0x4f, 0x50, 0x4f, 0x5f, 0x49, 0x4e, 0x46,
+	0x4f, 0x5f, 0x4d, 0x45, 0x54, 0x41, 0x10, 0x01, 0x12, 0x11, 0x0a, 0x0d, 0x54, 0x4f, 0x50, 0x4f,
+	0x5f, 0x49, 0x4e, 0x46, 0x4f, 0x5f, 0x57, 0x41, 0x4e, 0x10, 0x02, 0x12, 0x12, 0x0a, 0x0e, 0x54,
+	0x4f, 0x50, 0x4f, 0x5f, 0x49, 0x4e, 0x46, 0x4f, 0x5f, 0x43, 0x4c, 0x4f, 0x53, 0x10, 0x03, 0x2a,
+	0x47, 0x0a, 0x0a, 0x46, 0x61, 0x62, 0x72, 0x69, 0x63, 0x54, 0x79, 0x70, 0x65, 0x12, 0x1b, 0x0a,
+	0x17, 0x46, 0x41, 0x42, 0x52, 0x49, 0x43, 0x5f, 0x54, 0x59, 0x50, 0x45, 0x5f, 0x55, 0x4e, 0x53,
+	0x50, 0x45, 0x43, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10, 0x00, 0x12, 0x0d, 0x0a, 0x09, 0x46, 0x55,
+	0x4c, 0x4c, 0x5f, 0x4d, 0x45, 0x53, 0x48, 0x10, 0x01, 0x12, 0x0d, 0x0a, 0x09, 0x48, 0x55, 0x42,
+	0x5f, 0x53, 0x50, 0x4f, 0x4b, 0x45, 0x10, 0x02, 0x2a, 0x63, 0x0a, 0x0d, 0x56, 0x70, 0x63, 0x53,
+	0x74, 0x61, 0x74, 0x75, 0x73, 0x43, 0x6f, 0x64, 0x65, 0x12, 0x1a, 0x0a, 0x16, 0x56, 0x50, 0x43,
+	0x5f, 0x53, 0x54, 0x41, 0x54, 0x55, 0x53, 0x5f, 0x55, 0x4e, 0x53, 0x50, 0x45, 0x43, 0x49, 0x46,
+	0x49, 0x45, 0x44, 0x10, 0x00, 0x12, 0x1a, 0x0a, 0x16, 0x56, 0x50, 0x43, 0x5f, 0x53, 0x54, 0x41,
+	0x54, 0x55, 0x53, 0x5f, 0x41, 0x44, 0x44, 0x5f, 0x53, 0x55, 0x43, 0x43, 0x45, 0x53, 0x53, 0x10,
+	0x01, 0x12, 0x1a, 0x0a, 0x16, 0x56, 0x50, 0x43, 0x5f, 0x53, 0x54, 0x41, 0x54, 0x55, 0x53, 0x5f,
+	0x41, 0x44, 0x44, 0x5f, 0x46, 0x41, 0x49, 0x4c, 0x55, 0x52, 0x45, 0x10, 0x02, 0x32, 0x9c, 0x03,
+	0x0a, 0x07, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x73, 0x12, 0x4a, 0x0a, 0x09, 0x41, 0x64, 0x64,
+	0x52, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x12, 0x1d, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65,
+	0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x41, 0x64, 0x64, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1e, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70,
+	0x6c, 0x6f, 0x79, 0x2e, 0x41, 0x64, 0x64, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x53, 0x0a, 0x0c, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x52,
+	0x6f, 0x75, 0x74, 0x65, 0x72, 0x12, 0x20, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70,
+	0x6c, 0x6f, 0x79, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x72,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x21, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64,
+	0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x52, 0x6f, 0x75, 0x74,
+	0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x53, 0x0a, 0x0c, 0x44, 0x65,
+	0x6c, 0x65, 0x74, 0x65, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x12, 0x20, 0x2e, 0x63, 0x6c, 0x6f,
+	0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x52,
+	0x6f, 0x75, 0x74, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x21, 0x2e, 0x63,
+	0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74,
+	0x65, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
+	0x4a, 0x0a, 0x09, 0x47, 0x65, 0x74, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x12, 0x1d, 0x2e, 0x63,
+	0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x47, 0x65, 0x74, 0x52, 0x6f,
+	0x75, 0x74, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1e, 0x2e, 0x63, 0x6c,
+	0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x47, 0x65, 0x74, 0x52, 0x6f, 0x75,
+	0x74, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x4f, 0x0a, 0x0a, 0x4c,
+	0x69, 0x73, 0x74, 0x52, 0x6f, 0x75, 0x74, 0x65, 0x72, 0x12, 0x1e, 0x2e, 0x63, 0x6c, 0x6f, 0x75,
+	0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x6f, 0x75, 0x74,
+	0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1f, 0x2e, 0x63, 0x6c, 0x6f, 0x75,
+	0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x6f, 0x75, 0x74,
+	0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x30, 0x01, 0x32, 0xfc, 0x03, 0x0a,
+	0x0d, 0x54, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x69, 0x6e, 0x66, 0x6f, 0x73, 0x12, 0x5c,
+	0x0a, 0x0f, 0x41, 0x64, 0x64, 0x54, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66,
+	0x6f, 0x12, 0x23, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e,
+	0x41, 0x64, 0x64, 0x54, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x24, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65,
+	0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x41, 0x64, 0x64, 0x54, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79,
+	0x49, 0x6e, 0x66, 0x6f, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x65, 0x0a, 0x12,
+	0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x54, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e,
+	0x66, 0x6f, 0x12, 0x26, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79,
+	0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x54, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49,
+	0x6e, 0x66, 0x6f, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x27, 0x2e, 0x63, 0x6c, 0x6f,
+	0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x54,
+	0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x65, 0x0a, 0x12, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x54, 0x6f, 0x70,
+	0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x26, 0x2e, 0x63, 0x6c, 0x6f, 0x75,
+	0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x54, 0x6f,
+	0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x27, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e,
+	0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x54, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e,
+	0x66, 0x6f, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x5c, 0x0a, 0x0f, 0x47, 0x65,
+	0x74, 0x54, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x23, 0x2e,
+	0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x47, 0x65, 0x74, 0x54,
+	0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x1a, 0x24, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79,
+	0x2e, 0x47, 0x65, 0x74, 0x54, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x61, 0x0a, 0x10, 0x4c, 0x69, 0x73, 0x74,
+	0x54, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x24, 0x2e, 0x63,
+	0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x54,
+	0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x1a, 0x25, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79,
+	0x2e, 0x4c, 0x69, 0x73, 0x74, 0x54, 0x6f, 0x70, 0x6f, 0x6c, 0x6f, 0x67, 0x79, 0x49, 0x6e, 0x66,
+	0x6f, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x30, 0x01, 0x32, 0xec, 0x02, 0x0a, 0x04,
+	0x56, 0x70, 0x63, 0x73, 0x12, 0x41, 0x0a, 0x06, 0x47, 0x65, 0x74, 0x56, 0x70, 0x63, 0x12, 0x1a,
+	0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x47, 0x65, 0x74,
+	0x56, 0x70, 0x63, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1b, 0x2e, 0x63, 0x6c, 0x6f,
+	0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x47, 0x65, 0x74, 0x56, 0x70, 0x63, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x46, 0x0a, 0x07, 0x4c, 0x69, 0x73, 0x74, 0x56,
+	0x70, 0x63, 0x12, 0x1b, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79,
+	0x2e, 0x4c, 0x69, 0x73, 0x74, 0x56, 0x70, 0x63, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
+	0x1c, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x4c, 0x69,
+	0x73, 0x74, 0x56, 0x70, 0x63, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x30, 0x01, 0x12,
+	0x41, 0x0a, 0x06, 0x41, 0x64, 0x64, 0x56, 0x70, 0x63, 0x12, 0x1a, 0x2e, 0x63, 0x6c, 0x6f, 0x75,
+	0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x41, 0x64, 0x64, 0x56, 0x70, 0x63, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1b, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70,
+	0x6c, 0x6f, 0x79, 0x2e, 0x41, 0x64, 0x64, 0x56, 0x70, 0x63, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x4a, 0x0a, 0x09, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x56, 0x70, 0x63, 0x12,
+	0x1d, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x55, 0x70,
+	0x64, 0x61, 0x74, 0x65, 0x56, 0x70, 0x63, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1e,
+	0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x55, 0x70, 0x64,
+	0x61, 0x74, 0x65, 0x56, 0x70, 0x63, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x4a,
+	0x0a, 0x09, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x56, 0x70, 0x63, 0x12, 0x1d, 0x2e, 0x63, 0x6c,
+	0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65,
+	0x56, 0x70, 0x63, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1e, 0x2e, 0x63, 0x6c, 0x6f,
+	0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x56,
+	0x70, 0x63, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0x9c, 0x03, 0x0a, 0x07, 0x53,
+	0x75, 0x62, 0x6e, 0x65, 0x74, 0x73, 0x12, 0x4a, 0x0a, 0x09, 0x47, 0x65, 0x74, 0x53, 0x75, 0x62,
+	0x6e, 0x65, 0x74, 0x12, 0x1d, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f,
+	0x79, 0x2e, 0x47, 0x65, 0x74, 0x53, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x1a, 0x1e, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79,
+	0x2e, 0x47, 0x65, 0x74, 0x53, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x4f, 0x0a, 0x0a, 0x4c, 0x69, 0x73, 0x74, 0x53, 0x75, 0x62, 0x6e, 0x65, 0x74,
+	0x12, 0x1e, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x4c,
+	0x69, 0x73, 0x74, 0x53, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x1f, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x4c,
+	0x69, 0x73, 0x74, 0x53, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x30, 0x01, 0x12, 0x4a, 0x0a, 0x09, 0x41, 0x64, 0x64, 0x53, 0x75, 0x62, 0x6e, 0x65, 0x74,
+	0x12, 0x1d, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x41,
+	0x64, 0x64, 0x53, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
+	0x1e, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x41, 0x64,
+	0x64, 0x53, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
+	0x53, 0x0a, 0x0c, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x53, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x12,
+	0x20, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x55, 0x70,
+	0x64, 0x61, 0x74, 0x65, 0x53, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x21, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e,
+	0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x53, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x53, 0x0a, 0x0c, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x53, 0x75,
+	0x62, 0x6e, 0x65, 0x74, 0x12, 0x20, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c,
+	0x6f, 0x79, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x53, 0x75, 0x62, 0x6e, 0x65, 0x74, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x21, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65,
+	0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x53, 0x75, 0x62, 0x6e, 0x65,
+	0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0x98, 0x01, 0x0a, 0x05, 0x50, 0x61,
+	0x74, 0x68, 0x73, 0x12, 0x44, 0x0a, 0x07, 0x47, 0x65, 0x74, 0x50, 0x61, 0x74, 0x68, 0x12, 0x1b,
+	0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x47, 0x65, 0x74,
+	0x50, 0x61, 0x74, 0x68, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1c, 0x2e, 0x63, 0x6c,
+	0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x47, 0x65, 0x74, 0x50, 0x61, 0x74,
+	0x68, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x49, 0x0a, 0x08, 0x4c, 0x69, 0x73,
+	0x74, 0x50, 0x61, 0x74, 0x68, 0x12, 0x1c, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70,
+	0x6c, 0x6f, 0x79, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x50, 0x61, 0x74, 0x68, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x1d, 0x2e, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f,
+	0x79, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x50, 0x61, 0x74, 0x68, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x30, 0x01, 0x42, 0x35, 0x5a, 0x33, 0x61, 0x72, 0x69, 0x73, 0x74, 0x61, 0x2f, 0x61,
+	0x65, 0x72, 0x69, 0x73, 0x2f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2f, 0x63, 0x6c, 0x6f,
+	0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x63, 0x6c, 0x6f,
+	0x75, 0x64, 0x64, 0x65, 0x70, 0x6c, 0x6f, 0x79, 0x2e, 0x76, 0x31, 0x62, 0x06, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x33,
 }
 
-func init() {
-	proto.RegisterFile("arista/aeris/service/clouddeploy/api/clouddeploy.v1/clouddeploy.proto", fileDescriptor_adaaf7ceeb53d211)
+var (
+	file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescOnce sync.Once
+	file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescData = file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDesc
+)
+
+func file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescGZIP() []byte {
+	file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescOnce.Do(func() {
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescData = protoimpl.X.CompressGZIP(file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescData)
+	})
+	return file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDescData
 }
 
-var fileDescriptor_adaaf7ceeb53d211 = []byte{
-	// 3968 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x3b, 0xc9, 0x72, 0x1b, 0x49,
-	0x76, 0x06, 0x40, 0x62, 0x79, 0x04, 0xc0, 0x62, 0x72, 0x83, 0xa0, 0xa5, 0x29, 0x4a, 0xdd, 0x52,
-	0x73, 0xc6, 0x94, 0x5b, 0xb2, 0x7b, 0x16, 0xb7, 0xbb, 0x0d, 0x01, 0x20, 0xbb, 0xd4, 0x10, 0x81,
-	0x28, 0x82, 0xd4, 0x4c, 0x8f, 0x23, 0x2a, 0x8a, 0x55, 0x49, 0xb0, 0x46, 0x40, 0x55, 0xb9, 0x32,
-	0x01, 0x98, 0xf2, 0x17, 0xf8, 0xe0, 0x35, 0x7c, 0x98, 0x83, 0xfd, 0x21, 0x0e, 0x87, 0xc3, 0xe1,
-	0x93, 0x0f, 0xf6, 0x27, 0x38, 0x7c, 0xf1, 0xd1, 0xcb, 0xc5, 0x27, 0x47, 0xf8, 0x30, 0x91, 0x4b,
-	0xa1, 0x16, 0x14, 0xd5, 0x12, 0xd1, 0x52, 0xf7, 0x85, 0x42, 0xbe, 0xf7, 0xea, 0x6d, 0x99, 0xf9,
-	0xde, 0xcb, 0x97, 0x29, 0x68, 0x1b, 0xbe, 0x4d, 0xa8, 0xf1, 0xc8, 0xc0, 0xbe, 0x4d, 0x1e, 0x11,
-	0xec, 0x4f, 0x6c, 0x13, 0x3f, 0x32, 0x87, 0xee, 0xd8, 0xb2, 0xb0, 0x37, 0x74, 0x2f, 0x1f, 0x19,
-	0x9e, 0x1d, 0x1d, 0xef, 0x4f, 0x3e, 0x89, 0x0d, 0x3d, 0xdf, 0xa5, 0x2e, 0x5a, 0x89, 0x80, 0xea,
-	0x3b, 0x03, 0xd7, 0x1d, 0x0c, 0xf1, 0x23, 0x8e, 0x3a, 0x1b, 0x9f, 0x3f, 0x3a, 0xb7, 0xf1, 0xd0,
-	0xd2, 0x47, 0x06, 0x79, 0x29, 0xc8, 0xeb, 0x1f, 0x4b, 0xa9, 0x3e, 0x26, 0xee, 0xd8, 0x37, 0x31,
-	0x09, 0x69, 0xa9, 0x3d, 0xc2, 0xfc, 0x8f, 0x24, 0xfd, 0x20, 0xc9, 0x8c, 0xe1, 0x08, 0x35, 0x46,
-	0x9e, 0x20, 0xd8, 0xfd, 0x55, 0x06, 0x2a, 0x9a, 0x3b, 0xa6, 0xb8, 0x6f, 0x9c, 0x0d, 0xb1, 0x6a,
-	0x11, 0xb4, 0x05, 0x79, 0x6f, 0x7c, 0x36, 0xb4, 0xcd, 0x5a, 0x66, 0x27, 0xf7, 0xb0, 0xa4, 0xc9,
-	0x11, 0xaa, 0x41, 0xc1, 0xf3, 0xed, 0x89, 0x41, 0x71, 0x2d, 0xcb, 0x11, 0xc1, 0x10, 0xd5, 0xa1,
-	0x68, 0x3b, 0x14, 0xfb, 0x8e, 0x31, 0xac, 0xe5, 0x38, 0x6a, 0x36, 0x46, 0x3f, 0x01, 0x08, 0xf5,
-	0xaf, 0x59, 0x3b, 0x99, 0x87, 0x2b, 0x8f, 0xeb, 0xfb, 0x42, 0xab, 0xfd, 0x40, 0xab, 0xfd, 0x03,
-	0x46, 0xf2, 0xdc, 0x20, 0x2f, 0xb5, 0xd2, 0x79, 0xf0, 0x73, 0xf7, 0x9f, 0xb3, 0xa0, 0x1c, 0x61,
-	0x3a, 0x75, 0xfd, 0x97, 0x2a, 0x63, 0x77, 0x6e, 0x98, 0x18, 0x6d, 0x43, 0xc1, 0x76, 0xe8, 0xb9,
-	0x6e, 0x5b, 0xb5, 0xcc, 0x4e, 0x86, 0xa9, 0xc7, 0x86, 0xaa, 0x85, 0x10, 0x2c, 0x39, 0xc6, 0x88,
-	0xe9, 0xc6, 0xa0, 0xfc, 0x37, 0xfa, 0x1c, 0x4a, 0x9c, 0x98, 0x5e, 0x7a, 0xb8, 0x96, 0xdb, 0xc9,
-	0x3c, 0xac, 0x3e, 0xbe, 0xbb, 0x1f, 0x75, 0x7f, 0x92, 0x7d, 0xff, 0xd2, 0xc3, 0x5c, 0xf9, 0x73,
-	0xf6, 0x0b, 0x7d, 0x04, 0xab, 0xd2, 0x46, 0xdd, 0xf6, 0x74, 0xc3, 0xb2, 0xfc, 0xda, 0x12, 0xb7,
-	0xaf, 0x22, 0xc1, 0xaa, 0xd7, 0xb0, 0x2c, 0x1f, 0xdd, 0x87, 0xaa, 0x70, 0xd2, 0x8c, 0x6c, 0x99,
-	0x6b, 0x51, 0x16, 0x50, 0x49, 0xb5, 0x05, 0x79, 0x32, 0x3e, 0x73, 0x30, 0xad, 0xe5, 0x85, 0xe6,
-	0x62, 0x84, 0x3e, 0x84, 0x2a, 0xc1, 0xe6, 0xd8, 0xb7, 0xe9, 0xa5, 0x3e, 0xf0, 0xdd, 0xb1, 0x57,
-	0x2b, 0x70, 0x7c, 0x25, 0x80, 0x1e, 0x32, 0xe0, 0x22, 0x9e, 0xfc, 0x8f, 0x1c, 0xe4, 0x9b, 0xa7,
-	0xaa, 0x73, 0xee, 0xa2, 0x2f, 0xa0, 0x6a, 0x4e, 0x74, 0x42, 0x0d, 0x3a, 0x26, 0xba, 0xe9, 0x5a,
-	0x98, 0xbb, 0xb1, 0xfa, 0xf8, 0x46, 0xcc, 0x2f, 0xcd, 0xd3, 0x63, 0x4e, 0xd1, 0x74, 0x2d, 0xac,
-	0x95, 0xcd, 0x49, 0x38, 0x42, 0xf7, 0xa0, 0x72, 0xe6, 0xba, 0x94, 0x50, 0xdf, 0xf0, 0x74, 0xf3,
-	0x7c, 0x20, 0x1d, 0x5e, 0x9e, 0x01, 0x9b, 0xe7, 0x03, 0x54, 0x87, 0xd2, 0x85, 0xa1, 0xfb, 0xd4,
-	0x67, 0xf3, 0x94, 0xe3, 0x04, 0x85, 0x0b, 0x43, 0xa3, 0xbe, 0x6a, 0xa1, 0x7d, 0xd8, 0xf0, 0x30,
-	0xf6, 0xf5, 0x89, 0x67, 0xea, 0x3e, 0xd5, 0x29, 0x5b, 0x77, 0x8c, 0x4c, 0x78, 0x56, 0x61, 0xb8,
-	0x53, 0xcf, 0xd4, 0xa8, 0x5c, 0x90, 0xa8, 0x01, 0xab, 0x9c, 0xd7, 0x8c, 0x92, 0x70, 0xef, 0x32,
-	0xe3, 0xa3, 0x2a, 0xc7, 0x16, 0xb1, 0x56, 0x66, 0xd2, 0x66, 0x4b, 0xfa, 0x7e, 0xd4, 0x68, 0x0b,
-	0x13, 0x53, 0xce, 0xc0, 0xcc, 0xb2, 0x16, 0x26, 0x26, 0xfa, 0x02, 0x6e, 0x85, 0x54, 0x3e, 0x36,
-	0xdd, 0xd1, 0x08, 0x3b, 0x16, 0xb6, 0x74, 0xc3, 0xa4, 0xb6, 0xeb, 0xc8, 0x59, 0xb9, 0x11, 0x7c,
-	0xa3, 0x85, 0x14, 0x0d, 0x4e, 0x80, 0x9e, 0x42, 0xc5, 0xc2, 0x2c, 0x02, 0x48, 0x26, 0xb5, 0x22,
-	0x77, 0xed, 0xed, 0x98, 0x9e, 0x2d, 0x4e, 0x11, 0x75, 0xaf, 0x15, 0x81, 0x2c, 0x32, 0xcb, 0xff,
-	0x9a, 0x81, 0xb5, 0xc6, 0xab, 0xb1, 0x8f, 0xb9, 0x2b, 0xfc, 0x16, 0xa6, 0x86, 0x3d, 0x44, 0xb7,
-	0x01, 0x8c, 0x89, 0x61, 0x0f, 0xf5, 0x57, 0xae, 0x83, 0xe5, 0x9e, 0x29, 0x71, 0xc8, 0xd7, 0xae,
-	0x83, 0xd1, 0x4d, 0x28, 0xf9, 0x98, 0xc8, 0x75, 0x27, 0xa6, 0xb2, 0xe8, 0x63, 0x22, 0x96, 0xdc,
-	0x3d, 0xa8, 0xd8, 0x0e, 0xa1, 0x86, 0x63, 0xe2, 0x70, 0x0f, 0x95, 0xb4, 0x72, 0x00, 0xe4, 0x9b,
-	0xe4, 0x26, 0x08, 0x76, 0x3a, 0xc1, 0xb4, 0xb6, 0x24, 0x38, 0x70, 0xc0, 0x31, 0xa6, 0x8b, 0x98,
-	0xf3, 0x17, 0x19, 0x58, 0x6d, 0x4c, 0xc9, 0xdb, 0x18, 0x33, 0xa7, 0x6f, 0x36, 0x45, 0xdf, 0x05,
-	0x54, 0xfa, 0xbf, 0x3c, 0xe4, 0x85, 0x3e, 0xb3, 0x70, 0x93, 0x89, 0x84, 0x9b, 0x4d, 0xc8, 0xb3,
-	0x45, 0x6d, 0x5b, 0x52, 0xee, 0xf2, 0xc4, 0x33, 0x55, 0x0b, 0x7d, 0x02, 0x4b, 0xa6, 0xa7, 0x53,
-	0x19, 0x80, 0xee, 0xc4, 0x37, 0x1a, 0xfb, 0xdd, 0xf3, 0xdd, 0x89, 0x6d, 0x61, 0x9f, 0x47, 0x9f,
-	0x9c, 0xe9, 0xf5, 0x59, 0xa8, 0xf0, 0xf1, 0x80, 0x2d, 0x3a, 0xe1, 0x50, 0x39, 0x42, 0x1f, 0xc0,
-	0xca, 0xcc, 0x40, 0xdb, 0x92, 0x51, 0x06, 0x02, 0x90, 0x6a, 0xb1, 0xf0, 0x78, 0x61, 0xe8, 0x5c,
-	0x33, 0x19, 0x64, 0x2e, 0x8c, 0x23, 0xa6, 0x5b, 0x15, 0xb2, 0xb6, 0x25, 0x97, 0x70, 0xd6, 0xe6,
-	0xe1, 0xd2, 0x74, 0x3c, 0xb1, 0x44, 0x4b, 0x1a, 0xff, 0xcd, 0x14, 0xa5, 0xc6, 0x80, 0xd4, 0x4a,
-	0x3b, 0xb9, 0x87, 0x2b, 0x89, 0x65, 0x2b, 0xcc, 0xde, 0xef, 0x1b, 0x03, 0xd2, 0x76, 0xa8, 0x7f,
-	0xa9, 0x71, 0x52, 0xf4, 0x29, 0x6c, 0xcb, 0x25, 0x8f, 0x1d, 0xdf, 0x1d, 0x0e, 0x47, 0xd8, 0xa1,
-	0x3a, 0x75, 0x5f, 0x62, 0xa7, 0x06, 0x9c, 0xf3, 0xa6, 0x40, 0xb7, 0x67, 0xd8, 0x3e, 0x43, 0xa2,
-	0xcf, 0xa0, 0x1c, 0xdb, 0xd1, 0x2b, 0xdf, 0xb8, 0xa3, 0xc1, 0x0f, 0xf7, 0xf3, 0x03, 0x58, 0xf5,
-	0x19, 0x52, 0xf7, 0xf1, 0xf9, 0x10, 0x9b, 0xd4, 0xf5, 0x6b, 0xe5, 0x9d, 0xcc, 0xc3, 0xa2, 0x56,
-	0xe5, 0x60, 0x2d, 0x80, 0xa2, 0xa7, 0x50, 0x35, 0xa6, 0x84, 0x07, 0x22, 0x8b, 0xaf, 0xa0, 0x5a,
-	0x85, 0x0b, 0xba, 0x15, 0x13, 0x94, 0x58, 0x65, 0x5a, 0xd9, 0x98, 0x12, 0x8d, 0x06, 0x6b, 0xee,
-	0x29, 0x54, 0x8c, 0x57, 0x51, 0x16, 0x55, 0xce, 0x22, 0x3e, 0x8f, 0x73, 0xfb, 0x4e, 0x5b, 0x31,
-	0x5e, 0x85, 0x3c, 0x3e, 0x81, 0x25, 0x96, 0x54, 0x6a, 0xab, 0x29, 0x9e, 0x4d, 0xe6, 0x20, 0x8d,
-	0x93, 0xa2, 0xdf, 0x07, 0xb0, 0xb0, 0x17, 0x44, 0x12, 0x25, 0x25, 0x79, 0xb5, 0xf8, 0x3f, 0xcc,
-	0xa7, 0x91, 0x68, 0x52, 0xb2, 0xb0, 0x27, 0x43, 0xc9, 0x0f, 0xa1, 0x60, 0x4e, 0x74, 0xdb, 0x39,
-	0x77, 0x6b, 0x6b, 0x5c, 0xe5, 0xf5, 0x44, 0x8c, 0x67, 0x09, 0x41, 0xcb, 0x9b, 0x13, 0x9e, 0x18,
-	0xf6, 0x60, 0x2d, 0x08, 0x5e, 0xd8, 0xb7, 0x8d, 0xa1, 0xee, 0x8c, 0x47, 0x35, 0xc4, 0xe7, 0x70,
-	0x55, 0x46, 0x28, 0x0e, 0x3f, 0x1a, 0x8f, 0x16, 0xd8, 0x42, 0xf5, 0x1f, 0x41, 0x69, 0xb6, 0x86,
-	0x90, 0x02, 0xb9, 0x97, 0xf8, 0x52, 0xee, 0x21, 0xf6, 0x13, 0x6d, 0xc0, 0xf2, 0xc4, 0x18, 0x8e,
-	0xf1, 0x6c, 0x07, 0xb1, 0xc1, 0x4f, 0xb3, 0x3f, 0xce, 0xec, 0x7e, 0x01, 0x4a, 0xc3, 0xb2, 0x84,
-	0x8b, 0x35, 0xfc, 0x87, 0x63, 0x4c, 0x28, 0xfa, 0x01, 0xe4, 0xf9, 0x84, 0xfb, 0x9c, 0x45, 0xd2,
-	0x40, 0x49, 0x2b, 0x49, 0x76, 0xff, 0x18, 0xd6, 0x22, 0x0c, 0x88, 0xe7, 0x3a, 0x04, 0xbf, 0x15,
-	0x07, 0x66, 0xb6, 0xe9, 0x63, 0x83, 0xb2, 0x94, 0x40, 0xb9, 0x86, 0x69, 0x66, 0xf7, 0x83, 0x0a,
-	0x4b, 0x2b, 0x49, 0xea, 0x06, 0xdd, 0x7d, 0x0a, 0xeb, 0x27, 0x9e, 0x65, 0x50, 0xbc, 0x80, 0x01,
-	0x7f, 0x04, 0x1b, 0x71, 0x1e, 0xd7, 0xb1, 0xe1, 0x09, 0x14, 0x0c, 0xaa, 0xb3, 0x2a, 0xf0, 0x0d,
-	0x0c, 0xc8, 0x1b, 0x94, 0x0d, 0x98, 0xf6, 0x2d, 0x3c, 0xc4, 0x0b, 0x69, 0xbf, 0x05, 0x1b, 0x71,
-	0x1e, 0x42, 0xfb, 0x5d, 0x0a, 0xca, 0x21, 0xa6, 0xd7, 0x67, 0x7c, 0x3d, 0x8b, 0xc6, 0xb0, 0x16,
-	0x91, 0xfa, 0xde, 0x1c, 0xf9, 0x8f, 0x19, 0x58, 0xeb, 0xd8, 0x64, 0xde, 0xdc, 0x73, 0x7b, 0x28,
-	0xe4, 0xe6, 0xae, 0x94, 0x2b, 0x48, 0xd8, 0xae, 0x8e, 0xcb, 0x5d, 0xdf, 0xe7, 0xf5, 0xbe, 0x64,
-	0xd6, 0xe0, 0x82, 0x02, 0x81, 0x6c, 0x3f, 0x4d, 0x0d, 0x6a, 0x5e, 0xf0, 0xe4, 0x53, 0xd4, 0xc4,
-	0x60, 0x91, 0x14, 0x38, 0x01, 0x14, 0x35, 0xe0, 0xbd, 0x79, 0xee, 0x3f, 0xb3, 0x50, 0x78, 0x61,
-	0x38, 0x3c, 0x54, 0xdd, 0x80, 0xe2, 0xd4, 0x70, 0xf4, 0x48, 0xfe, 0x2d, 0x4c, 0x0d, 0x87, 0xa7,
-	0xb9, 0x1f, 0x41, 0x81, 0xe5, 0xda, 0x20, 0xf7, 0x7f, 0x73, 0xba, 0xcd, 0x9b, 0x1e, 0xaf, 0x0a,
-	0x6e, 0x03, 0xf0, 0xaa, 0x94, 0x31, 0x25, 0xf2, 0x14, 0x53, 0x62, 0x10, 0xc6, 0x96, 0xb0, 0xe8,
-	0x88, 0xad, 0x01, 0xd6, 0xf9, 0x1f, 0x06, 0xb6, 0x9d, 0x01, 0xcf, 0xcd, 0x45, 0x6d, 0x95, 0xc1,
-	0xda, 0xd6, 0x00, 0xf7, 0x04, 0x18, 0xed, 0x42, 0x25, 0xa4, 0xb5, 0x07, 0x53, 0x9e, 0xa6, 0x8b,
-	0xda, 0x4a, 0x40, 0xa7, 0x0e, 0xa6, 0xe8, 0xb7, 0x61, 0x8b, 0xa3, 0x2d, 0x6c, 0xd9, 0x26, 0x8f,
-	0x28, 0xa6, 0xeb, 0x38, 0xd8, 0x14, 0x67, 0x83, 0xa2, 0xb6, 0xc1, 0xb0, 0xad, 0x00, 0xd9, 0x14,
-	0x38, 0xf4, 0x43, 0x40, 0xe6, 0xc4, 0x63, 0xa4, 0xd4, 0xb0, 0x1d, 0xa9, 0xad, 0x4c, 0xea, 0x8a,
-	0x39, 0xf1, 0x9a, 0x01, 0x82, 0xfb, 0x62, 0x81, 0x59, 0xfe, 0xdf, 0x2c, 0x14, 0x9b, 0x43, 0x97,
-	0x70, 0x77, 0xdf, 0x84, 0x92, 0x39, 0x74, 0x49, 0xd4, 0xdf, 0x45, 0x06, 0x58, 0xcc, 0xe1, 0x8f,
-	0x20, 0x7f, 0x6e, 0x9c, 0xf9, 0xb6, 0x29, 0xeb, 0xa2, 0xed, 0xd8, 0x77, 0x07, 0x1c, 0x25, 0x3e,
-	0x10, 0x64, 0x6c, 0x0a, 0x86, 0xd8, 0x38, 0x4f, 0x9d, 0x02, 0x86, 0x48, 0x4c, 0x41, 0x48, 0x1b,
-	0x99, 0x82, 0x80, 0x8e, 0x4d, 0xc1, 0x03, 0x58, 0x15, 0x34, 0x8e, 0xe9, 0x5f, 0x7a, 0xbc, 0xc2,
-	0x17, 0xbe, 0xaf, 0x72, 0xaa, 0x19, 0xf4, 0xfd, 0x79, 0xfd, 0xdf, 0x97, 0xa0, 0xdc, 0x77, 0x3d,
-	0x77, 0xe8, 0x0e, 0x2e, 0xb9, 0xe7, 0xd3, 0x8a, 0x4c, 0x51, 0xc8, 0x65, 0x67, 0x85, 0xdc, 0x4f,
-	0xa1, 0x44, 0x5d, 0xcf, 0x8d, 0x9e, 0x71, 0xe3, 0xf5, 0x45, 0x94, 0xa3, 0x38, 0xdf, 0x32, 0x7a,
-	0x3e, 0x07, 0x77, 0x60, 0xe5, 0x6c, 0xe0, 0xe9, 0x06, 0x71, 0xf4, 0xa1, 0x3b, 0xe5, 0xce, 0xac,
-	0x68, 0xa5, 0xb3, 0x81, 0xd7, 0x20, 0x4e, 0xc7, 0x9d, 0xa2, 0x1d, 0x28, 0x07, 0xf8, 0x0b, 0x7b,
-	0x70, 0xc1, 0xbd, 0x58, 0xd1, 0x40, 0x10, 0x7c, 0x69, 0x0f, 0x2e, 0x18, 0xc5, 0x84, 0x62, 0x8f,
-	0x9d, 0x7b, 0x4d, 0xdb, 0xf2, 0x65, 0xd1, 0x09, 0x0c, 0xa6, 0x7a, 0x4d, 0xdb, 0x62, 0xf1, 0x0a,
-	0x51, 0xec, 0x8f, 0x6c, 0xc7, 0xa0, 0xec, 0x38, 0x28, 0xe9, 0xa4, 0xf7, 0x42, 0x8c, 0xa4, 0x7e,
-	0x02, 0x5b, 0x96, 0x47, 0xb8, 0xaf, 0x7d, 0x77, 0xa8, 0x7b, 0x43, 0xc3, 0xc1, 0xe2, 0x0b, 0x51,
-	0xa8, 0xae, 0x5b, 0x1e, 0x69, 0x0a, 0x64, 0x8f, 0xe1, 0xf8, 0x47, 0x0f, 0x60, 0x75, 0x64, 0x38,
-	0xc6, 0x00, 0x5b, 0xba, 0xa8, 0x54, 0x44, 0x09, 0x5b, 0xd2, 0xaa, 0x12, 0x2c, 0xce, 0x5c, 0x04,
-	0xdd, 0x85, 0xb2, 0x39, 0x31, 0x0c, 0xa2, 0x5b, 0xee, 0xc8, 0xb0, 0x83, 0x12, 0x75, 0x85, 0xc3,
-	0x5a, 0x1c, 0x14, 0x92, 0x10, 0xec, 0x4f, 0xb0, 0xcf, 0x0b, 0xd3, 0x80, 0xe4, 0x98, 0x83, 0xd0,
-	0x23, 0x11, 0x7e, 0x78, 0x61, 0x55, 0xe6, 0xf3, 0xbb, 0x11, 0x73, 0xb8, 0x0c, 0x53, 0x3c, 0x28,
-	0xf1, 0x69, 0x7c, 0x2c, 0x37, 0x10, 0xff, 0x42, 0x14, 0xa0, 0x9b, 0xc9, 0x5d, 0xc2, 0xb7, 0x9a,
-	0xd8, 0x57, 0xfc, 0x9b, 0x1a, 0x14, 0x26, 0xd8, 0x27, 0x6c, 0x55, 0x56, 0x45, 0x88, 0x93, 0xc3,
-	0x45, 0x16, 0xd8, 0xcf, 0x60, 0xab, 0x61, 0x59, 0xd1, 0x05, 0x11, 0xa4, 0xa0, 0xcf, 0xa1, 0x42,
-	0x25, 0x58, 0xa8, 0x29, 0xe2, 0xf8, 0x8d, 0x2b, 0x57, 0x92, 0x56, 0xa6, 0x91, 0xd1, 0xee, 0x5f,
-	0x67, 0x60, 0x7b, 0x8e, 0xb5, 0x4c, 0x0e, 0x0b, 0xf2, 0x5e, 0xa4, 0xec, 0xfa, 0x05, 0xdc, 0x10,
-	0x25, 0xd3, 0xbb, 0xb0, 0xf9, 0x2f, 0x33, 0x50, 0x4f, 0xe3, 0xfe, 0x2d, 0x99, 0x7d, 0xad, 0x34,
-	0xf9, 0x0b, 0xb8, 0x21, 0xaa, 0xac, 0x77, 0x61, 0xf0, 0x2d, 0xa8, 0xa7, 0x31, 0x97, 0x85, 0xdc,
-	0x9f, 0x66, 0x60, 0xeb, 0x10, 0xd3, 0x77, 0x20, 0xf8, 0x7a, 0xae, 0xf8, 0xb3, 0x0c, 0x6c, 0xcf,
-	0xe9, 0xf3, 0x5d, 0xce, 0xcd, 0xbf, 0x64, 0x60, 0x9b, 0xd5, 0x4e, 0x69, 0x1e, 0xfa, 0x24, 0x51,
-	0x02, 0xbe, 0x46, 0x93, 0x77, 0x57, 0x08, 0x2e, 0xbd, 0x4d, 0x2c, 0xf9, 0xf3, 0x0c, 0xd4, 0xe6,
-	0xad, 0xf9, 0x2e, 0xfd, 0xfb, 0x6f, 0x19, 0xa8, 0xf0, 0x73, 0xf8, 0xa9, 0x83, 0x29, 0x67, 0xa3,
-	0x40, 0xce, 0x21, 0x03, 0xd9, 0xc7, 0x66, 0x3f, 0xd1, 0x87, 0x50, 0x0d, 0xba, 0xe6, 0xb1, 0x9e,
-	0x57, 0x25, 0x80, 0x8a, 0xc6, 0x17, 0x82, 0x25, 0x9e, 0x74, 0x72, 0xb2, 0x3b, 0xc2, 0xb2, 0x4c,
-	0xa2, 0xcf, 0x95, 0x8b, 0xf5, 0xb9, 0x3e, 0x82, 0x55, 0x59, 0x92, 0xf0, 0x42, 0x4e, 0x34, 0x67,
-	0x44, 0xa7, 0x58, 0x80, 0x59, 0x09, 0xa7, 0x5a, 0x8b, 0x04, 0xef, 0x7f, 0xca, 0x00, 0x34, 0xa6,
-	0xe4, 0xd4, 0x33, 0xb9, 0x6d, 0xf3, 0x5d, 0x63, 0x61, 0x66, 0xa2, 0x6b, 0x1c, 0x58, 0x92, 0x8d,
-	0x58, 0xb2, 0x09, 0x79, 0x7b, 0x30, 0x0d, 0x5b, 0xb3, 0xcb, 0xf6, 0x60, 0xaa, 0x5a, 0x69, 0x36,
-	0x2c, 0x7d, 0xdb, 0x36, 0x64, 0x61, 0xa5, 0x27, 0x1a, 0xbc, 0xdc, 0x88, 0xe7, 0x50, 0x99, 0xf5,
-	0x82, 0xb9, 0x9a, 0x62, 0xf5, 0x7f, 0x1c, 0x5b, 0x27, 0x91, 0x0f, 0x82, 0xdf, 0x2c, 0xed, 0x8b,
-	0x36, 0xd4, 0x8a, 0x17, 0x42, 0x58, 0x35, 0xc2, 0xd9, 0xf9, 0x03, 0x3d, 0x72, 0x17, 0xc0, 0x0b,
-	0x7b, 0x6d, 0xc0, 0xab, 0xb3, 0xfb, 0x50, 0x15, 0x02, 0x1d, 0x4c, 0x05, 0x8d, 0x6c, 0x69, 0x72,
-	0x36, 0x0e, 0xa6, 0x9c, 0x2a, 0xe0, 0xc3, 0xa9, 0xb8, 0x1b, 0x66, 0x7c, 0xf8, 0xda, 0x5a, 0xc4,
-	0x07, 0xf5, 0xcf, 0x41, 0x49, 0x5a, 0xf1, 0x56, 0x8d, 0x90, 0xbf, 0x2a, 0x40, 0xee, 0xd4, 0x33,
-	0xbf, 0xa3, 0x0e, 0xa4, 0x28, 0x3f, 0x97, 0x67, 0xe5, 0xe7, 0x63, 0x28, 0xf9, 0xee, 0x50, 0xb6,
-	0x5b, 0xf3, 0x9c, 0xff, 0x66, 0xe2, 0xf0, 0x37, 0x94, 0xd7, 0x2a, 0xbe, 0xfc, 0x85, 0xee, 0x45,
-	0xa2, 0x43, 0xa4, 0x96, 0x9e, 0x85, 0x00, 0x3e, 0x07, 0xb1, 0x53, 0x47, 0x31, 0x71, 0xea, 0x88,
-	0x9e, 0x00, 0x4b, 0xf1, 0x13, 0xe0, 0x67, 0x50, 0x36, 0x5e, 0xc9, 0x99, 0x63, 0x91, 0x07, 0x52,
-	0x3a, 0x8b, 0xb1, 0x28, 0xa1, 0x81, 0xf1, 0x6a, 0x16, 0x31, 0x7e, 0x02, 0x65, 0x63, 0x4a, 0xf8,
-	0x7a, 0xe4, 0x5f, 0x8b, 0xbe, 0xe4, 0x76, 0xb2, 0x5d, 0x28, 0x97, 0xa3, 0x06, 0x46, 0xb8, 0x21,
-	0x83, 0x8e, 0x6a, 0x39, 0xd2, 0x51, 0x4d, 0x69, 0x54, 0x56, 0x52, 0x1b, 0x95, 0xfb, 0xb2, 0xf5,
-	0x5a, 0xe5, 0xeb, 0x3f, 0xae, 0xed, 0xa9, 0x67, 0xce, 0xf5, 0x5d, 0xdb, 0xc9, 0x8d, 0x23, 0x3a,
-	0x8b, 0x77, 0xe7, 0x3e, 0x7c, 0xfd, 0x86, 0xf9, 0x5d, 0x58, 0x89, 0x5e, 0x05, 0x89, 0x2e, 0xe3,
-	0x9c, 0xf4, 0x48, 0x7b, 0x11, 0x48, 0x78, 0x13, 0x54, 0x83, 0x82, 0x61, 0x9a, 0xee, 0xd8, 0xa1,
-	0xbc, 0xbf, 0x58, 0xd2, 0x82, 0x21, 0xfa, 0x2c, 0xa2, 0x1d, 0x77, 0x23, 0xe2, 0x6e, 0xac, 0x5d,
-	0xb5, 0xad, 0x67, 0x4a, 0x05, 0xf5, 0xde, 0xfb, 0xee, 0x2e, 0x2e, 0xbc, 0x29, 0x9f, 0x40, 0xa5,
-	0x61, 0x59, 0xa7, 0x9e, 0x19, 0x24, 0xf4, 0x5d, 0xc8, 0x4d, 0x3c, 0x53, 0xe6, 0x3d, 0x25, 0xe9,
-	0x51, 0x8d, 0x21, 0x77, 0x5d, 0xa8, 0x06, 0x1f, 0xc9, 0xbc, 0xf9, 0x06, 0x5f, 0x2d, 0x52, 0x0e,
-	0x7f, 0x0a, 0x8a, 0x28, 0x58, 0xdf, 0x52, 0xd1, 0x21, 0xac, 0x45, 0xbe, 0x7b, 0x0b, 0x5d, 0xaf,
-	0x95, 0xc7, 0x3f, 0x05, 0x45, 0x94, 0x99, 0x6f, 0xa9, 0xe5, 0x3a, 0xac, 0x45, 0xbe, 0x93, 0x55,
-	0xe9, 0x05, 0x54, 0x0e, 0x31, 0x7d, 0x3b, 0x4e, 0xd7, 0x53, 0xdb, 0x86, 0x6a, 0x20, 0xe9, 0x5d,
-	0x7b, 0xe8, 0xef, 0x32, 0x50, 0x65, 0xb5, 0x57, 0xc4, 0xac, 0x87, 0x89, 0x02, 0x72, 0x5e, 0xdc,
-	0xf7, 0xa4, 0x81, 0xf8, 0x4b, 0x58, 0x9d, 0xa9, 0xfe, 0xae, 0xfd, 0xf4, 0xb7, 0x59, 0xc8, 0x1f,
-	0x8b, 0x4b, 0xf6, 0x9b, 0x50, 0x12, 0xd7, 0xed, 0xe1, 0xcb, 0x81, 0xa2, 0x00, 0x44, 0xf2, 0x63,
-	0xf6, 0xcd, 0xf3, 0xa3, 0xc8, 0x83, 0xb9, 0xd8, 0x7d, 0x9a, 0xcd, 0xdf, 0x07, 0xc4, 0xea, 0x2c,
-	0x99, 0x8d, 0x97, 0xa3, 0xd9, 0x38, 0x7e, 0x89, 0x99, 0x4f, 0x5e, 0x62, 0x6e, 0xf3, 0x77, 0x16,
-	0x23, 0x7d, 0x30, 0x95, 0x79, 0x31, 0xcf, 0x86, 0x87, 0x53, 0xc6, 0x8e, 0x60, 0x93, 0xc1, 0x45,
-	0x3a, 0x5c, 0x26, 0xd8, 0x3c, 0x9c, 0x2e, 0x32, 0x17, 0xe2, 0x4e, 0x45, 0x78, 0x28, 0xd2, 0x8c,
-	0x96, 0xaf, 0x14, 0xd2, 0x5a, 0xb9, 0x92, 0x56, 0x92, 0xc8, 0x3b, 0x95, 0x80, 0x41, 0xd8, 0x0c,
-	0x7e, 0x63, 0x0e, 0xdf, 0xca, 0x9d, 0xca, 0x02, 0x06, 0xcc, 0xee, 0x54, 0x16, 0xb1, 0x61, 0xb1,
-	0x3b, 0x95, 0x05, 0xb4, 0x9f, 0xdd, 0xa9, 0xc4, 0xb5, 0x97, 0x77, 0x2a, 0xd7, 0x67, 0xbc, 0xc8,
-	0x9d, 0xca, 0x7b, 0x77, 0x64, 0x70, 0xa7, 0x32, 0x67, 0xee, 0x6b, 0xee, 0x54, 0x02, 0xb9, 0xdf,
-	0xab, 0x3b, 0x95, 0xf7, 0xee, 0xb9, 0xff, 0xce, 0xc0, 0x7a, 0xcf, 0xa0, 0x17, 0xcd, 0x0b, 0xc3,
-	0x37, 0x4c, 0x8a, 0x7d, 0x9b, 0x50, 0xdb, 0x24, 0x2c, 0x40, 0x0d, 0x0d, 0x8a, 0x1d, 0xf3, 0x52,
-	0x1f, 0x11, 0x2e, 0x7d, 0x49, 0x2b, 0x49, 0xc8, 0x73, 0xc2, 0x42, 0xe9, 0x2f, 0x6d, 0x4a, 0xb1,
-	0xcf, 0xb0, 0x59, 0x8e, 0x2d, 0x0a, 0xc0, 0x73, 0x82, 0xee, 0xc0, 0x8a, 0xf7, 0x92, 0xea, 0x43,
-	0x97, 0x10, 0xdd, 0x13, 0xbd, 0xfd, 0x25, 0xad, 0xe4, 0xbd, 0xa4, 0x1d, 0x97, 0x90, 0x9e, 0xc9,
-	0xa2, 0xdb, 0xd9, 0x54, 0x1f, 0x9d, 0x79, 0x84, 0x87, 0xca, 0x25, 0x2d, 0x7f, 0x36, 0x7d, 0x7e,
-	0xe6, 0x11, 0x16, 0x50, 0xc7, 0x9e, 0xec, 0xd3, 0x67, 0xc7, 0x1e, 0x3b, 0x80, 0x8c, 0x3d, 0x6e,
-	0x50, 0x5e, 0xd0, 0x89, 0xd1, 0x22, 0x7e, 0xfe, 0x87, 0x02, 0x2c, 0x31, 0x7b, 0xd1, 0x03, 0x50,
-	0x88, 0x6f, 0x8a, 0xe2, 0x99, 0xf9, 0x34, 0xcc, 0x09, 0x15, 0xe2, 0x9b, 0xac, 0x08, 0x64, 0x50,
-	0xd5, 0x62, 0x07, 0xc1, 0x80, 0x30, 0x7a, 0xa0, 0x14, 0x44, 0xc1, 0x51, 0x31, 0xa0, 0x18, 0x8f,
-	0x67, 0x19, 0x41, 0x52, 0x9c, 0x8c, 0x6d, 0x0b, 0xfd, 0x00, 0xd0, 0xd0, 0x35, 0x8d, 0x21, 0x7f,
-	0x42, 0x30, 0x13, 0x27, 0xf2, 0xc4, 0x2a, 0xc7, 0x68, 0xd4, 0x0f, 0x04, 0xde, 0x87, 0x6a, 0x48,
-	0xcc, 0x45, 0xca, 0x97, 0x64, 0x01, 0x61, 0x70, 0x8a, 0x0d, 0xa9, 0xb8, 0xd8, 0x7c, 0x9c, 0x2a,
-	0x2e, 0x58, 0x3c, 0x98, 0x93, 0x2f, 0xd3, 0x0a, 0x11, 0xc1, 0xaa, 0x43, 0xcf, 0xe5, 0xe3, 0xb4,
-	0xdb, 0xc0, 0x74, 0xd6, 0xe5, 0x99, 0x4f, 0x24, 0x98, 0x12, 0xf1, 0x4d, 0x4d, 0x1c, 0xfb, 0x7e,
-	0x0c, 0x45, 0x86, 0xe6, 0x59, 0xb2, 0xf4, 0x66, 0xf7, 0x3c, 0xc4, 0x37, 0x9b, 0x5e, 0x9f, 0xf9,
-	0xda, 0x22, 0x34, 0xee, 0x6b, 0xd1, 0x77, 0xaf, 0x58, 0xbc, 0x0c, 0x88, 0xf8, 0x3a, 0x20, 0xe4,
-	0x86, 0x8b, 0xce, 0x3b, 0x08, 0xa2, 0xc0, 0xd7, 0x01, 0x05, 0x37, 0xba, 0x1c, 0xa5, 0xe0, 0x26,
-	0xff, 0x26, 0xac, 0xfb, 0x78, 0xe4, 0xb2, 0x03, 0x57, 0xd4, 0xd9, 0x15, 0x71, 0xdb, 0x20, 0x50,
-	0x11, 0x6f, 0x7f, 0x04, 0xab, 0x11, 0x72, 0x2e, 0xb5, 0x1a, 0xb4, 0x83, 0x24, 0x29, 0x17, 0x1c,
-	0xa7, 0xe3, 0xb2, 0x57, 0x13, 0x74, 0x09, 0xf1, 0x31, 0x97, 0x2b, 0x51, 0xf1, 0x71, 0x9f, 0x33,
-	0x7b, 0xa4, 0xcf, 0xc5, 0x19, 0xaa, 0x64, 0x11, 0x1a, 0xfa, 0x9c, 0xa1, 0xb9, 0xcf, 0xd1, 0x9b,
-	0xf9, 0xdc, 0x22, 0x94, 0xf9, 0x7c, 0xee, 0x80, 0xbd, 0x9e, 0x72, 0xc0, 0xfe, 0x14, 0x96, 0xc6,
-	0x43, 0x9d, 0xd6, 0x36, 0x38, 0xeb, 0x7b, 0x31, 0xd6, 0x27, 0x8e, 0x85, 0xfd, 0xa1, 0x71, 0x29,
-	0x2f, 0x1e, 0x6d, 0xd7, 0x11, 0x95, 0xcf, 0x78, 0xd8, 0x47, 0xbf, 0x07, 0x25, 0xcf, 0xa0, 0x17,
-	0xba, 0x79, 0x61, 0xf8, 0xb5, 0x4d, 0xbe, 0xff, 0x76, 0xe2, 0x07, 0xbb, 0xf9, 0x90, 0xa2, 0x15,
-	0x3d, 0x09, 0x5c, 0x64, 0xff, 0x0e, 0x79, 0x85, 0xcd, 0xd8, 0x07, 0x51, 0xfe, 0x43, 0x58, 0x62,
-	0x8c, 0x65, 0x84, 0x5c, 0x9b, 0x53, 0x43, 0xe3, 0xe8, 0xeb, 0x45, 0xc7, 0x11, 0xac, 0xce, 0xa4,
-	0xc9, 0x90, 0xfc, 0x2e, 0xc5, 0xfd, 0x7d, 0x46, 0x14, 0xc6, 0x51, 0xf3, 0x3e, 0x4e, 0x24, 0xb1,
-	0x14, 0x89, 0xdf, 0x93, 0x14, 0xe6, 0x80, 0x12, 0x2a, 0xff, 0xee, 0xbd, 0xb5, 0xf7, 0x1c, 0xd6,
-	0xe6, 0x96, 0x3f, 0x42, 0x50, 0x6d, 0xf6, 0xf4, 0x93, 0xa3, 0xe3, 0x5e, 0xbb, 0xa9, 0x1e, 0xa8,
-	0xed, 0x96, 0xf2, 0x1b, 0x08, 0x20, 0xdf, 0xec, 0xe9, 0x8d, 0x17, 0xc7, 0x4a, 0x06, 0x95, 0xa1,
-	0xc8, 0x7e, 0x7f, 0x7d, 0xa2, 0xb5, 0x95, 0xac, 0xc4, 0x1c, 0x36, 0x7b, 0x4a, 0x6e, 0xaf, 0x11,
-	0x5e, 0xbc, 0x72, 0x4e, 0x1b, 0xa0, 0xf4, 0xbb, 0xbd, 0x6e, 0x82, 0x57, 0x05, 0x4a, 0x1c, 0xda,
-	0xec, 0x74, 0x25, 0x3b, 0x3e, 0x7c, 0xd1, 0x38, 0x52, 0xb2, 0x7b, 0x5f, 0xc1, 0x56, 0xfa, 0xae,
-	0x41, 0x25, 0x58, 0x3e, 0xe9, 0xe8, 0x47, 0x0d, 0xa1, 0xcd, 0x49, 0x47, 0x57, 0x0f, 0x5f, 0x28,
-	0x19, 0x54, 0x05, 0x38, 0xe9, 0xe8, 0xbd, 0x76, 0x5b, 0x53, 0x8f, 0x0e, 0x85, 0x3e, 0x27, 0x1d,
-	0xbd, 0x7f, 0xf8, 0x42, 0xc9, 0xed, 0x3d, 0x83, 0xcd, 0xee, 0xe4, 0x0a, 0x5e, 0xdd, 0x90, 0x57,
-	0xb7, 0xa3, 0xb7, 0x7a, 0x52, 0x95, 0x6e, 0x47, 0x3f, 0xfd, 0x59, 0x87, 0xa9, 0x22, 0x47, 0x6a,
-	0xef, 0xb8, 0xdd, 0x54, 0x72, 0x7b, 0x47, 0x50, 0x0c, 0x7a, 0x70, 0xcc, 0x2e, 0xad, 0xdb, 0x69,
-	0xcf, 0xdb, 0xc5, 0xa1, 0xed, 0xd6, 0x61, 0x5b, 0x28, 0xc6, 0x87, 0xc7, 0x3d, 0xf5, 0x88, 0x39,
-	0x2a, 0x40, 0x77, 0xda, 0x8d, 0x03, 0x25, 0xb7, 0xf7, 0x8a, 0x15, 0x9d, 0xf3, 0x2f, 0xcf, 0x50,
-	0x1d, 0xb6, 0x5a, 0xed, 0x9e, 0x7e, 0xdc, 0x6f, 0xf4, 0x4f, 0x8e, 0x13, 0x12, 0xe2, 0x38, 0xf5,
-	0x48, 0xef, 0x69, 0xdd, 0x43, 0xad, 0x7d, 0xcc, 0x74, 0xdf, 0x02, 0x14, 0xc1, 0x1d, 0x9f, 0x34,
-	0x9b, 0x0c, 0x9e, 0x65, 0xb3, 0x19, 0x81, 0xb7, 0x35, 0x4d, 0xc9, 0xed, 0xfd, 0x4f, 0x06, 0xca,
-	0xd1, 0xb7, 0xc9, 0xe8, 0x06, 0x6c, 0x36, 0x4f, 0xd3, 0x65, 0xc6, 0x50, 0x5a, 0x5f, 0xd3, 0x9b,
-	0x5a, 0xbb, 0xd1, 0x6f, 0xb7, 0x94, 0x0c, 0xba, 0x05, 0xb5, 0x38, 0xaa, 0xa5, 0x1e, 0x37, 0xbb,
-	0xa7, 0x6d, 0xad, 0xdd, 0x52, 0xb2, 0xe8, 0x36, 0xdc, 0x88, 0x63, 0x7b, 0x5a, 0xf7, 0x54, 0x3d,
-	0x56, 0xbb, 0x47, 0xed, 0x96, 0x92, 0x9b, 0xff, 0xb8, 0xd9, 0x3d, 0x3a, 0x50, 0x0f, 0xf5, 0x17,
-	0x6a, 0x4f, 0x59, 0x42, 0xdb, 0xb0, 0x1e, 0xc7, 0x6a, 0xed, 0x46, 0xeb, 0xe7, 0xca, 0x32, 0xaa,
-	0xc1, 0x46, 0x1c, 0x71, 0xd0, 0x50, 0x3b, 0xed, 0x96, 0x92, 0x67, 0xce, 0x89, 0x63, 0xd4, 0xa3,
-	0x46, 0xb3, 0xaf, 0x9e, 0xb6, 0x95, 0xc2, 0xde, 0x9f, 0x64, 0x40, 0x49, 0xbe, 0x18, 0x66, 0x0a,
-	0xb6, 0xda, 0xa7, 0x6a, 0xb3, 0x9d, 0x6e, 0xf8, 0x2e, 0xdc, 0x89, 0xa3, 0x5f, 0x74, 0xb5, 0xaf,
-	0x12, 0x4e, 0xbf, 0x01, 0x9b, 0x71, 0x9a, 0xd0, 0xef, 0xdb, 0xb0, 0x1e, 0x47, 0xb5, 0x35, 0xad,
-	0xcb, 0x9c, 0x3f, 0x81, 0x8d, 0xb4, 0xf7, 0xf2, 0x8c, 0x97, 0x7a, 0xd4, 0x3f, 0xd0, 0xfb, 0x3f,
-	0xef, 0x25, 0x57, 0xd6, 0x26, 0xac, 0x85, 0xa8, 0x9e, 0xa6, 0x9e, 0x36, 0xfa, 0x6c, 0x85, 0x6d,
-	0x80, 0x12, 0x01, 0x9f, 0x3c, 0xed, 0xa8, 0x4d, 0x25, 0xcb, 0x16, 0x42, 0x08, 0x55, 0x8f, 0xfa,
-	0x6d, 0xed, 0xa8, 0xd1, 0x51, 0x72, 0x7b, 0x23, 0x50, 0x92, 0x6f, 0x18, 0xd0, 0x1d, 0xa8, 0xf3,
-	0xbd, 0xa7, 0x1e, 0x1d, 0x74, 0xd3, 0x04, 0x23, 0xa8, 0x86, 0xf8, 0xe7, 0xed, 0x7e, 0x43, 0xc9,
-	0xa0, 0x35, 0xa8, 0x84, 0x30, 0xbe, 0x69, 0xe3, 0x64, 0x7c, 0x5b, 0xe7, 0xf6, 0x0e, 0x01, 0xc2,
-	0xd7, 0x27, 0xe8, 0x26, 0x6c, 0x1f, 0x34, 0x9e, 0x6a, 0x6a, 0x33, 0x4d, 0x4a, 0x05, 0x4a, 0x07,
-	0x27, 0x9d, 0x8e, 0xfe, 0xbc, 0x7d, 0xfc, 0xa5, 0x92, 0x61, 0xc3, 0x2f, 0x4f, 0x9e, 0xea, 0xc7,
-	0xbd, 0xee, 0x57, 0x6d, 0x25, 0xbb, 0x67, 0x42, 0x25, 0xd6, 0x3c, 0x65, 0x13, 0x7d, 0xda, 0x6b,
-	0x5e, 0xb9, 0x43, 0x22, 0xb8, 0x46, 0xab, 0x35, 0x9b, 0x91, 0x4c, 0x0a, 0x8e, 0xad, 0x1d, 0x1e,
-	0xc5, 0x1e, 0xff, 0x4d, 0x0e, 0x0a, 0xe2, 0x7d, 0x15, 0x41, 0xcf, 0xa0, 0x34, 0x7b, 0xe1, 0x88,
-	0xe2, 0x8f, 0x40, 0x92, 0x4f, 0x27, 0xeb, 0x77, 0xae, 0x42, 0xcb, 0xe0, 0x7d, 0x0c, 0xe5, 0xe8,
-	0x63, 0x43, 0x14, 0x4f, 0xf1, 0x29, 0x6f, 0x19, 0xeb, 0x77, 0x5f, 0x43, 0x11, 0x32, 0x8d, 0xbe,
-	0x01, 0x4c, 0x30, 0x4d, 0x79, 0x62, 0x58, 0xbf, 0xfb, 0x1a, 0x0a, 0xc9, 0xf4, 0x19, 0x94, 0x66,
-	0x4f, 0xf9, 0x12, 0x56, 0x27, 0x1f, 0x16, 0x26, 0xac, 0x9e, 0x7f, 0x01, 0xd8, 0x05, 0x08, 0x5f,
-	0xb7, 0xa1, 0x38, 0xf5, 0xdc, 0xbb, 0xbd, 0xfa, 0x07, 0x57, 0xe2, 0x05, 0xbb, 0xdf, 0xca, 0x3c,
-	0xfe, 0xff, 0x1c, 0x54, 0x82, 0xc5, 0x6b, 0x3b, 0xe7, 0x2e, 0x41, 0x7f, 0x00, 0xab, 0x89, 0x87,
-	0x12, 0xe8, 0x5e, 0x72, 0x2e, 0x52, 0x6e, 0x88, 0xeb, 0xf7, 0x5f, 0x4f, 0x24, 0x0d, 0xc0, 0x80,
-	0xe6, 0x9f, 0x24, 0xa0, 0x8f, 0x52, 0xa6, 0x26, 0x4d, 0xc6, 0x83, 0x6f, 0xa4, 0x0b, 0xc5, 0xcc,
-	0xbf, 0x04, 0x48, 0x88, 0xb9, 0xf2, 0x1d, 0x42, 0x42, 0xcc, 0xd5, 0x4f, 0x0a, 0x98, 0xaf, 0x12,
-	0x37, 0xf8, 0x09, 0x5f, 0xa5, 0xbf, 0x37, 0x48, 0xf8, 0xea, 0xaa, 0x47, 0x00, 0x86, 0xa8, 0x59,
-	0x62, 0xec, 0xef, 0xcf, 0x4d, 0x69, 0x1a, 0xff, 0x0f, 0xbf, 0x81, 0x6a, 0x36, 0xfd, 0xff, 0x95,
-	0x85, 0xa5, 0x53, 0xcf, 0x24, 0xa8, 0x01, 0x79, 0xd1, 0x1c, 0x46, 0xf5, 0xa4, 0x6e, 0x61, 0x13,
-	0xb7, 0x7e, 0x33, 0x15, 0x27, 0xd5, 0x3d, 0x80, 0x82, 0x6c, 0x9c, 0xa2, 0x9b, 0x73, 0xf2, 0x23,
-	0x4c, 0x6e, 0xa5, 0x23, 0x03, 0x9d, 0x98, 0x2a, 0xe2, 0xd6, 0x21, 0xa1, 0x4a, 0xec, 0xfe, 0x22,
-	0xa1, 0x4a, 0xe2, 0x9a, 0xe2, 0x19, 0x94, 0x66, 0xf7, 0x01, 0x89, 0x2d, 0x97, 0xbc, 0x5f, 0x48,
-	0x6c, 0xb9, 0xf9, 0x6b, 0x84, 0x67, 0x50, 0x9a, 0x75, 0xed, 0xd1, 0xed, 0x94, 0x95, 0x71, 0x25,
-	0xaf, 0xb9, 0x66, 0x3f, 0x0f, 0x86, 0xa2, 0x31, 0x42, 0x64, 0x58, 0x90, 0xdd, 0xdf, 0xb9, 0xb0,
-	0x10, 0x6b, 0x16, 0xcd, 0x87, 0x85, 0x44, 0x2b, 0x46, 0x86, 0x05, 0xc9, 0x6c, 0x3e, 0x2c, 0xc4,
-	0xb9, 0x7d, 0x70, 0x25, 0x7e, 0x36, 0x07, 0x22, 0x52, 0xa7, 0x2a, 0x97, 0x6c, 0xc8, 0xce, 0x47,
-	0xea, 0x84, 0x72, 0xb3, 0x48, 0x2d, 0xd9, 0xa5, 0x45, 0xea, 0x38, 0xc7, 0xbb, 0xaf, 0xa1, 0x48,
-	0x46, 0xea, 0x54, 0xa6, 0x29, 0x8d, 0xcb, 0xd4, 0x48, 0x1d, 0x67, 0xfa, 0xf8, 0x57, 0x19, 0x58,
-	0x66, 0x85, 0x3f, 0x41, 0x2d, 0x28, 0xc8, 0xb3, 0x15, 0x9a, 0x5b, 0xf3, 0x91, 0x03, 0x50, 0x62,
-	0x2d, 0x27, 0x8f, 0x63, 0x2a, 0x14, 0x83, 0x43, 0x07, 0x9a, 0x5f, 0xf5, 0x51, 0x3e, 0xb7, 0xaf,
-	0xc0, 0x06, 0x13, 0xf2, 0xf4, 0x77, 0xbe, 0x7e, 0x72, 0x8d, 0xff, 0xca, 0x79, 0x96, 0xe7, 0x47,
-	0x94, 0x27, 0xbf, 0x0e, 0x00, 0x00, 0xff, 0xff, 0x69, 0x49, 0xc2, 0x94, 0x08, 0x3a, 0x00, 0x00,
+var file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes = make([]protoimpl.EnumInfo, 12)
+var file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes = make([]protoimpl.MessageInfo, 64)
+var file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_goTypes = []interface{}{
+	(CloudProviderType)(0),             // 0: clouddeploy.CloudProviderType
+	(TopologyType)(0),                  // 1: clouddeploy.TopologyType
+	(UnderlayConnectionType)(0),        // 2: clouddeploy.UnderlayConnectionType
+	(OverlayConnectionType)(0),         // 3: clouddeploy.OverlayConnectionType
+	(RoleType)(0),                      // 4: clouddeploy.RoleType
+	(DeploymentStatusCode)(0),          // 5: clouddeploy.DeploymentStatusCode
+	(CVStatusCode)(0),                  // 6: clouddeploy.CVStatusCode
+	(DeviceStatusCode)(0),              // 7: clouddeploy.DeviceStatusCode
+	(NetworkInterfaceType)(0),          // 8: clouddeploy.NetworkInterfaceType
+	(TopologyInfoType)(0),              // 9: clouddeploy.TopologyInfoType
+	(FabricType)(0),                    // 10: clouddeploy.FabricType
+	(VpcStatusCode)(0),                 // 11: clouddeploy.VpcStatusCode
+	(*RouteTableIds)(nil),              // 12: clouddeploy.RouteTableIds
+	(*NetworkInterface)(nil),           // 13: clouddeploy.NetworkInterface
+	(*CVInfo)(nil),                     // 14: clouddeploy.CVInfo
+	(*AzureRouterDetail)(nil),          // 15: clouddeploy.AzureRouterDetail
+	(*AwsRouterDetail)(nil),            // 16: clouddeploy.AwsRouterDetail
+	(*Router)(nil),                     // 17: clouddeploy.Router
+	(*AddRouterRequest)(nil),           // 18: clouddeploy.AddRouterRequest
+	(*AddRouterResponse)(nil),          // 19: clouddeploy.AddRouterResponse
+	(*UpdateRouterRequest)(nil),        // 20: clouddeploy.UpdateRouterRequest
+	(*UpdateRouterResponse)(nil),       // 21: clouddeploy.UpdateRouterResponse
+	(*DeleteRouterRequest)(nil),        // 22: clouddeploy.DeleteRouterRequest
+	(*DeleteRouterResponse)(nil),       // 23: clouddeploy.DeleteRouterResponse
+	(*GetRouterRequest)(nil),           // 24: clouddeploy.GetRouterRequest
+	(*GetRouterResponse)(nil),          // 25: clouddeploy.GetRouterResponse
+	(*ListRouterRequest)(nil),          // 26: clouddeploy.ListRouterRequest
+	(*ListRouterResponse)(nil),         // 27: clouddeploy.ListRouterResponse
+	(*WanInfo)(nil),                    // 28: clouddeploy.WanInfo
+	(*ClosInfo)(nil),                   // 29: clouddeploy.ClosInfo
+	(*TopologyInfo)(nil),               // 30: clouddeploy.TopologyInfo
+	(*AddTopologyInfoRequest)(nil),     // 31: clouddeploy.AddTopologyInfoRequest
+	(*AddTopologyInfoResponse)(nil),    // 32: clouddeploy.AddTopologyInfoResponse
+	(*UpdateTopologyInfoRequest)(nil),  // 33: clouddeploy.UpdateTopologyInfoRequest
+	(*UpdateTopologyInfoResponse)(nil), // 34: clouddeploy.UpdateTopologyInfoResponse
+	(*DeleteTopologyInfoRequest)(nil),  // 35: clouddeploy.DeleteTopologyInfoRequest
+	(*DeleteTopologyInfoResponse)(nil), // 36: clouddeploy.DeleteTopologyInfoResponse
+	(*GetTopologyInfoRequest)(nil),     // 37: clouddeploy.GetTopologyInfoRequest
+	(*GetTopologyInfoResponse)(nil),    // 38: clouddeploy.GetTopologyInfoResponse
+	(*ListTopologyInfoRequest)(nil),    // 39: clouddeploy.ListTopologyInfoRequest
+	(*ListTopologyInfoResponse)(nil),   // 40: clouddeploy.ListTopologyInfoResponse
+	(*AzureVnetInfo)(nil),              // 41: clouddeploy.AzureVnetInfo
+	(*AwsVpcInfo)(nil),                 // 42: clouddeploy.AwsVpcInfo
+	(*PeerVpcInfo)(nil),                // 43: clouddeploy.PeerVpcInfo
+	(*Vpc)(nil),                        // 44: clouddeploy.Vpc
+	(*AddVpcRequest)(nil),              // 45: clouddeploy.AddVpcRequest
+	(*AddVpcResponse)(nil),             // 46: clouddeploy.AddVpcResponse
+	(*UpdateVpcRequest)(nil),           // 47: clouddeploy.UpdateVpcRequest
+	(*UpdateVpcResponse)(nil),          // 48: clouddeploy.UpdateVpcResponse
+	(*DeleteVpcRequest)(nil),           // 49: clouddeploy.DeleteVpcRequest
+	(*DeleteVpcResponse)(nil),          // 50: clouddeploy.DeleteVpcResponse
+	(*GetVpcRequest)(nil),              // 51: clouddeploy.GetVpcRequest
+	(*GetVpcResponse)(nil),             // 52: clouddeploy.GetVpcResponse
+	(*ListVpcRequest)(nil),             // 53: clouddeploy.ListVpcRequest
+	(*ListVpcResponse)(nil),            // 54: clouddeploy.ListVpcResponse
+	(*Subnet)(nil),                     // 55: clouddeploy.Subnet
+	(*AddSubnetRequest)(nil),           // 56: clouddeploy.AddSubnetRequest
+	(*AddSubnetResponse)(nil),          // 57: clouddeploy.AddSubnetResponse
+	(*UpdateSubnetRequest)(nil),        // 58: clouddeploy.UpdateSubnetRequest
+	(*UpdateSubnetResponse)(nil),       // 59: clouddeploy.UpdateSubnetResponse
+	(*DeleteSubnetRequest)(nil),        // 60: clouddeploy.DeleteSubnetRequest
+	(*DeleteSubnetResponse)(nil),       // 61: clouddeploy.DeleteSubnetResponse
+	(*GetSubnetRequest)(nil),           // 62: clouddeploy.GetSubnetRequest
+	(*GetSubnetResponse)(nil),          // 63: clouddeploy.GetSubnetResponse
+	(*ListSubnetRequest)(nil),          // 64: clouddeploy.ListSubnetRequest
+	(*ListSubnetResponse)(nil),         // 65: clouddeploy.ListSubnetResponse
+	(*PathCharacteristics)(nil),        // 66: clouddeploy.PathCharacteristics
+	(*Path)(nil),                       // 67: clouddeploy.Path
+	(*GetPathRequest)(nil),             // 68: clouddeploy.GetPathRequest
+	(*GetPathResponse)(nil),            // 69: clouddeploy.GetPathResponse
+	(*ListPathRequest)(nil),            // 70: clouddeploy.ListPathRequest
+	(*ListPathResponse)(nil),           // 71: clouddeploy.ListPathResponse
+	nil,                                // 72: clouddeploy.Router.TagsEntry
+	nil,                                // 73: clouddeploy.PeerVpcInfo.PeerVpcCidrEntry
+	nil,                                // 74: clouddeploy.Vpc.TagsEntry
+	nil,                                // 75: clouddeploy.Vpc.PeerVpcCidrEntry
+	(*fieldmaskpb.FieldMask)(nil),      // 76: google.protobuf.FieldMask
+	(*timestamppb.Timestamp)(nil),      // 77: google.protobuf.Timestamp
+	(*time.RequestAtTime)(nil),         // 78: time.RequestAtTime
+}
+var file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_depIdxs = []int32{
+	76,  // 0: clouddeploy.RouteTableIds.field_mask:type_name -> google.protobuf.FieldMask
+	8,   // 1: clouddeploy.NetworkInterface.intf_type:type_name -> clouddeploy.NetworkInterfaceType
+	76,  // 2: clouddeploy.NetworkInterface.field_mask:type_name -> google.protobuf.FieldMask
+	6,   // 3: clouddeploy.CVInfo.cv_status_code:type_name -> clouddeploy.CVStatusCode
+	12,  // 4: clouddeploy.CVInfo.ha_rt_table_ids:type_name -> clouddeploy.RouteTableIds
+	7,   // 5: clouddeploy.CVInfo.device_status:type_name -> clouddeploy.DeviceStatusCode
+	76,  // 6: clouddeploy.CVInfo.field_mask:type_name -> google.protobuf.FieldMask
+	76,  // 7: clouddeploy.AzureRouterDetail.field_mask:type_name -> google.protobuf.FieldMask
+	76,  // 8: clouddeploy.AwsRouterDetail.field_mask:type_name -> google.protobuf.FieldMask
+	0,   // 9: clouddeploy.Router.cp_t:type_name -> clouddeploy.CloudProviderType
+	72,  // 10: clouddeploy.Router.tags:type_name -> clouddeploy.Router.TagsEntry
+	12,  // 11: clouddeploy.Router.rt_table_ids:type_name -> clouddeploy.RouteTableIds
+	16,  // 12: clouddeploy.Router.aws_rtr_detail:type_name -> clouddeploy.AwsRouterDetail
+	15,  // 13: clouddeploy.Router.az_rtr_detail:type_name -> clouddeploy.AzureRouterDetail
+	13,  // 14: clouddeploy.Router.intf:type_name -> clouddeploy.NetworkInterface
+	5,   // 15: clouddeploy.Router.dep_status:type_name -> clouddeploy.DeploymentStatusCode
+	14,  // 16: clouddeploy.Router.cv_info:type_name -> clouddeploy.CVInfo
+	76,  // 17: clouddeploy.Router.field_mask:type_name -> google.protobuf.FieldMask
+	17,  // 18: clouddeploy.AddRouterRequest.router:type_name -> clouddeploy.Router
+	17,  // 19: clouddeploy.AddRouterResponse.router:type_name -> clouddeploy.Router
+	77,  // 20: clouddeploy.AddRouterResponse.created_at:type_name -> google.protobuf.Timestamp
+	17,  // 21: clouddeploy.UpdateRouterRequest.router:type_name -> clouddeploy.Router
+	17,  // 22: clouddeploy.UpdateRouterResponse.router:type_name -> clouddeploy.Router
+	77,  // 23: clouddeploy.UpdateRouterResponse.at_time:type_name -> google.protobuf.Timestamp
+	17,  // 24: clouddeploy.DeleteRouterRequest.router:type_name -> clouddeploy.Router
+	17,  // 25: clouddeploy.GetRouterRequest.router:type_name -> clouddeploy.Router
+	77,  // 26: clouddeploy.GetRouterRequest.at_time:type_name -> google.protobuf.Timestamp
+	17,  // 27: clouddeploy.GetRouterResponse.router:type_name -> clouddeploy.Router
+	77,  // 28: clouddeploy.GetRouterResponse.at_time:type_name -> google.protobuf.Timestamp
+	17,  // 29: clouddeploy.ListRouterRequest.filter:type_name -> clouddeploy.Router
+	78,  // 30: clouddeploy.ListRouterRequest.at_time:type_name -> time.RequestAtTime
+	76,  // 31: clouddeploy.ListRouterRequest.field_mask:type_name -> google.protobuf.FieldMask
+	17,  // 32: clouddeploy.ListRouterResponse.router:type_name -> clouddeploy.Router
+	77,  // 33: clouddeploy.ListRouterResponse.at_time:type_name -> google.protobuf.Timestamp
+	0,   // 34: clouddeploy.WanInfo.cp_type:type_name -> clouddeploy.CloudProviderType
+	76,  // 35: clouddeploy.WanInfo.field_mask:type_name -> google.protobuf.FieldMask
+	0,   // 36: clouddeploy.ClosInfo.cp_type:type_name -> clouddeploy.CloudProviderType
+	10,  // 37: clouddeploy.ClosInfo.fabric:type_name -> clouddeploy.FabricType
+	76,  // 38: clouddeploy.ClosInfo.field_mask:type_name -> google.protobuf.FieldMask
+	9,   // 39: clouddeploy.TopologyInfo.topo_type:type_name -> clouddeploy.TopologyInfoType
+	28,  // 40: clouddeploy.TopologyInfo.wan_info:type_name -> clouddeploy.WanInfo
+	29,  // 41: clouddeploy.TopologyInfo.clos_info:type_name -> clouddeploy.ClosInfo
+	76,  // 42: clouddeploy.TopologyInfo.field_mask:type_name -> google.protobuf.FieldMask
+	30,  // 43: clouddeploy.AddTopologyInfoRequest.topology_info:type_name -> clouddeploy.TopologyInfo
+	30,  // 44: clouddeploy.AddTopologyInfoResponse.topology_info:type_name -> clouddeploy.TopologyInfo
+	77,  // 45: clouddeploy.AddTopologyInfoResponse.created_at:type_name -> google.protobuf.Timestamp
+	30,  // 46: clouddeploy.UpdateTopologyInfoRequest.topology_info:type_name -> clouddeploy.TopologyInfo
+	30,  // 47: clouddeploy.UpdateTopologyInfoResponse.topology_info:type_name -> clouddeploy.TopologyInfo
+	77,  // 48: clouddeploy.UpdateTopologyInfoResponse.at_time:type_name -> google.protobuf.Timestamp
+	30,  // 49: clouddeploy.DeleteTopologyInfoRequest.topology_info:type_name -> clouddeploy.TopologyInfo
+	30,  // 50: clouddeploy.GetTopologyInfoRequest.topology_info:type_name -> clouddeploy.TopologyInfo
+	77,  // 51: clouddeploy.GetTopologyInfoRequest.at_time:type_name -> google.protobuf.Timestamp
+	30,  // 52: clouddeploy.GetTopologyInfoResponse.topology_info:type_name -> clouddeploy.TopologyInfo
+	77,  // 53: clouddeploy.GetTopologyInfoResponse.at_time:type_name -> google.protobuf.Timestamp
+	30,  // 54: clouddeploy.ListTopologyInfoRequest.filter:type_name -> clouddeploy.TopologyInfo
+	78,  // 55: clouddeploy.ListTopologyInfoRequest.at_time:type_name -> time.RequestAtTime
+	76,  // 56: clouddeploy.ListTopologyInfoRequest.field_mask:type_name -> google.protobuf.FieldMask
+	30,  // 57: clouddeploy.ListTopologyInfoResponse.topology_info:type_name -> clouddeploy.TopologyInfo
+	77,  // 58: clouddeploy.ListTopologyInfoResponse.at_time:type_name -> google.protobuf.Timestamp
+	76,  // 59: clouddeploy.AzureVnetInfo.field_mask:type_name -> google.protobuf.FieldMask
+	76,  // 60: clouddeploy.AwsVpcInfo.field_mask:type_name -> google.protobuf.FieldMask
+	73,  // 61: clouddeploy.PeerVpcInfo.peer_vpc_cidr:type_name -> clouddeploy.PeerVpcInfo.PeerVpcCidrEntry
+	76,  // 62: clouddeploy.PeerVpcInfo.field_mask:type_name -> google.protobuf.FieldMask
+	0,   // 63: clouddeploy.Vpc.cp_t:type_name -> clouddeploy.CloudProviderType
+	4,   // 64: clouddeploy.Vpc.role_type:type_name -> clouddeploy.RoleType
+	41,  // 65: clouddeploy.Vpc.az_vnet_info:type_name -> clouddeploy.AzureVnetInfo
+	42,  // 66: clouddeploy.Vpc.aws_vpc_info:type_name -> clouddeploy.AwsVpcInfo
+	74,  // 67: clouddeploy.Vpc.tags:type_name -> clouddeploy.Vpc.TagsEntry
+	75,  // 68: clouddeploy.Vpc.peer_vpc_cidr:type_name -> clouddeploy.Vpc.PeerVpcCidrEntry
+	11,  // 69: clouddeploy.Vpc.status_code:type_name -> clouddeploy.VpcStatusCode
+	43,  // 70: clouddeploy.Vpc.peer_vpc_info:type_name -> clouddeploy.PeerVpcInfo
+	76,  // 71: clouddeploy.Vpc.field_mask:type_name -> google.protobuf.FieldMask
+	44,  // 72: clouddeploy.AddVpcRequest.vpc:type_name -> clouddeploy.Vpc
+	44,  // 73: clouddeploy.AddVpcResponse.vpc:type_name -> clouddeploy.Vpc
+	77,  // 74: clouddeploy.AddVpcResponse.created_at:type_name -> google.protobuf.Timestamp
+	44,  // 75: clouddeploy.UpdateVpcRequest.vpc:type_name -> clouddeploy.Vpc
+	44,  // 76: clouddeploy.UpdateVpcResponse.vpc:type_name -> clouddeploy.Vpc
+	77,  // 77: clouddeploy.UpdateVpcResponse.at_time:type_name -> google.protobuf.Timestamp
+	44,  // 78: clouddeploy.DeleteVpcRequest.vpc:type_name -> clouddeploy.Vpc
+	44,  // 79: clouddeploy.GetVpcRequest.vpc:type_name -> clouddeploy.Vpc
+	77,  // 80: clouddeploy.GetVpcRequest.at_time:type_name -> google.protobuf.Timestamp
+	44,  // 81: clouddeploy.GetVpcResponse.vpc:type_name -> clouddeploy.Vpc
+	77,  // 82: clouddeploy.GetVpcResponse.at_time:type_name -> google.protobuf.Timestamp
+	44,  // 83: clouddeploy.ListVpcRequest.filter:type_name -> clouddeploy.Vpc
+	78,  // 84: clouddeploy.ListVpcRequest.at_time:type_name -> time.RequestAtTime
+	76,  // 85: clouddeploy.ListVpcRequest.field_mask:type_name -> google.protobuf.FieldMask
+	44,  // 86: clouddeploy.ListVpcResponse.vpc:type_name -> clouddeploy.Vpc
+	77,  // 87: clouddeploy.ListVpcResponse.at_time:type_name -> google.protobuf.Timestamp
+	0,   // 88: clouddeploy.Subnet.cp_t:type_name -> clouddeploy.CloudProviderType
+	76,  // 89: clouddeploy.Subnet.field_mask:type_name -> google.protobuf.FieldMask
+	55,  // 90: clouddeploy.AddSubnetRequest.subnet:type_name -> clouddeploy.Subnet
+	55,  // 91: clouddeploy.AddSubnetResponse.subnet:type_name -> clouddeploy.Subnet
+	77,  // 92: clouddeploy.AddSubnetResponse.created_at:type_name -> google.protobuf.Timestamp
+	55,  // 93: clouddeploy.UpdateSubnetRequest.subnet:type_name -> clouddeploy.Subnet
+	55,  // 94: clouddeploy.UpdateSubnetResponse.subnet:type_name -> clouddeploy.Subnet
+	77,  // 95: clouddeploy.UpdateSubnetResponse.at_time:type_name -> google.protobuf.Timestamp
+	55,  // 96: clouddeploy.DeleteSubnetRequest.subnet:type_name -> clouddeploy.Subnet
+	55,  // 97: clouddeploy.GetSubnetRequest.subnet:type_name -> clouddeploy.Subnet
+	77,  // 98: clouddeploy.GetSubnetRequest.at_time:type_name -> google.protobuf.Timestamp
+	55,  // 99: clouddeploy.GetSubnetResponse.subnet:type_name -> clouddeploy.Subnet
+	77,  // 100: clouddeploy.GetSubnetResponse.at_time:type_name -> google.protobuf.Timestamp
+	55,  // 101: clouddeploy.ListSubnetRequest.filter:type_name -> clouddeploy.Subnet
+	78,  // 102: clouddeploy.ListSubnetRequest.at_time:type_name -> time.RequestAtTime
+	76,  // 103: clouddeploy.ListSubnetRequest.field_mask:type_name -> google.protobuf.FieldMask
+	55,  // 104: clouddeploy.ListSubnetResponse.subnet:type_name -> clouddeploy.Subnet
+	77,  // 105: clouddeploy.ListSubnetResponse.at_time:type_name -> google.protobuf.Timestamp
+	76,  // 106: clouddeploy.PathCharacteristics.field_mask:type_name -> google.protobuf.FieldMask
+	0,   // 107: clouddeploy.Path.src_cp_t:type_name -> clouddeploy.CloudProviderType
+	0,   // 108: clouddeploy.Path.dst_cp_t:type_name -> clouddeploy.CloudProviderType
+	2,   // 109: clouddeploy.Path.ul_t:type_name -> clouddeploy.UnderlayConnectionType
+	66,  // 110: clouddeploy.Path.path_char:type_name -> clouddeploy.PathCharacteristics
+	76,  // 111: clouddeploy.Path.field_mask:type_name -> google.protobuf.FieldMask
+	67,  // 112: clouddeploy.GetPathRequest.path:type_name -> clouddeploy.Path
+	77,  // 113: clouddeploy.GetPathRequest.at_time:type_name -> google.protobuf.Timestamp
+	67,  // 114: clouddeploy.GetPathResponse.path:type_name -> clouddeploy.Path
+	77,  // 115: clouddeploy.GetPathResponse.at_time:type_name -> google.protobuf.Timestamp
+	67,  // 116: clouddeploy.ListPathRequest.filter:type_name -> clouddeploy.Path
+	78,  // 117: clouddeploy.ListPathRequest.at_time:type_name -> time.RequestAtTime
+	76,  // 118: clouddeploy.ListPathRequest.field_mask:type_name -> google.protobuf.FieldMask
+	67,  // 119: clouddeploy.ListPathResponse.path:type_name -> clouddeploy.Path
+	77,  // 120: clouddeploy.ListPathResponse.at_time:type_name -> google.protobuf.Timestamp
+	18,  // 121: clouddeploy.Routers.AddRouter:input_type -> clouddeploy.AddRouterRequest
+	20,  // 122: clouddeploy.Routers.UpdateRouter:input_type -> clouddeploy.UpdateRouterRequest
+	22,  // 123: clouddeploy.Routers.DeleteRouter:input_type -> clouddeploy.DeleteRouterRequest
+	24,  // 124: clouddeploy.Routers.GetRouter:input_type -> clouddeploy.GetRouterRequest
+	26,  // 125: clouddeploy.Routers.ListRouter:input_type -> clouddeploy.ListRouterRequest
+	31,  // 126: clouddeploy.Topologyinfos.AddTopologyInfo:input_type -> clouddeploy.AddTopologyInfoRequest
+	33,  // 127: clouddeploy.Topologyinfos.UpdateTopologyInfo:input_type -> clouddeploy.UpdateTopologyInfoRequest
+	35,  // 128: clouddeploy.Topologyinfos.DeleteTopologyInfo:input_type -> clouddeploy.DeleteTopologyInfoRequest
+	37,  // 129: clouddeploy.Topologyinfos.GetTopologyInfo:input_type -> clouddeploy.GetTopologyInfoRequest
+	39,  // 130: clouddeploy.Topologyinfos.ListTopologyInfo:input_type -> clouddeploy.ListTopologyInfoRequest
+	51,  // 131: clouddeploy.Vpcs.GetVpc:input_type -> clouddeploy.GetVpcRequest
+	53,  // 132: clouddeploy.Vpcs.ListVpc:input_type -> clouddeploy.ListVpcRequest
+	45,  // 133: clouddeploy.Vpcs.AddVpc:input_type -> clouddeploy.AddVpcRequest
+	47,  // 134: clouddeploy.Vpcs.UpdateVpc:input_type -> clouddeploy.UpdateVpcRequest
+	49,  // 135: clouddeploy.Vpcs.DeleteVpc:input_type -> clouddeploy.DeleteVpcRequest
+	62,  // 136: clouddeploy.Subnets.GetSubnet:input_type -> clouddeploy.GetSubnetRequest
+	64,  // 137: clouddeploy.Subnets.ListSubnet:input_type -> clouddeploy.ListSubnetRequest
+	56,  // 138: clouddeploy.Subnets.AddSubnet:input_type -> clouddeploy.AddSubnetRequest
+	58,  // 139: clouddeploy.Subnets.UpdateSubnet:input_type -> clouddeploy.UpdateSubnetRequest
+	60,  // 140: clouddeploy.Subnets.DeleteSubnet:input_type -> clouddeploy.DeleteSubnetRequest
+	68,  // 141: clouddeploy.Paths.GetPath:input_type -> clouddeploy.GetPathRequest
+	70,  // 142: clouddeploy.Paths.ListPath:input_type -> clouddeploy.ListPathRequest
+	19,  // 143: clouddeploy.Routers.AddRouter:output_type -> clouddeploy.AddRouterResponse
+	21,  // 144: clouddeploy.Routers.UpdateRouter:output_type -> clouddeploy.UpdateRouterResponse
+	23,  // 145: clouddeploy.Routers.DeleteRouter:output_type -> clouddeploy.DeleteRouterResponse
+	25,  // 146: clouddeploy.Routers.GetRouter:output_type -> clouddeploy.GetRouterResponse
+	27,  // 147: clouddeploy.Routers.ListRouter:output_type -> clouddeploy.ListRouterResponse
+	32,  // 148: clouddeploy.Topologyinfos.AddTopologyInfo:output_type -> clouddeploy.AddTopologyInfoResponse
+	34,  // 149: clouddeploy.Topologyinfos.UpdateTopologyInfo:output_type -> clouddeploy.UpdateTopologyInfoResponse
+	36,  // 150: clouddeploy.Topologyinfos.DeleteTopologyInfo:output_type -> clouddeploy.DeleteTopologyInfoResponse
+	38,  // 151: clouddeploy.Topologyinfos.GetTopologyInfo:output_type -> clouddeploy.GetTopologyInfoResponse
+	40,  // 152: clouddeploy.Topologyinfos.ListTopologyInfo:output_type -> clouddeploy.ListTopologyInfoResponse
+	52,  // 153: clouddeploy.Vpcs.GetVpc:output_type -> clouddeploy.GetVpcResponse
+	54,  // 154: clouddeploy.Vpcs.ListVpc:output_type -> clouddeploy.ListVpcResponse
+	46,  // 155: clouddeploy.Vpcs.AddVpc:output_type -> clouddeploy.AddVpcResponse
+	48,  // 156: clouddeploy.Vpcs.UpdateVpc:output_type -> clouddeploy.UpdateVpcResponse
+	50,  // 157: clouddeploy.Vpcs.DeleteVpc:output_type -> clouddeploy.DeleteVpcResponse
+	63,  // 158: clouddeploy.Subnets.GetSubnet:output_type -> clouddeploy.GetSubnetResponse
+	65,  // 159: clouddeploy.Subnets.ListSubnet:output_type -> clouddeploy.ListSubnetResponse
+	57,  // 160: clouddeploy.Subnets.AddSubnet:output_type -> clouddeploy.AddSubnetResponse
+	59,  // 161: clouddeploy.Subnets.UpdateSubnet:output_type -> clouddeploy.UpdateSubnetResponse
+	61,  // 162: clouddeploy.Subnets.DeleteSubnet:output_type -> clouddeploy.DeleteSubnetResponse
+	69,  // 163: clouddeploy.Paths.GetPath:output_type -> clouddeploy.GetPathResponse
+	71,  // 164: clouddeploy.Paths.ListPath:output_type -> clouddeploy.ListPathResponse
+	143, // [143:165] is the sub-list for method output_type
+	121, // [121:143] is the sub-list for method input_type
+	121, // [121:121] is the sub-list for extension type_name
+	121, // [121:121] is the sub-list for extension extendee
+	0,   // [0:121] is the sub-list for field type_name
+}
+
+func init() { file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_init() }
+func file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_init() {
+	if File_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto != nil {
+		return
+	}
+	if !protoimpl.UnsafeEnabled {
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*RouteTableIds); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*NetworkInterface); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CVInfo); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*AzureRouterDetail); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*AwsRouterDetail); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Router); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*AddRouterRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*AddRouterResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateRouterRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateRouterResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteRouterRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteRouterResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetRouterRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetRouterResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListRouterRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListRouterResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*WanInfo); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ClosInfo); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*TopologyInfo); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*AddTopologyInfoRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*AddTopologyInfoResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateTopologyInfoRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateTopologyInfoResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteTopologyInfoRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteTopologyInfoResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetTopologyInfoRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetTopologyInfoResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListTopologyInfoRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListTopologyInfoResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[29].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*AzureVnetInfo); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*AwsVpcInfo); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[31].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*PeerVpcInfo); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[32].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Vpc); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[33].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*AddVpcRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[34].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*AddVpcResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[35].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateVpcRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[36].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateVpcResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[37].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteVpcRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[38].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteVpcResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[39].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetVpcRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[40].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetVpcResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[41].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListVpcRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[42].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListVpcResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[43].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Subnet); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[44].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*AddSubnetRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[45].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*AddSubnetResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[46].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateSubnetRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[47].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateSubnetResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[48].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteSubnetRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[49].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteSubnetResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[50].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetSubnetRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[51].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetSubnetResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[52].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListSubnetRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[53].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListSubnetResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[54].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*PathCharacteristics); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[55].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Path); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[56].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetPathRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[57].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetPathResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[58].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListPathRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes[59].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListPathResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+	}
+	type x struct{}
+	out := protoimpl.TypeBuilder{
+		File: protoimpl.DescBuilder{
+			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
+			RawDescriptor: file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDesc,
+			NumEnums:      12,
+			NumMessages:   64,
+			NumExtensions: 0,
+			NumServices:   5,
+		},
+		GoTypes:           file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_goTypes,
+		DependencyIndexes: file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_depIdxs,
+		EnumInfos:         file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_enumTypes,
+		MessageInfos:      file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_msgTypes,
+	}.Build()
+	File_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto = out.File
+	file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_rawDesc = nil
+	file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_goTypes = nil
+	file_arista_aeris_service_clouddeploy_api_clouddeploy_v1_clouddeploy_proto_depIdxs = nil
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
-var _ grpc.ClientConn
+var _ grpc.ClientConnInterface
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion4
+const _ = grpc.SupportPackageIsVersion6
 
 // RoutersClient is the client API for Routers service.
 //
@@ -4477,10 +6898,10 @@ type RoutersClient interface {
 }
 
 type routersClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewRoutersClient(cc *grpc.ClientConn) RoutersClient {
+func NewRoutersClient(cc grpc.ClientConnInterface) RoutersClient {
 	return &routersClient{cc}
 }
 
@@ -4565,19 +6986,19 @@ type RoutersServer interface {
 type UnimplementedRoutersServer struct {
 }
 
-func (*UnimplementedRoutersServer) AddRouter(ctx context.Context, req *AddRouterRequest) (*AddRouterResponse, error) {
+func (*UnimplementedRoutersServer) AddRouter(context.Context, *AddRouterRequest) (*AddRouterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddRouter not implemented")
 }
-func (*UnimplementedRoutersServer) UpdateRouter(ctx context.Context, req *UpdateRouterRequest) (*UpdateRouterResponse, error) {
+func (*UnimplementedRoutersServer) UpdateRouter(context.Context, *UpdateRouterRequest) (*UpdateRouterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateRouter not implemented")
 }
-func (*UnimplementedRoutersServer) DeleteRouter(ctx context.Context, req *DeleteRouterRequest) (*DeleteRouterResponse, error) {
+func (*UnimplementedRoutersServer) DeleteRouter(context.Context, *DeleteRouterRequest) (*DeleteRouterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteRouter not implemented")
 }
-func (*UnimplementedRoutersServer) GetRouter(ctx context.Context, req *GetRouterRequest) (*GetRouterResponse, error) {
+func (*UnimplementedRoutersServer) GetRouter(context.Context, *GetRouterRequest) (*GetRouterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRouter not implemented")
 }
-func (*UnimplementedRoutersServer) ListRouter(req *ListRouterRequest, srv Routers_ListRouterServer) error {
+func (*UnimplementedRoutersServer) ListRouter(*ListRouterRequest, Routers_ListRouterServer) error {
 	return status.Errorf(codes.Unimplemented, "method ListRouter not implemented")
 }
 
@@ -4721,10 +7142,10 @@ type TopologyinfosClient interface {
 }
 
 type topologyinfosClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewTopologyinfosClient(cc *grpc.ClientConn) TopologyinfosClient {
+func NewTopologyinfosClient(cc grpc.ClientConnInterface) TopologyinfosClient {
 	return &topologyinfosClient{cc}
 }
 
@@ -4809,19 +7230,19 @@ type TopologyinfosServer interface {
 type UnimplementedTopologyinfosServer struct {
 }
 
-func (*UnimplementedTopologyinfosServer) AddTopologyInfo(ctx context.Context, req *AddTopologyInfoRequest) (*AddTopologyInfoResponse, error) {
+func (*UnimplementedTopologyinfosServer) AddTopologyInfo(context.Context, *AddTopologyInfoRequest) (*AddTopologyInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddTopologyInfo not implemented")
 }
-func (*UnimplementedTopologyinfosServer) UpdateTopologyInfo(ctx context.Context, req *UpdateTopologyInfoRequest) (*UpdateTopologyInfoResponse, error) {
+func (*UnimplementedTopologyinfosServer) UpdateTopologyInfo(context.Context, *UpdateTopologyInfoRequest) (*UpdateTopologyInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateTopologyInfo not implemented")
 }
-func (*UnimplementedTopologyinfosServer) DeleteTopologyInfo(ctx context.Context, req *DeleteTopologyInfoRequest) (*DeleteTopologyInfoResponse, error) {
+func (*UnimplementedTopologyinfosServer) DeleteTopologyInfo(context.Context, *DeleteTopologyInfoRequest) (*DeleteTopologyInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteTopologyInfo not implemented")
 }
-func (*UnimplementedTopologyinfosServer) GetTopologyInfo(ctx context.Context, req *GetTopologyInfoRequest) (*GetTopologyInfoResponse, error) {
+func (*UnimplementedTopologyinfosServer) GetTopologyInfo(context.Context, *GetTopologyInfoRequest) (*GetTopologyInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTopologyInfo not implemented")
 }
-func (*UnimplementedTopologyinfosServer) ListTopologyInfo(req *ListTopologyInfoRequest, srv Topologyinfos_ListTopologyInfoServer) error {
+func (*UnimplementedTopologyinfosServer) ListTopologyInfo(*ListTopologyInfoRequest, Topologyinfos_ListTopologyInfoServer) error {
 	return status.Errorf(codes.Unimplemented, "method ListTopologyInfo not implemented")
 }
 
@@ -4965,10 +7386,10 @@ type VpcsClient interface {
 }
 
 type vpcsClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewVpcsClient(cc *grpc.ClientConn) VpcsClient {
+func NewVpcsClient(cc grpc.ClientConnInterface) VpcsClient {
 	return &vpcsClient{cc}
 }
 
@@ -5053,19 +7474,19 @@ type VpcsServer interface {
 type UnimplementedVpcsServer struct {
 }
 
-func (*UnimplementedVpcsServer) GetVpc(ctx context.Context, req *GetVpcRequest) (*GetVpcResponse, error) {
+func (*UnimplementedVpcsServer) GetVpc(context.Context, *GetVpcRequest) (*GetVpcResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetVpc not implemented")
 }
-func (*UnimplementedVpcsServer) ListVpc(req *ListVpcRequest, srv Vpcs_ListVpcServer) error {
+func (*UnimplementedVpcsServer) ListVpc(*ListVpcRequest, Vpcs_ListVpcServer) error {
 	return status.Errorf(codes.Unimplemented, "method ListVpc not implemented")
 }
-func (*UnimplementedVpcsServer) AddVpc(ctx context.Context, req *AddVpcRequest) (*AddVpcResponse, error) {
+func (*UnimplementedVpcsServer) AddVpc(context.Context, *AddVpcRequest) (*AddVpcResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddVpc not implemented")
 }
-func (*UnimplementedVpcsServer) UpdateVpc(ctx context.Context, req *UpdateVpcRequest) (*UpdateVpcResponse, error) {
+func (*UnimplementedVpcsServer) UpdateVpc(context.Context, *UpdateVpcRequest) (*UpdateVpcResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateVpc not implemented")
 }
-func (*UnimplementedVpcsServer) DeleteVpc(ctx context.Context, req *DeleteVpcRequest) (*DeleteVpcResponse, error) {
+func (*UnimplementedVpcsServer) DeleteVpc(context.Context, *DeleteVpcRequest) (*DeleteVpcResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteVpc not implemented")
 }
 
@@ -5209,10 +7630,10 @@ type SubnetsClient interface {
 }
 
 type subnetsClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewSubnetsClient(cc *grpc.ClientConn) SubnetsClient {
+func NewSubnetsClient(cc grpc.ClientConnInterface) SubnetsClient {
 	return &subnetsClient{cc}
 }
 
@@ -5297,19 +7718,19 @@ type SubnetsServer interface {
 type UnimplementedSubnetsServer struct {
 }
 
-func (*UnimplementedSubnetsServer) GetSubnet(ctx context.Context, req *GetSubnetRequest) (*GetSubnetResponse, error) {
+func (*UnimplementedSubnetsServer) GetSubnet(context.Context, *GetSubnetRequest) (*GetSubnetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSubnet not implemented")
 }
-func (*UnimplementedSubnetsServer) ListSubnet(req *ListSubnetRequest, srv Subnets_ListSubnetServer) error {
+func (*UnimplementedSubnetsServer) ListSubnet(*ListSubnetRequest, Subnets_ListSubnetServer) error {
 	return status.Errorf(codes.Unimplemented, "method ListSubnet not implemented")
 }
-func (*UnimplementedSubnetsServer) AddSubnet(ctx context.Context, req *AddSubnetRequest) (*AddSubnetResponse, error) {
+func (*UnimplementedSubnetsServer) AddSubnet(context.Context, *AddSubnetRequest) (*AddSubnetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddSubnet not implemented")
 }
-func (*UnimplementedSubnetsServer) UpdateSubnet(ctx context.Context, req *UpdateSubnetRequest) (*UpdateSubnetResponse, error) {
+func (*UnimplementedSubnetsServer) UpdateSubnet(context.Context, *UpdateSubnetRequest) (*UpdateSubnetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateSubnet not implemented")
 }
-func (*UnimplementedSubnetsServer) DeleteSubnet(ctx context.Context, req *DeleteSubnetRequest) (*DeleteSubnetResponse, error) {
+func (*UnimplementedSubnetsServer) DeleteSubnet(context.Context, *DeleteSubnetRequest) (*DeleteSubnetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteSubnet not implemented")
 }
 
@@ -5450,10 +7871,10 @@ type PathsClient interface {
 }
 
 type pathsClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewPathsClient(cc *grpc.ClientConn) PathsClient {
+func NewPathsClient(cc grpc.ClientConnInterface) PathsClient {
 	return &pathsClient{cc}
 }
 
@@ -5508,10 +7929,10 @@ type PathsServer interface {
 type UnimplementedPathsServer struct {
 }
 
-func (*UnimplementedPathsServer) GetPath(ctx context.Context, req *GetPathRequest) (*GetPathResponse, error) {
+func (*UnimplementedPathsServer) GetPath(context.Context, *GetPathRequest) (*GetPathResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPath not implemented")
 }
-func (*UnimplementedPathsServer) ListPath(req *ListPathRequest, srv Paths_ListPathServer) error {
+func (*UnimplementedPathsServer) ListPath(*ListPathRequest, Paths_ListPathServer) error {
 	return status.Errorf(codes.Unimplemented, "method ListPath not implemented")
 }
 

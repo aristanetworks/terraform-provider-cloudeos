@@ -86,8 +86,8 @@ func cloudeosClos() *schema.Resource {
 
 func cloudeosClosCreate(d *schema.ResourceData, m interface{}) error {
 	provider := m.(CloudeosProvider)
-	duplicate, err := provider.CheckForTopologyDuplicates(d, "TOPO_INFO_CLOS")
-	if duplicate || err != nil {
+	allowed, err := provider.IsValidTopoAddition(d, "TOPO_INFO_CLOS")
+	if !allowed || err != nil {
 		return err
 	}
 	err = provider.AddClosTopology(d)

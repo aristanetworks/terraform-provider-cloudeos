@@ -36,7 +36,18 @@ func TestResourceTopology(t *testing.T) {
 				Config:      testInvalidDPSCidr,
 				ExpectError: regexp.MustCompile("is not a valid CIDR"),
 			},
-
+			{
+				Config:      testInvaliddDeployModeValue,
+				ExpectError: regexp.MustCompile("Valid options for deploy mode in"),
+			},
+			{
+				Config:      testBgpAsnWithProvisionDeployMode,
+				ExpectError: regexp.MustCompile("bgp_asn should not be specified"),
+			},
+			{
+				Config:      testMissingAttributesForDefaultDeployMode,
+				ExpectError: regexp.MustCompile("is a required variable for cloudeos_topology"),
+			},
 			{
 				Config: testResourceInitialTopologyConfig,
 				Check:  testResourceInitialTopologyCheck,
@@ -58,7 +69,64 @@ provider "cloudeos" {
 }
 
 resource "cloudeos_topology" "topology2" {
+   topology_name = "topo-test26"
+   bgp_asn = "65000-65100"
+   vtep_ip_cidr = "1.0.0.0/16"
+   terminattr_ip_cidr = "2.0.0.0/16"
+   dps_controlplane_cidr = "3.0.0.0/16"
+}
+
+`, os.Getenv("token"))
+
+// When deploy_mode is unspecified/ defaults to empty, ensure
+// that terminattr_ip_cidr, dps_controlplane_cidr, bgp_asn,
+// vtep_ip_cidr are specified, since they are required
+var testMissingAttributesForDefaultDeployMode = fmt.Sprintf(`
+provider "cloudeos" {
+  cvaas_domain = "apiserver.cv-play.corp.arista.io"
+  cvaas_server = "www.cv-play.corp.arista.io"
+  // clouddeploy token
+  service_account_web_token = %q
+}
+
+resource "cloudeos_topology" "topology2" {
    topology_name = "topo-test2"
+   bgp_asn = "65000-65100"
+}
+
+`, os.Getenv("token"))
+
+// When deploy_mode = provision, bgp_asn, vtep_ip_cidr,
+// terminattr_ip_cidr, dps_controlplane_cidr are not allowed
+var testBgpAsnWithProvisionDeployMode = fmt.Sprintf(`
+provider "cloudeos" {
+  cvaas_domain = "apiserver.cv-play.corp.arista.io"
+  cvaas_server = "www.cv-play.corp.arista.io"
+  // clouddeploy token
+  service_account_web_token = %q
+}
+
+resource "cloudeos_topology" "topology2" {
+   topology_name = "topo-test2"
+   bgp_asn = "65000-65100"
+   deploy_mode = "PROvision"
+}
+
+`, os.Getenv("token"))
+
+// Only 'provision' for deploy_mode is supported,
+// validated at the backend
+var testInvaliddDeployModeValue = fmt.Sprintf(`
+provider "cloudeos" {
+  cvaas_domain = "apiserver.cv-play.corp.arista.io"
+  cvaas_server = "www.cv-play.corp.arista.io"
+  // clouddeploy token
+  service_account_web_token = %q
+}
+
+resource "cloudeos_topology" "topology2" {
+   topology_name = "topo-test97"
+   deploy_mode = "randommode"
    bgp_asn = "65000-65100"
    vtep_ip_cidr = "1.0.0.0/16"
    terminattr_ip_cidr = "2.0.0.0/16"

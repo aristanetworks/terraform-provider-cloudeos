@@ -211,13 +211,15 @@ func (p *CloudeosProvider) getDeviceEnrollmentToken() (string, error) {
 	return "", errors.New("Token key not found in AddEnrollmentToken response")
 }
 
-//CheckForTopologyDuplicates check if there already exists an entry in CVaaS
-func (p *CloudeosProvider) CheckForTopologyDuplicates(d *schema.ResourceData,
+//IsValidTopoAddition checks if there already exists an entry in CVaaS by
+//the given topo name and that clos topo are not added when deploy mode for the
+//corresponding meta topo is provision
+func (p *CloudeosProvider) IsValidTopoAddition(d *schema.ResourceData,
 	topoType string) (bool, error) {
 	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
-		log.Printf("Failed to create new CVaaS client to execute CheckForTopologyDuplicates")
-		return true, err
+		log.Printf("Failed to create new CVaaS client to execute IsValidTopoAddition")
+		return false, err
 	}
 	defer client.wrpcClient.Close()
 
@@ -225,7 +227,7 @@ func (p *CloudeosProvider) CheckForTopologyDuplicates(d *schema.ResourceData,
 	wanName := ""
 	topoName := d.Get("topology_name").(string)
 	if topoName == "" {
-		return true, fmt.Errorf("Topology name isn't set")
+		return false, fmt.Errorf("Topology name isn't set")
 	}
 	if topoType == "TOPO_INFO_CLOS" {
 		closName = d.Get("name").(string)
@@ -239,7 +241,7 @@ func (p *CloudeosProvider) CheckForTopologyDuplicates(d *schema.ResourceData,
 	fieldMask, err := getOuterFieldMask(topoInfo)
 	if err != nil {
 		log.Print("ListTopology: Failed to get field mask")
-		return true, err
+		return false, err
 	}
 	topoInfo.FieldMask = fieldMask
 
@@ -261,7 +263,7 @@ func (p *CloudeosProvider) CheckForTopologyDuplicates(d *schema.ResourceData,
 
 	err = client.wrpcClient.WriteJSON(request)
 	if err != nil {
-		return true, fmt.Errorf("Failed to send %s request to CVaaS : %s",
+		return false, fmt.Errorf("Failed to send %s request to CVaaS : %s",
 			request.Params["method"].(string), err)
 	}
 
@@ -270,7 +272,7 @@ func (p *CloudeosProvider) CheckForTopologyDuplicates(d *schema.ResourceData,
 		// read respose from clouddeploy
 		err = client.wrpcClient.ReadJSON(&resp)
 		if err != nil {
-			return true, fmt.Errorf("Failed to get %s response from CVaaS, Error: %v",
+			return false, fmt.Errorf("Failed to get %s response from CVaaS, Error: %v",
 				request.Params["method"].(string), err)
 		}
 		log.Printf("Received ListTopology Resp: %v", resp)
@@ -283,32 +285,42 @@ func (p *CloudeosProvider) CheckForTopologyDuplicates(d *schema.ResourceData,
 							if topo["name"] == topoName && topo["topo_type"] == topoType {
 								if wan, ok := topo["wan_info"].(map[string]interface{}); ok {
 									if wan["wan_name"] == wanName {
-										return true, fmt.Errorf("cloudeos_wan %s already exists",
+										return false, fmt.Errorf("cloudeos_wan %s already exists",
 											wanName)
 									}
 								} else if clos, ok :=
 									topo["clos_info"].(map[string]interface{}); ok {
 									if clos["clos_name"] == closName {
-										return true, fmt.Errorf("cloudeos_clos %s already exists",
+										return false, fmt.Errorf("cloudeos_clos %s already exists",
 											closName)
 									}
 								} else {
-									return true, fmt.Errorf("cloudeos_topology %s already exists",
+									return false, fmt.Errorf("cloudeos_topology %s already exists",
 										topoName)
 								}
+							}
+							// Find the meta topo for the given clos topo (same name). If the
+							// deploy mode for meta is provision, disallow addition of the clos,
+							// since we only allow wan topo in provision mode
+							if topo["name"] == topoName && topo["topo_type"] == "TOPO_INFO_META" &&
+								topoType == "TOPO_INFO_CLOS" && topo["deploy_mode"] == "provision" {
+
+								return false, fmt.Errorf("cloudeos_clos cannot be associated with"+
+									" a cloudeos_topology resource (%s) that has deploy_mode"+
+									" as provision", topoName)
 							}
 						}
 					}
 				}
 			} else {
-				return true, fmt.Errorf("couldn't parse the ListTopology response from CVaaS")
+				return false, fmt.Errorf("couldn't parse the ListTopology response from CVaaS")
 			}
 		}
 		if _, ok := resp["error"].(string); ok {
 			break
 		}
 	}
-	return false, nil
+	return true, nil
 }
 
 //AddVpcConfig adds VPC resource to Aeris
@@ -322,6 +334,7 @@ func (p *CloudeosProvider) AddVpcConfig(d *schema.ResourceData) error {
 
 	vpcName, cpType := getCpTypeAndVpcName(d)
 	roleType := getRoleType(d.Get("role").(string))
+
 	vpc := &api.Vpc{
 		Name:         vpcName,
 		Id:           d.Get("tf_id").(string),
@@ -332,6 +345,7 @@ func (p *CloudeosProvider) AddVpcConfig(d *schema.ResourceData) error {
 		ClosName:     d.Get("clos_name").(string),
 		WanName:      d.Get("wan_name").(string),
 		Cnps:         d.Get("cnps").(string),
+		DeployMode:   strings.ToLower(d.Get("deploy_mode").(string)),
 	}
 
 	fieldMask, err := getOuterFieldMask(vpc)
@@ -798,6 +812,10 @@ func (p *CloudeosProvider) AddVpc(d *schema.ResourceData) error {
 
 	roleType := getRoleType(d.Get("role").(string))
 	vpcName, cpType := getCpTypeAndVpcName(d)
+
+	// Note that the deploy_mode for vpc status MUST be the same as vpc config,
+	// resource, ensured by the modules, which use the vpc config resource var
+	// to set the deployMode var for vpc status
 	vpc := &api.Vpc{
 		Name:         vpcName,
 		Id:           d.Get("tf_id").(string),
@@ -810,6 +828,7 @@ func (p *CloudeosProvider) AddVpc(d *schema.ResourceData) error {
 		WanName:      d.Get("wan_name").(string),
 		Cnps:         d.Get("cnps").(string),
 		Account:      d.Get("account").(string),
+		DeployMode:   strings.ToLower(d.Get("deploy_mode").(string)),
 	}
 
 	fieldMask, err := getOuterFieldMask(vpc)
@@ -968,6 +987,8 @@ func (p *CloudeosProvider) ListTopology(d *schema.ResourceData) error {
 	var wanTopoExist bool  // true if wan topology exists in Aeris
 
 	resp := make(map[string]interface{})
+	var topoDeployMode string
+
 	for {
 		// read respose from clouddeploy
 		err = client.wrpcClient.ReadJSON(&resp)
@@ -987,6 +1008,7 @@ func (p *CloudeosProvider) ListTopology(d *schema.ResourceData) error {
 							if topo["name"] == topoName &&
 								topo["topo_type"] == "TOPO_INFO_META" {
 								metaTopoExist = true
+								topoDeployMode = topo["deploy_mode"].(string)
 							}
 							if topo["name"] == topoName &&
 								topo["topo_type"] == "TOPO_INFO_WAN" {
@@ -1016,6 +1038,8 @@ func (p *CloudeosProvider) ListTopology(d *schema.ResourceData) error {
 
 	role := d.Get("role").(string)
 	var errStr string
+	// No vpc with role CloudLeaf can be created in provision deploy mode, so we
+	// don't do anything special for it
 	if strings.EqualFold("CloudLeaf", role) {
 		if metaTopoExist && closTopoExist {
 			return nil
@@ -1027,17 +1051,27 @@ func (p *CloudeosProvider) ListTopology(d *schema.ResourceData) error {
 			errStr = errStr + "Resource cloudeos_clos " + closName + " does not exist."
 		}
 	} else if strings.EqualFold("CloudEdge", role) {
-		if metaTopoExist && wanTopoExist && closTopoExist {
+		// For vpc with role CloudEdge created with deploy_mode provision, we only
+		// allow for wan topo, so we skip the closTopo exist check
+		if topoDeployMode == "provision" {
+			if metaTopoExist && wanTopoExist {
+				return nil
+			}
+		} else if metaTopoExist && wanTopoExist && closTopoExist {
 			return nil
 		}
+
 		if !metaTopoExist {
 			errStr = errStr + "Resource cloudeos_topology " + topoName + " does not exist. "
 		}
-		if !closTopoExist {
-			errStr = errStr + "Resource cloudeos_clos " + closName + " does not exist. "
-		}
+
 		if !wanTopoExist {
 			errStr = errStr + "Resource cloudeos_wan " + wanName + " does not exist."
+		}
+
+		// Note that if deploy mode = provision, we'll never get here, as desired
+		if !closTopoExist {
+			errStr = errStr + "Resource cloudeos_clos " + closName + " does not exist. "
 		}
 	}
 	log.Printf("metaTopoExist: %v", metaTopoExist)
@@ -1140,9 +1174,10 @@ func (p *CloudeosProvider) AddTopology(d *schema.ResourceData) error {
 	}
 	defer client.wrpcClient.Close()
 
-	// get bgp asn
+	// bgp_asn is not needed when deploy_mode = 'provision'
+	deployMode := d.Get("deploy_mode").(string)
 	asnLow, asnHigh, err := getBgpAsn(d.Get("bgp_asn").(string))
-	if err != nil {
+	if err != nil && deployMode != "provision" {
 		log.Printf("[CVaaS-ERROR]Failed to parse bgp asn")
 		return err
 	}
@@ -1170,6 +1205,7 @@ func (p *CloudeosProvider) AddTopology(d *schema.ResourceData) error {
 		ManagedDevices:      managedDevices,
 		CvaasDomain:         p.cvaasDomain,
 		CvaasServer:         p.server,
+		DeployMode:          deployMode,
 	}
 
 	fieldMask, err := getOuterFieldMask(topoInfo)
@@ -1845,7 +1881,7 @@ func (p *CloudeosProvider) GetRouter(d *schema.ResourceData) error {
 	return nil
 }
 
-func (p *CloudeosProvider) GetRouterStatus(d *schema.ResourceData) error {
+func (p *CloudeosProvider) GetRouterStatusAndSetBgpAsn(d *schema.ResourceData) error {
 	resp, err := p.GetRouterResponse(d)
 	if err != nil {
 		return err
@@ -2007,6 +2043,7 @@ func (p *CloudeosProvider) AddRouterConfig(d *schema.ResourceData) error {
 		DeviceEnrollmentToken: enrollmentToken,
 		RouteReflector:        d.Get("is_rr").(bool),
 		Intf:                  intfs,
+		DeployMode:            strings.ToLower(d.Get("deploy_mode").(string)),
 	}
 
 	fieldMask, err := getOuterFieldMask(rtr)
@@ -2298,6 +2335,7 @@ func (p *CloudeosProvider) AddRouter(d *schema.ResourceData) error {
 		RtTableIds:     routeTableList,
 		RouteReflector: d.Get("is_rr").(bool),
 		HaName:         d.Get("ha_name").(string),
+		DeployMode:     strings.ToLower(d.Get("deploy_mode").(string)),
 	}
 
 	fieldMask, err := getOuterFieldMask(rtr)

@@ -1,6 +1,7 @@
 package cloudeos
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -11,6 +12,21 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
+
+// Given a ResourceData with 'role' and 'deploy_mode' attributes,
+// this shall specify whether the deploy_mode value is valid
+// for the given role. Currently, when deploy_mode ='provision'
+// we only accept resources with role = 'CloudEdge'
+func validateDeployModeWithRole(d *schema.ResourceData) error {
+
+	deployMode := strings.ToLower(d.Get("deploy_mode").(string))
+	role := d.Get("role").(string)
+	if deployMode == "provision" && strings.EqualFold("CloudLeaf", role) {
+		return errors.New("Deploy mode provision is only applicable to " +
+			"resources with role CloudEdge")
+	}
+	return nil
+}
 
 func getCloudProviderType(d *schema.ResourceData) api.CloudProviderType {
 	cloudProvider := d.Get("cloud_provider").(string)
@@ -96,14 +112,24 @@ func getAndCreateRouteTableIDs(d *schema.ResourceData) *api.RouteTableIds {
 }
 
 func getBgpAsn(bgpAsnRange string) (uint32, uint32, error) {
+	if bgpAsnRange == "" {
+		log.Printf("[CVaaS-ERROR] bgp_asn cannot be empty")
+		return uint32(0), uint32(0), errors.New("bgp_asn is empty")
+	}
 	asnRange := strings.Split(bgpAsnRange, "-")
+	if len(asnRange) != 2 {
+		log.Printf("[CVaaS-ERROR] Can't parse bgp_asn")
+		return uint32(0), uint32(0), errors.New("Can't parse bgp_asn")
+	}
 	asnLow, err := strconv.ParseUint(asnRange[0], 10, 32)
 	if err != nil {
 		log.Printf("[CVaaS-ERROR]Can't parse bgp asn")
+		return uint32(0), uint32(0), err
 	}
 	asnHigh, err := strconv.ParseUint(asnRange[1], 10, 32)
 	if err != nil {
 		log.Printf("[CVaaS-ERROR]Can't parse bgp asn")
+		return uint32(0), uint32(0), err
 	}
 	log.Printf("[CVaaS-INFO]Bgp Asn Range %v - %v", asnLow, asnHigh)
 	return uint32(asnLow), uint32(asnHigh), err

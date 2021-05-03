@@ -161,6 +161,12 @@ func cloudeosRouterConfig() *schema.Resource {
 				Computed: true,
 				Type:     schema.TypeString,
 			},
+			"deploy_mode": {
+				Type:             schema.TypeString,
+				Optional:         true,
+				DiffSuppressFunc: suppressAttributeChange,
+				Description:      "Deployment mode for the resources: provision or empty",
+			},
 		},
 	}
 }
@@ -168,11 +174,16 @@ func cloudeosRouterConfig() *schema.Resource {
 func cloudeosRouterConfigCreate(d *schema.ResourceData, m interface{}) error {
 	//TBD: Call ListVpc to get deployment type( not needed for EFT )
 
+	err := validateDeployModeWithRole(d)
+	if err != nil {
+		return err
+	}
+
 	provider := m.(CloudeosProvider)
 
 	//Retry ListVpc to check VPC is present in Aeris before Router.
 
-	err := resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
+	err = resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
 		err := provider.CheckVpcPresence(d)
 		if err != nil {
 			return resource.RetryableError(err)

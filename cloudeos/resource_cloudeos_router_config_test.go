@@ -7,6 +7,7 @@ package cloudeos
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"testing"
 
 	r "github.com/hashicorp/terraform-plugin-sdk/helper/resource"
@@ -20,6 +21,10 @@ func TestResourceRouterConfig(t *testing.T) {
 		CheckDestroy: testResourceRouterConfigDestroy,
 		Steps: []r.TestStep{
 			{
+				Config:      testLeafRtrConfigInProvisionMode,
+				ExpectError: regexp.MustCompile("only applicable to resources with role CloudEdge"),
+			},
+			{
 				Config: testResourceIntialRouterConfig,
 				Check:  testResourceIntialRouterCheck,
 			},
@@ -30,6 +35,94 @@ func TestResourceRouterConfig(t *testing.T) {
 		},
 	})
 }
+
+var testLeafRtrConfigInProvisionMode = fmt.Sprintf(`
+provider "cloudeos" {
+  cvaas_domain = "apiserver.cv-play.corp.arista.io"
+  cvaas_server = "www.cv-play.corp.arista.io"
+  // clouddeploy token
+  service_account_web_token = %q
+}
+
+resource "cloudeos_topology" "topology" {
+   topology_name = "topo-test25"
+   deploy_mode = "provision"
+}
+
+resource "cloudeos_wan" "wan" {
+   name = "wan-test25"
+   topology_name = cloudeos_topology.topology.topology_name
+   cv_container_name = "CloudEdge"
+}
+
+resource "cloudeos_vpc_config" "vpc" {
+  cloud_provider = "aws"
+  topology_name = cloudeos_topology.topology.topology_name
+  wan_name = cloudeos_wan.wan.name
+  role = "CloudLeaf"
+  cnps = ""
+  tags = {
+       Name = "edgeVpc"
+  }
+  region = "us-west-1"
+  deploy_mode = "provision"
+}
+
+resource "cloudeos_vpc_status" "vpc" {
+  cloud_provider = cloudeos_vpc_config.vpc.cloud_provider
+  vpc_id = "vpc-dummy"
+  security_group_id = "sg-dummy"
+  cidr_block = "11.0.0.0/16"
+  igw = "egdeVpcigw"
+  cnps = ""
+  role = cloudeos_vpc_config.vpc.role
+  topology_name = cloudeos_topology.topology.topology_name
+  tags = cloudeos_vpc_config.vpc.tags
+  wan_name = cloudeos_wan.wan.name
+  region = cloudeos_vpc_config.vpc.region
+  account = "dummy_aws_account"
+  tf_id = cloudeos_vpc_config.vpc.tf_id
+  deploy_mode = "provision"
+}
+
+resource "cloudeos_subnet" "subnet" {
+  cloud_provider = cloudeos_vpc_status.vpc.cloud_provider
+  vpc_id = cloudeos_vpc_status.vpc.vpc_id
+  availability_zone = "us-west-1b"
+  subnet_id = "subnet-id"
+  cidr_block = "11.0.0.0/24"
+  subnet_name = "edgeSubnet0"
+}
+
+resource "cloudeos_subnet" "subnet1" {
+  cloud_provider = cloudeos_vpc_status.vpc.cloud_provider
+  vpc_id = cloudeos_vpc_status.vpc.vpc_id
+  availability_zone = "us-west-1c"
+  subnet_id = "subnet-id1"
+  cidr_block = "11.0.1.0/24"
+  subnet_name = "edgeSubnet1"
+}
+
+resource "cloudeos_router_config" "cloudeos" {
+  cloud_provider = cloudeos_vpc_status.vpc.cloud_provider
+  topology_name = cloudeos_topology.topology.topology_name
+  role = cloudeos_vpc_config.vpc.role
+  vpc_id = cloudeos_vpc_status.vpc.vpc_id
+  cnps = ""
+  tags = {
+    "Name" = "edgeRoutercloudeos1"
+  }
+  region = cloudeos_vpc_config.vpc.region
+  is_rr = false
+  ami = "dummy-aws-machine-image"
+  key_name = "foo"
+  availability_zone = "us-west-1c"
+  intf_name = ["edgecloudeos1Intf0", "edgecloudeos1Intf1"]
+  intf_private_ip = ["11.0.0.101", "11.0.1.101"]
+  intf_type = ["public", "internal"]
+  deploy_mode = "provision"
+}
+`, os.Getenv("token"))
 
 var testResourceIntialRouterConfig = fmt.Sprintf(`
 provider "cloudeos" {
@@ -79,7 +172,7 @@ resource "cloudeos_vpc_status" "vpc" {
   security_group_id = "sg-dummy"
   cidr_block = "11.0.0.0/16"
   igw = "egdeVpcigw"
-  role = cloudeos_vpc_config.vpc.role  
+  role = cloudeos_vpc_config.vpc.role
   topology_name = cloudeos_topology.topology.topology_name
   tags = cloudeos_vpc_config.vpc.tags
   clos_name = cloudeos_clos.clos.name

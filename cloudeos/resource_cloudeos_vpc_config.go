@@ -163,6 +163,11 @@ func cloudeosVpcConfig() *schema.Resource {
 				Computed: true,
 				Type:     schema.TypeString,
 			},
+			"deploy_mode": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Deploy mode for the routers: empty for default or provision",
+			},
 		},
 	}
 }
@@ -170,12 +175,18 @@ func cloudeosVpcConfig() *schema.Resource {
 func cloudeosVpcConfigCreate(d *schema.ResourceData, m interface{}) error {
 	provider := m.(CloudeosProvider)
 
-	err := resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
+	err := validateDeployModeWithRole(d)
+	if err != nil {
+		return err
+	}
+
+	err = resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
 		if err := provider.ListTopology(d); err != nil {
 			return resource.RetryableError(err)
 		}
 		return nil
 	})
+
 	if err != nil {
 		return err
 	}

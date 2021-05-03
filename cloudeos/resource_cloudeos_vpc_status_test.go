@@ -7,6 +7,7 @@ package cloudeos
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"testing"
 
 	r "github.com/hashicorp/terraform-plugin-sdk/helper/resource"
@@ -20,6 +21,10 @@ func TestResourceVpcStatus(t *testing.T) {
 		CheckDestroy: testResourceVpcStatusDestroy,
 		Steps: []r.TestStep{
 			{
+				Config:      testLeafVpcStatusInProvisionMode,
+				ExpectError: regexp.MustCompile("only applicable to resources with role CloudEdge"),
+			},
+			{
 				Config: testResourceInitialVpcStatusConfig,
 				Check:  testResourceInitialVpcStatusConfigCheck,
 			},
@@ -30,6 +35,56 @@ func TestResourceVpcStatus(t *testing.T) {
 		},
 	})
 }
+
+var testLeafVpcStatusInProvisionMode = fmt.Sprintf(`
+provider "cloudeos" {
+  cvaas_domain = "apiserver.cv-play.corp.arista.io"
+  cvaas_server = "www.cv-play.corp.arista.io"
+  // clouddeploy token
+  service_account_web_token = %q
+}
+
+resource "cloudeos_topology" "topology" {
+   topology_name = "topo-test5"
+   deploy_mode = "provision"
+}
+
+resource "cloudeos_wan" "wan" {
+   name = "wan-test5"
+   topology_name = cloudeos_topology.topology.topology_name
+   cv_container_name = "CloudEdge"
+}
+
+resource "cloudeos_vpc_config" "vpc" {
+  cloud_provider = "aws"
+  topology_name = cloudeos_topology.topology.topology_name
+  wan_name = cloudeos_wan.wan.name
+  role = "CloudLeaf"
+  cnps = ""
+  tags = {
+       Name = "edgeVpc"
+  }
+  region = "us-west-1"
+  deploy_mode ="provision"
+}
+
+resource "cloudeos_vpc_status" "vpc" {
+  cloud_provider = cloudeos_vpc_config.vpc.cloud_provider
+  vpc_id = "vpc-dummy"
+  security_group_id = "sg-dummy"
+  cidr_block = "11.0.0.0/16"
+  igw = "egdeVpcigw"
+  cnps = ""
+  role = cloudeos_vpc_config.vpc.role
+  topology_name = cloudeos_topology.topology.topology_name
+  tags = cloudeos_vpc_config.vpc.tags
+  wan_name = cloudeos_wan.wan.name
+  region = cloudeos_vpc_config.vpc.region
+  account = "dummy_aws_account"
+  tf_id = cloudeos_vpc_config.vpc.tf_id
+  deploy_mode = "provision"
+}
+`, os.Getenv("token"))
 
 var testResourceInitialVpcStatusConfig = fmt.Sprintf(`
 provider "cloudeos" {
@@ -79,7 +134,7 @@ resource "cloudeos_vpc_status" "vpc" {
   security_group_id = "sg-dummy"
   cidr_block = "11.0.0.0/16"
   igw = "egdeVpcigw"
-  role = cloudeos_vpc_config.vpc.role  
+  role = cloudeos_vpc_config.vpc.role
   topology_name = cloudeos_topology.topology.topology_name
   tags = cloudeos_vpc_config.vpc.tags
   clos_name = cloudeos_clos.clos.name

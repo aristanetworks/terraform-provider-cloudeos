@@ -7,6 +7,7 @@ package cloudeos
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"testing"
 
 	r "github.com/hashicorp/terraform-plugin-sdk/helper/resource"
@@ -20,6 +21,10 @@ func TestResourceVpcConfig(t *testing.T) {
 		CheckDestroy: testResourceVpcConfigDestroy,
 		Steps: []r.TestStep{
 			{
+				Config:      testLeafVpcConfigInProvisionMode,
+				ExpectError: regexp.MustCompile("only applicable to resources with role CloudEdge"),
+			},
+			{
 				Config: testResourceInitialVpcConfig,
 				Check:  testResourceInitialVpcConfigCheck,
 			},
@@ -30,6 +35,42 @@ func TestResourceVpcConfig(t *testing.T) {
 		},
 	})
 }
+
+// Note that in an actual deployment, deploy_mode in
+// cloudeos_vpc_config will be copied from cloudeos_topology
+// in the modules
+var testLeafVpcConfigInProvisionMode = fmt.Sprintf(`
+provider "cloudeos" {
+  cvaas_domain = "apiserver.cv-play.corp.arista.io"
+  cvaas_server = "www.cv-play.corp.arista.io"
+  // clouddeploy token
+  service_account_web_token = %q
+}
+
+resource "cloudeos_topology" "topology" {
+   topology_name = "topo-test32"
+   deploy_mode = "provision"
+}
+
+resource "cloudeos_wan" "wan" {
+   name = "wan-test32"
+   topology_name = cloudeos_topology.topology.topology_name
+   cv_container_name = "CloudEdge"
+}
+
+resource "cloudeos_vpc_config" "vpc" {
+  cloud_provider = "aws"
+  topology_name = cloudeos_topology.topology.topology_name
+  wan_name = cloudeos_wan.wan.name
+  role = "CloudLeaf"
+  cnps = ""
+  tags = {
+       Name = "edgeVpc"
+  }
+  region = "us-west-1"
+  deploy_mode = "provision"
+}
+`, os.Getenv("token"))
 
 var testResourceInitialVpcConfig = fmt.Sprintf(`
 provider "cloudeos" {

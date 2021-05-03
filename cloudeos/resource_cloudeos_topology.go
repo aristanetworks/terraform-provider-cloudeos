@@ -35,27 +35,27 @@ func cloudeosTopology() *schema.Resource {
 			},
 			"bgp_asn": {
 				Type:             schema.TypeString,
-				Required:         true,
+				Optional:         true,
 				Description:      "Range, a-b, of BGP ASN’s used for topology",
 				DiffSuppressFunc: suppressAttributeChange,
 			},
 			"vtep_ip_cidr": {
 				Type:             schema.TypeString,
-				Required:         true,
+				Optional:         true,
 				Description:      "CIDR block for VTEP IPs on cloudeos",
 				ValidateFunc:     validateCIDRBlock,
 				DiffSuppressFunc: suppressAttributeChange,
 			},
 			"terminattr_ip_cidr": {
 				Type:             schema.TypeString,
-				Required:         true,
+				Optional:         true,
 				Description:      "Loopback IP range on cloudeos",
 				ValidateFunc:     validateCIDRBlock,
 				DiffSuppressFunc: suppressAttributeChange,
 			},
 			"dps_controlplane_cidr": {
 				Type:             schema.TypeString,
-				Required:         true,
+				Optional:         true,
 				Description:      "CIDR block for TerminAttr IPs on cloudeos",
 				ValidateFunc:     validateCIDRBlock,
 				DiffSuppressFunc: suppressAttributeChange,
@@ -71,15 +71,50 @@ func cloudeosTopology() *schema.Resource {
 				Computed: true,
 				Type:     schema.TypeString,
 			},
+			"deploy_mode": {
+				Type:             schema.TypeString,
+				Optional:         true,
+				DiffSuppressFunc: suppressAttributeChange,
+				Default:          "",
+				Description:      "Deployment type of the topology - provision or empty",
+			},
 		},
 	}
 }
 
+func validateInputVarsAgainstDeployMode(d *schema.ResourceData, deployMode string) error {
+	unexpectedVarsForProvisionMode := []string{"dps_controlplane_cidr", "terminattr_ip_cidr",
+		"vtep_ip_cidr", "bgp_asn"}
+
+	if strings.ToLower(deployMode) == "provision" {
+		for _, inputVar := range unexpectedVarsForProvisionMode {
+			if d.Get(inputVar).(string) != "" {
+				return errors.New(inputVar + " should not be specified for a topology with " +
+					"deploy mode provision")
+			}
+		}
+	} else {
+		// Ensure that the needed variables are present if deploy mode is not provision
+		for _, inputVar := range unexpectedVarsForProvisionMode {
+			if d.Get(inputVar).(string) == "" {
+				return errors.New(inputVar + " is a required variable for cloudeos_topology")
+			}
+		}
+	}
+	return nil
+}
+
 func cloudeosTopologyCreate(d *schema.ResourceData, m interface{}) error {
 	provider := m.(CloudeosProvider)
-	//Check for duplicates only for Add and not for Updates.
-	duplicate, err := provider.CheckForTopologyDuplicates(d, "TOPO_INFO_META")
-	if duplicate || err != nil {
+
+	deployMode := d.Get("deploy_mode").(string)
+	err := validateInputVarsAgainstDeployMode(d, deployMode)
+	if err != nil {
+		return err
+	}
+
+	allowed, err := provider.IsValidTopoAddition(d, "TOPO_INFO_META")
+	if !allowed || err != nil {
 		return err
 	}
 	err = provider.AddTopology(d)

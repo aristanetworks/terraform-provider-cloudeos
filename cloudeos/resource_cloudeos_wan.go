@@ -71,8 +71,8 @@ func cloudeosWan() *schema.Resource {
 
 func cloudeosWanCreate(d *schema.ResourceData, m interface{}) error {
 	provider := m.(CloudeosProvider)
-	duplicate, err := provider.CheckForTopologyDuplicates(d, "TOPO_INFO_WAN")
-	if duplicate || err != nil {
+	allowed, err := provider.IsValidTopoAddition(d, "TOPO_INFO_WAN")
+	if !allowed || err != nil {
 		return err
 	}
 

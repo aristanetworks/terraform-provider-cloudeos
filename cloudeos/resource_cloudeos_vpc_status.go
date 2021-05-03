@@ -125,13 +125,24 @@ func cloudeosVpcStatus() *schema.Resource {
 				Required:    true,
 				Description: "The unique identifier of the account",
 			},
+			"deploy_mode": {
+				Type:             schema.TypeString,
+				Optional:         true,
+				DiffSuppressFunc: suppressAttributeChange,
+				Description:      "Deployment mode for the resources: provision or empty",
+			},
 		},
 	}
 }
 
 func cloudeosVpcStatusCreate(d *schema.ResourceData, m interface{}) error {
+	err := validateDeployModeWithRole(d)
+	if err != nil {
+		return err
+	}
+
 	provider := m.(CloudeosProvider)
-	err := provider.AddVpc(d)
+	err = provider.AddVpc(d)
 	if err != nil {
 		return err
 	}

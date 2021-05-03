@@ -169,6 +169,12 @@ func cloudeosRouterStatus() *schema.Resource {
 				Optional:    true,
 				Description: "BGP ASN computed on the CloudEOS Router",
 			},
+			"deploy_mode": {
+				Type:             schema.TypeString,
+				Optional:         true,
+				DiffSuppressFunc: suppressAttributeChange,
+				Description:      "Deployment mode for the resources: provision or empty",
+			},
 		},
 	}
 }
@@ -179,24 +185,26 @@ func cloudeosRouterStatusCreate(d *schema.ResourceData, m interface{}) error {
 	if err != nil {
 		return err
 	}
-	//Retry GetRouter for router_bgp_asn
-	err = resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
-		err := provider.GetRouterStatus(d)
+
+	// In the standard deploy mode, we retrieve the bgp_asn allocated for the router
+	// and set it in the resource, which is then passed to aws_customer_gateway
+	// resource, if the router is set to serve as a remote vpn gateway. For deploy mode
+	// provision, this isn't possible since we don't really allocate asn for the routers
+	// and we do not support this mode for the tgw stuff, as of now. So skip this.
+	deployMode := strings.ToLower(d.Get("deploy_mode").(string))
+
+	if deployMode != "provision" {
+		err := provider.GetRouterStatusAndSetBgpAsn(d)
 		if err != nil {
-			return resource.RetryableError(fmt.Errorf("GetRouter failed: %s", err))
+			return fmt.Errorf("GetRouter failed: %s", err)
 		}
 		bgpAsn := d.Get("router_bgp_asn").(string)
-		if bgpAsn != "" {
-			return nil
+		// If we can't find an asn in the standard deploy mode in the router status entry,
+		// something is wrong (since this is allocated when router_config resource is created.
+		// Error out since this state means something is broken). Do we want to cleanup?
+		if bgpAsn == "" {
+			return fmt.Errorf("BGP ASN for the Router not returned")
 		}
-		return resource.RetryableError(fmt.Errorf("attempting to get router bgp asn"))
-	})
-	if err != nil {
-		err := provider.DeleteRouter(d)
-		if err != nil {
-			return errors.New("bgp asn isn't present in router response. Failed during cleanup")
-		}
-		return errors.New("BGP ASN for the Router not returned.(Try terraform apply again)")
 	}
 
 	uuid := "cloudeos-router-status" + strings.TrimPrefix(d.Get("tf_id").(string), RtrPrefix)
