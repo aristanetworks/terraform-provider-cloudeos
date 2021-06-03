@@ -164,9 +164,9 @@ func cloudeosVpcConfig() *schema.Resource {
 				Type:     schema.TypeString,
 			},
 			"deploy_mode": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Deploy mode for the routers: empty for default or provision",
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
 			},
 		},
 	}
@@ -175,15 +175,19 @@ func cloudeosVpcConfig() *schema.Resource {
 func cloudeosVpcConfigCreate(d *schema.ResourceData, m interface{}) error {
 	provider := m.(CloudeosProvider)
 
-	err := validateDeployModeWithRole(d)
-	if err != nil {
-		return err
-	}
+	var vpcDeployMode string
 
-	err = resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
-		if err := provider.ListTopology(d); err != nil {
+	// Validate that the various topo (meta, clos, wan) exist, based on vpc role and
+	// return meta topo's deploy_mode. vpc deploy_mode == topo deploy_mode is an
+	// invariant that CVP relies on and MUST be enforced. We derive deploy_mode of vpc
+	// and rtr config resources from topo and that of vpc and rtr status resources from
+	// the respective config (The former is done in the plugin, latter in the modules)
+	err := resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
+		deployMode, err := provider.ValidateTopoInfoAndGetDeployMode(d)
+		if err != nil {
 			return resource.RetryableError(err)
 		}
+		vpcDeployMode = deployMode
 		return nil
 	})
 
@@ -191,9 +195,21 @@ func cloudeosVpcConfigCreate(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
-	err = provider.AddVpcConfig(d)
+	err = d.Set("deploy_mode", vpcDeployMode)
+	if err != nil {
+		return fmt.Errorf("Failed to set deploy_mode in vpc resource"+
+			" Error : %v", err)
+	}
+
+	// Relies on deploy_mode being set
+	err = validateDeployModeWithRole(d)
 	if err != nil {
 		return err
+	}
+
+	err = provider.AddVpcConfig(d)
+	if err != nil {
+		return fmt.Errorf("Failed to add vpc config : %v", err)
 	}
 
 	role := d.Get("role").(string)

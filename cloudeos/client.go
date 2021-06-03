@@ -724,12 +724,14 @@ func (p *CloudeosProvider) ListVpc(d *schema.ResourceData) error {
 	return nil
 }
 
-//CheckVpcPresence check if VPC is created in Aeris status path
-func (p *CloudeosProvider) CheckVpcPresence(d *schema.ResourceData) error {
+//CheckVpcPresenceAndGetDeployMode checks if VPC is created in Aeris status
+//path and returns deploy_mode set for that vpc
+func (p *CloudeosProvider) CheckVpcPresenceAndGetDeployMode(
+	d *schema.ResourceData) (string, error) {
 	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
 	if err != nil {
 		log.Printf("Failed to create new client to execute CheckVpcPresence")
-		return err
+		return "", err
 	}
 	defer client.wrpcClient.Close()
 
@@ -744,7 +746,7 @@ func (p *CloudeosProvider) CheckVpcPresence(d *schema.ResourceData) error {
 	fieldMask, err := getOuterFieldMask(vpc)
 	if err != nil {
 		log.Print("CheckVpcPresence: Failed to get field mask")
-		return err
+		return "", err
 	}
 	vpc.FieldMask = fieldMask
 
@@ -767,7 +769,7 @@ func (p *CloudeosProvider) CheckVpcPresence(d *schema.ResourceData) error {
 	if err != nil {
 		log.Printf("Failed to send %s request to CVaaS : %s",
 			request.Params["method"].(string), err)
-		return err
+		return "", err
 	}
 	log.Printf("Successfully sent CheckVpcPresence %s request for %s",
 		request.Params["method"].(string), request.Token)
@@ -777,7 +779,7 @@ func (p *CloudeosProvider) CheckVpcPresence(d *schema.ResourceData) error {
 	if err != nil {
 		log.Printf("Failed to get %s response from CVaaS, Error: %v",
 			request.Params["method"].(string), err)
-		return err
+		return "", err
 	}
 
 	log.Printf("Received Resp: %v", resp)
@@ -789,7 +791,8 @@ func (p *CloudeosProvider) CheckVpcPresence(d *schema.ResourceData) error {
 						for k, v := range vpc {
 							if strings.EqualFold(k, "vpc_id") {
 								if v.(string) == vpcID {
-									return nil
+									deployMode := strings.ToLower(vpc["deploy_mode"].(string))
+									return deployMode, nil
 								}
 							}
 						}
@@ -798,7 +801,7 @@ func (p *CloudeosProvider) CheckVpcPresence(d *schema.ResourceData) error {
 			}
 		}
 	}
-	return errors.New("No response for ListVpc")
+	return "", errors.New("No response for ListVpc")
 }
 
 //AddVpc adds VPC resource to Aeris
@@ -932,19 +935,9 @@ func (p *CloudeosProvider) DeleteVpc(d *schema.ResourceData) error {
 	return nil
 }
 
-//ListTopology gets the Topology from Aeris which satisfy the filter
-func (p *CloudeosProvider) ListTopology(d *schema.ResourceData) error {
-	// Create new client, as the client that provider created might have died.
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
-	if err != nil {
-		log.Printf("[CVaaS-ERROR]Failed to create new client in ListTopology")
-		return err
-	}
-	defer client.wrpcClient.Close()
-
-	topoName := d.Get("topology_name").(string)
-	closName := d.Get("clos_name").(string)
-	wanName := d.Get("wan_name").(string)
+// ConstructListTopology - Given a topoName, return a
+// wrpc ListTopologyInfo that satisfies the filters
+func ConstructListTopologyRequest(topoName string) (wrpcRequest, error) {
 
 	topoInfo := &api.TopologyInfo{
 		Name: topoName,
@@ -953,7 +946,7 @@ func (p *CloudeosProvider) ListTopology(d *schema.ResourceData) error {
 	fieldMask, err := getOuterFieldMask(topoInfo)
 	if err != nil {
 		log.Print("ListTopology: Failed to get field mask")
-		return err
+		return wrpcRequest{}, err
 	}
 	topoInfo.FieldMask = fieldMask
 
@@ -964,7 +957,7 @@ func (p *CloudeosProvider) ListTopology(d *schema.ResourceData) error {
 	}
 
 	request := wrpcRequest{
-		Token:   "RPC_Token_List_" + d.Get("topology_name").(string) + "_1",
+		Token:   "RPC_Token_List_" + topoName + "_1",
 		Command: "serviceRequest",
 		Params: map[string]interface{}{
 			"service": "clouddeploy.Topologyinfos",
@@ -972,12 +965,36 @@ func (p *CloudeosProvider) ListTopology(d *schema.ResourceData) error {
 			"body":    &listTopoInfoRequest,
 		},
 	}
+	return request, nil
+}
+
+// ValidateTopoInfoForAndGetDeployMode -
+func (p *CloudeosProvider) ValidateTopoInfoAndGetDeployMode(
+	d *schema.ResourceData) (string, error) {
+
+	// Create new client, as the client that provider created might have died.
+	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
+	if err != nil {
+		log.Printf("[CVaaS-ERROR]Failed to create new client in ListTopology")
+		return "", err
+	}
+	defer client.wrpcClient.Close()
+
+	topoName := d.Get("topology_name").(string)
+	closName := d.Get("clos_name").(string)
+	wanName := d.Get("wan_name").(string)
+
+	request, err := ConstructListTopologyRequest(topoName)
+	if err != nil {
+		log.Print("ValidateTopoInfoForAddVpc: failed to create ListTopo request", err)
+		return "", err
+	}
 
 	err = client.wrpcClient.WriteJSON(request)
 	if err != nil {
 		log.Printf("Failed to send %s request to CVaaS : %s",
 			request.Params["method"].(string), err)
-		return err
+		return "", err
 	}
 	log.Printf("Successfully sent %s request for %s",
 		request.Params["method"].(string), request.Token)
@@ -995,7 +1012,7 @@ func (p *CloudeosProvider) ListTopology(d *schema.ResourceData) error {
 		if err != nil {
 			log.Printf("Failed to get %s response from CVaaS, Error: %v",
 				request.Params["method"].(string), err)
-			return err
+			return "", err
 		}
 		log.Printf("Received ListTopology Resp: %v", resp)
 
@@ -1008,7 +1025,7 @@ func (p *CloudeosProvider) ListTopology(d *schema.ResourceData) error {
 							if topo["name"] == topoName &&
 								topo["topo_type"] == "TOPO_INFO_META" {
 								metaTopoExist = true
-								topoDeployMode = topo["deploy_mode"].(string)
+								topoDeployMode = strings.ToLower(topo["deploy_mode"].(string))
 							}
 							if topo["name"] == topoName &&
 								topo["topo_type"] == "TOPO_INFO_WAN" {
@@ -1042,7 +1059,7 @@ func (p *CloudeosProvider) ListTopology(d *schema.ResourceData) error {
 	// don't do anything special for it
 	if strings.EqualFold("CloudLeaf", role) {
 		if metaTopoExist && closTopoExist {
-			return nil
+			return topoDeployMode, nil
 		}
 		if !metaTopoExist {
 			errStr = errStr + "Resource cloudeos_topology " + topoName + " does not exist. "
@@ -1055,10 +1072,10 @@ func (p *CloudeosProvider) ListTopology(d *schema.ResourceData) error {
 		// allow for wan topo, so we skip the closTopo exist check
 		if topoDeployMode == "provision" {
 			if metaTopoExist && wanTopoExist {
-				return nil
+				return topoDeployMode, nil
 			}
 		} else if metaTopoExist && wanTopoExist && closTopoExist {
-			return nil
+			return topoDeployMode, nil
 		}
 
 		if !metaTopoExist {
@@ -1077,7 +1094,7 @@ func (p *CloudeosProvider) ListTopology(d *schema.ResourceData) error {
 	log.Printf("metaTopoExist: %v", metaTopoExist)
 	log.Printf("wanTopoExist: %v", wanTopoExist)
 	log.Printf("closTopoExist: %v", closTopoExist)
-	return errors.New(errStr)
+	return "", errors.New(errStr)
 }
 
 //CheckTopologyDeletionStatus returns nil if topology doesn't exist

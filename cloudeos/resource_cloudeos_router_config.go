@@ -162,10 +162,9 @@ func cloudeosRouterConfig() *schema.Resource {
 				Type:     schema.TypeString,
 			},
 			"deploy_mode": {
-				Type:             schema.TypeString,
-				Optional:         true,
-				DiffSuppressFunc: suppressAttributeChange,
-				Description:      "Deployment mode for the resources: provision or empty",
+				Type:     schema.TypeString,
+				Computed: true,
+				Optional: true,
 			},
 		},
 	}
@@ -173,25 +172,31 @@ func cloudeosRouterConfig() *schema.Resource {
 
 func cloudeosRouterConfigCreate(d *schema.ResourceData, m interface{}) error {
 	//TBD: Call ListVpc to get deployment type( not needed for EFT )
-
-	err := validateDeployModeWithRole(d)
-	if err != nil {
-		return err
-	}
-
 	provider := m.(CloudeosProvider)
 
 	//Retry ListVpc to check VPC is present in Aeris before Router.
-
-	err = resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
-		err := provider.CheckVpcPresence(d)
+	var rtrDeployMode string
+	err := resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
+		deployMode, err := provider.CheckVpcPresenceAndGetDeployMode(d)
 		if err != nil {
 			return resource.RetryableError(err)
 		}
+		rtrDeployMode = deployMode
 		return nil
 	})
 	if err != nil {
 		return errors.New("Could not find the VPC in CVaaS.(Try terraform apply again)")
+	}
+
+	err = d.Set("deploy_mode", rtrDeployMode)
+	if err != nil {
+		return fmt.Errorf("Failed to set deploy mode in router resource :%v", err)
+	}
+
+	// Relies on deploy_mode being set
+	err = validateDeployModeWithRole(d)
+	if err != nil {
+		return err
 	}
 
 	role := d.Get("role").(string)
