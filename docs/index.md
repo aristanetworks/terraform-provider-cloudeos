@@ -3,7 +3,9 @@
 The Arista CloudEOS provider helps with automating the deployment of a multi-cloud network
 fabric using Arista CloudVision as a Service ( CVaaS ). The provider interacts with CVaaS to
 create a BGP/EVPN/VxLAN based overlay network between CloudEOS Routers running in various
-regions across Cloud Providers.
+regions across Cloud Providers. Optionally, it can be used to automate the deployment of
+standalone CloudEOS routers across Cloud Providers and their integration with CVaaS, wherein
+the CloudEOS configuration to define the topology is created and applied by the user.
 
 ## Terminology
 

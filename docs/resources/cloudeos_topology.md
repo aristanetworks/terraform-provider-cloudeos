@@ -30,14 +30,22 @@ resource "cloudeos_topology" "topology" {
 ## Argument Reference
 
 * `topology_name` - (Required) Name of the topology.
-* `bgp_asn` - (Required) A range of BGP ASN’s which would be used to configure CloudEOS instances,
+* `deploy_mode` - (Optional) Deployment mode for the topology. Valid values are "" (empty) - deploy and
+    configure a fabric OR "provision" - Deploy the routers and onboard them to Cvaas, but do not create a
+    fabric by configuring them. When not specified, deploy_mode defaults to "". See examples/
+    multicloud_tworegion_provisionmode for an example deployment using provision deploy mode.
+* `bgp_asn` - (Optional) A range of BGP ASN’s which would be used to configure CloudEOS instances,
     based on the role and region in which they are being deployed. For example, a CloudEdge and CloudLeaf
     instance in the same region and CLOS will use iBGP and will have the same ASN. Whereas 2 CloudEdge’s
-    in different regions use eBGP and will have different ASNs.
-* `vtep_ip_cidr` - (Required) CIDR block for VTEP IPs for CloudEOS Routers
-* `terminattr_ip_cidr` - (Required) TerminAttr is used by Arista devices to stream Telemetry to CVaaS.
-    Every CloudEOS Router needs a unique TerminAttr local IP.
-* `dps_controlplane_cidr` - (Required) Each CloudEOS router needs a unique IP for Dynamic Path Selection.
+    in different regions use eBGP and will have different ASNs. Required when deploy_mode is empty; Not needed
+    when deploy_mode is provision.
+* `vtep_ip_cidr` - (Optional) CIDR block for VTEP IPs for CloudEOS Routers. Required when deploy_mode is empty;
+    Not needed when deploy_mode is provision.
+* `terminattr_ip_cidr` - (Optional) TerminAttr is used by Arista devices to stream Telemetry to CVaaS.
+    Every CloudEOS Router needs a unique TerminAttr local IP. Required when deploy_mode is empty; Not needed
+    when deploy_mode is provision.
+* `dps_controlplane_cidr` - (Optional) Each CloudEOS router needs a unique IP for Dynamic Path Selection.
+    Required when deploy_mode is empty; Not needed when deploy_mode is provision.
 * `eos_managed` - (Optional) List of CloudEOS devices already deployed.
 
 CVaaS reserves ip and asn from the ranges specified in the arguments above to deploy the fabric. The VNI range
