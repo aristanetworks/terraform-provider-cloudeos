@@ -40,6 +40,10 @@ resource "cloudeos_topology" "topology" {
 * `dps_controlplane_cidr` - (Required) Each CloudEOS router needs a unique IP for Dynamic Path Selection.
 * `eos_managed` - (Optional) List of CloudEOS devices already deployed.
 
+CVaaS reserves ip and asn from the ranges specified in the arguments above to deploy the fabric. The VNI range
+- 101 to 116 is reserved by CVaaS and any vni's needed to deploy the fabric are handed out from this range.
+Furthermore, a loopback10 interface is created and assigned an ip from the 198.18.0.0/16 range for each router.
+This allows configuration changes to be pushed out from CVaaS.
 ## Attributes Reference
 
 In addition to the Arguments listed above - the following Attributes are exported:
