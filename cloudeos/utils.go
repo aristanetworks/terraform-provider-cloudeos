@@ -155,43 +155,42 @@ func setBootStrapCfg(d *schema.ResourceData, cfg string) error {
 	if strings.EqualFold(cfg, "") {
 		log.Printf("[WARN]The CloudEOS Router is deployed but without bootstrap configuration")
 	}
-	//No PayG image for Azure.
-	cpType := d.Get("cloud_provider")
-	if cpType == "azure" {
-		ipsecFile := "AristaTesting-IPSec.json"
-		content, err := ioutil.ReadFile(ipsecFile)
-		if err != nil {
-			log.Printf("Problem reading IpSec license file: %s , %v", ipsecFile, err)
-		}
-		ipsecLicense := string(content)
+	bootstrapCfg := "%EOS-STARTUP-CONFIG-START%\n" +
+		cfg +
+		"\n" +
+		"%EOS-STARTUP-CONFIG-END%\n"
 
-		bwFile := "AristaTesting-vEOS.json"
-		bwContent, err := ioutil.ReadFile(bwFile)
-		if err != nil {
-			log.Printf("Problem reading vEOS license file: %s , %v", bwFile, err)
+	imageOffer := d.Get("cloudeos_image_offer")
+	value, licensesExist := d.GetOk("licenses")
+	if licensesExist && imageOffer == "cloudeos-router-byol" {
+		licenses := value.(*schema.Set).List()
+		for _, v := range licenses {
+			license := v.(map[string]interface{})
+			marker := ""
+			switch license["type"] {
+			case "ipsec":
+				marker = "IPSEC"
+			case "bandwidth":
+				marker = "BANDWIDTH"
+			default:
+				return fmt.Errorf("Unrecognised license type : %s", license["type"])
+			}
+			if marker != "" {
+				filePath := license["path"].(string)
+				content, err := ioutil.ReadFile(filePath)
+				if err != nil {
+					return fmt.Errorf("Problem reading %s license file: %s , %v", license["type"], filePath, err)
+				} else {
+					bootstrapCfg = bootstrapCfg +
+						"%LICENSE-" + marker + "-START%\n" +
+						string(content) +
+						"%LICENSE-" + marker + "-END%\n"
+				}
+			}
 		}
-		bwLicense := string(bwContent)
-		bootstrapCfg := "%EOS-STARTUP-CONFIG-START%\n" +
-			cfg +
-			"\n" +
-			"%EOS-STARTUP-CONFIG-END%\n" +
-			"%LICENSE-IPSEC-START%\n" +
-			ipsecLicense +
-			"%LICENSE-IPSEC-END%\n" +
-			"%LICENSE-BANDWIDTH-START%\n" +
-			bwLicense +
-			"%LICENSE-BANDWIDTH-END%\n"
-		if err := d.Set("bootstrap_cfg", bootstrapCfg); err != nil {
-			return fmt.Errorf("Error bootstrap_cfg: %v", err)
-		}
-	} else if cpType == "aws" {
-		bootstrapCfg := "%EOS-STARTUP-CONFIG-START%\n" +
-			cfg +
-			"\n" +
-			"%EOS-STARTUP-CONFIG-END%\n"
-		if err := d.Set("bootstrap_cfg", bootstrapCfg); err != nil {
-			return fmt.Errorf("Error bootstrap_cfg: %v", err)
-		}
+	}
+	if err := d.Set("bootstrap_cfg", bootstrapCfg); err != nil {
+		return fmt.Errorf("Error bootstrap_cfg: %v", err)
 	}
 	return nil
 }

@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 	"time"
 
@@ -92,6 +93,42 @@ func cloudeosRouterConfig() *schema.Resource {
 				Type:        schema.TypeString,
 				ForceNew:    true,
 			},
+			"cloudeos_image_offer": {
+				Optional:         true,
+				Description:      "CloudEos Licensing Model",
+				Type:             schema.TypeString,
+				DiffSuppressFunc: suppressAttributeChange,
+				Default:          "cloudeos-router-payg",
+				ValidateFunc: func(val interface{}, key string) (warns []string, errs []error) {
+					v := val.(string)
+					if v != "cloudeos-router-byol" && v != "cloudeos-router-payg" {
+						errs = append(errs, fmt.Errorf(
+							"%q must be cloudeos-router-byol/cloudeos-router-payg got: %q", key, v))
+					}
+					return
+				},
+			},
+			"licenses": {
+				Type:        schema.TypeSet,
+				Optional:    true,
+				Description: "A set of licenses for cloudeos",
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"type": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"path": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"hash": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+					},
+				},
+			},
 			"key_name": {
 				Optional:    true,
 				Description: "AWS keypair name",
@@ -166,6 +203,73 @@ func cloudeosRouterConfig() *schema.Resource {
 				Computed: true,
 				Optional: true,
 			},
+		},
+		CustomizeDiff: func(d *schema.ResourceDiff, m interface{}) error {
+			oldoffer, offer := d.GetChange("cloudeos_image_offer")
+			// LicenseType : Compulsory map
+			licenseNeeded := map[string]bool{
+				"ipsec":     true,
+				"bandwidth": true,
+			}
+
+			// Validate licenses here, as TypeSet doesn't support validateFunc.
+			if v, ok := d.GetOk("licenses"); ok {
+				// Licenses should be specified only with BYOL
+				if offer != "cloudeos-router-byol" {
+					return fmt.Errorf("Licenses not supported when using PAYG. Are you sure you are using correct cloudeos-image-offer")
+				}
+				licenseList := v.(*schema.Set).List()
+				for _, k := range licenseList {
+					license := k.(map[string]interface{})
+					licenseType := license["type"].(string)
+					if _, ok := licenseNeeded[licenseType]; ok {
+						licenseNeeded[licenseType] = false
+						_, err := os.Stat(license["path"].(string))
+						if err != nil {
+							return fmt.Errorf(" License %s, Unable to open file %q", licenseType, license["path"])
+						}
+					} else {
+						supportedLicenses := " "
+						for k, _ := range licenseNeeded {
+							supportedLicenses += k + ", "
+						}
+						return fmt.Errorf("%s license isn't supported. Supported Licenses : [%s]", licenseType, supportedLicenses)
+					}
+				}
+			}
+
+			if offer == "cloudeos-router-byol" {
+
+				// Plugin upgraded for already deployed topology
+				oldCloudProvider, _ := d.GetChange("cloud_provider")
+				if oldCloudProvider != "" && oldoffer == "" {
+					return fmt.Errorf("Already exists payg topology, destroy it first before changing cloudeos_image_offer to byol")
+
+				}
+
+				// Some licenses are compulsory, check they are present
+				missingLicenses := " "
+				for k, v := range licenseNeeded {
+					if v == true {
+						missingLicenses += k + ", "
+					}
+				}
+				if missingLicenses != " " {
+					return fmt.Errorf("[%s] license needs to be specified when using BYOL", missingLicenses)
+				}
+
+				// Check if license attribute is updated
+				oldLicenses, newLicenses := d.GetChange("licenses")
+				if oldoffer == "cloudeos-router-byol" && oldLicenses != nil && newLicenses != nil {
+					oldLicensesSet := oldLicenses.(*schema.Set)
+					newLicensesSet := newLicenses.(*schema.Set)
+					if !oldLicensesSet.Equal(newLicensesSet) {
+						log.Printf("Attribute Change: licenses \n[old] : %#v \n[new] : %#v", oldLicensesSet, newLicensesSet)
+						return fmt.Errorf("Updating Licenses is not supported, you need to destroy first or make changes through CVaaS")
+					}
+				}
+			}
+			return nil
 		},
 	}
 }

@@ -8,7 +8,7 @@
 # when build and publish, script will increment version number to build
 # and publish binaries with this new version number. New version number
 # must be merged so people will be on same page.
-
+set -e
 # Read current version from version file
 vfile="./cloudeos/version.go"
 if [ -f "$vfile" ]; then
@@ -54,10 +54,13 @@ mv terraform-provider-cloudeos_v$version terraform.d/plugins/registry.terraform.
 if [ $# -eq 0 ] || [ $1 != 'b' ]; then
     echo Publishing provider-cloudeos binary tarball terraform-cloudeos-plugin_v$version.tar.gz and terraform-cloudeos-plugin_latest.tar.gz
     # Create tarball and publish
+    DISTPATH="dist:/dist/release/CloudEOS-Terraform/SE-EFT1/"
     tar -czvf terraform-cloudeos-plugin_v$version.tar.gz terraform.d
-    a4 scp terraform-cloudeos-plugin_v$version.tar.gz $1
-    tar -czvf terraform-cloudeos-plugin_latest.tar.gz terraform.d
-    a4 scp terraform-cloudeos-plugin_dev_latest_13.tar.gz $1
+    a4 scp terraform-cloudeos-plugin_v$version.tar.gz $DISTPATH
+    tar -czvf terraform-cloudeos-plugin_dev_latest.tar.gz terraform.d
+    a4 scp terraform-cloudeos-plugin_dev_latest.tar.gz $DISTPATH
+    tar -czvf terraform-cloudeos-plugin_dev_latest_13.tar.gz terraform.d
+    a4 scp terraform-cloudeos-plugin_dev_latest_13.tar.gz $DISTPATH
 
     echo Cleaning up
     # Cleaning up
