@@ -8,7 +8,10 @@ import (
 	"strconv"
 	"strings"
 
-	api "github.com/terraform-providers/terraform-provider-cloudeos/cloudeos/internal/api"
+	cd_api "terraform-provider-cloudeos/cloudeos/arista/api"
+	cdv1_api "terraform-provider-cloudeos/cloudeos/arista/clouddeploy.v1"
+
+	fmp "terraform-provider-cloudeos/cloudeos/fmp"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
@@ -28,14 +31,14 @@ func validateDeployModeWithRole(d *schema.ResourceData) error {
 	return nil
 }
 
-func getCloudProviderType(d *schema.ResourceData) api.CloudProviderType {
+func getCloudProviderType(d *schema.ResourceData) cd_api.CloudProviderType {
 	cloudProvider := d.Get("cloud_provider").(string)
-	cpType := api.CloudProviderType_CP_UNSPECIFIED
+	cpType := cd_api.CloudProviderType_CP_UNSPECIFIED
 	switch {
 	case strings.EqualFold("aws", cloudProvider):
-		cpType = api.CloudProviderType_CP_AWS
+		cpType = cd_api.CloudProviderType_CP_AWS
 	case strings.EqualFold("azure", cloudProvider):
-		cpType = api.CloudProviderType_CP_AZURE
+		cpType = cd_api.CloudProviderType_CP_AZURE
 	}
 	return cpType
 }
@@ -56,37 +59,37 @@ func getAwsVpcName(d *schema.ResourceData) (string, error) {
 	return vpcName, nil
 }
 
-func getCpTypeAndVpcName(d *schema.ResourceData) (string, api.CloudProviderType) {
+func getCpTypeAndVpcName(d *schema.ResourceData) (string, cd_api.CloudProviderType) {
 	var vpcName string
-	var cpType api.CloudProviderType
+	var cpType cd_api.CloudProviderType
 	cloudProvider := d.Get("cloud_provider").(string)
 	switch {
 	case strings.EqualFold("aws", cloudProvider):
-		cpType = api.CloudProviderType_CP_AWS
+		cpType = cd_api.CloudProviderType_CP_AWS
 		vpcName, _ = getAwsVpcName(d)
 	case strings.EqualFold("azure", cloudProvider):
-		cpType = api.CloudProviderType_CP_AZURE
+		cpType = cd_api.CloudProviderType_CP_AZURE
 		vpcName = d.Get("vnet_name").(string)
 	}
 	return vpcName, cpType
 }
 
-func getRoleType(role string) api.RoleType {
-	var roleType api.RoleType
+func getRoleType(role string) cd_api.RoleType {
+	var roleType cd_api.RoleType
 	switch {
 	case strings.EqualFold("CloudEdge", role):
-		roleType = api.RoleType_ROLE_EDGE
+		roleType = cd_api.RoleType_ROLE_EDGE
 	case strings.EqualFold("CloudSpine", role):
-		roleType = api.RoleType_ROLE_SPINE
+		roleType = cd_api.RoleType_ROLE_SPINE
 	case strings.EqualFold("CloudLeaf", role):
-		roleType = api.RoleType_ROLE_LEAF
+		roleType = cd_api.RoleType_ROLE_LEAF
 	default:
-		roleType = api.RoleType_ROLE_UNSPECIFIED
+		roleType = cd_api.RoleType_ROLE_UNSPECIFIED
 	}
 	return roleType
 }
 
-func getAndCreateRouteTableIDs(d *schema.ResourceData) *api.RouteTableIds {
+func getAndCreateRouteTableIDs(d *schema.ResourceData) *cdv1_api.RouteTableIds {
 	privateRtTblList := d.Get("private_rt_table_ids").([]interface{})
 	internalRtTblList := d.Get("internal_rt_table_ids").([]interface{})
 	publicRtTblList := d.Get("public_rt_table_ids").([]interface{})
@@ -103,10 +106,11 @@ func getAndCreateRouteTableIDs(d *schema.ResourceData) *api.RouteTableIds {
 	for i, v := range internalRtTblList {
 		internal[i] = fmt.Sprint(v)
 	}
-	var routeTableList api.RouteTableIds
-	routeTableList.Public = pub
-	routeTableList.Internal = internal
-	routeTableList.Private = priv
+	routeTableList := cdv1_api.RouteTableIds{
+		Public:   &fmp.RepeatedString{Values: pub},
+		Private:  &fmp.RepeatedString{Values: priv},
+		Internal: &fmp.RepeatedString{Values: internal},
+	}
 
 	return &routeTableList
 }
@@ -195,7 +199,7 @@ func setBootStrapCfg(d *schema.ResourceData, cfg string) error {
 	return nil
 }
 
-func parseRtrResponse(rtr map[string]interface{}, d *schema.ResourceData) error {
+func parseRtrResponse(ent *cdv1_api.RouterConfig, d *schema.ResourceData) error {
 	// Parse the bootstrap_cfg, haRtrId, peerRtTable  from response and set
 	// in schema
 	var bootstrapCfg string
@@ -205,45 +209,21 @@ func parseRtrResponse(rtr map[string]interface{}, d *schema.ResourceData) error 
 	var privateRtTblID []string
 	var internalRtTblID []string
 
-	for k, v := range rtr {
-		if strings.EqualFold(k, "cv_info") {
-			if cvInfo, ok := v.(map[string]interface{}); ok {
-				for cvKey, cvVal := range cvInfo {
-					if strings.EqualFold(cvKey, "bootstrap_cfg") {
-						bootstrapCfg = cvVal.(string)
-					}
-					if strings.EqualFold(cvKey, "ha_rtr_id") {
-						haRtrID = cvVal.(string)
-					}
-					if strings.EqualFold(cvKey, "peer_vpc_rt_table_id") {
-						for _, id := range cvVal.([]interface{}) {
-							peerRtTblID = append(peerRtTblID, id.(string))
-						}
-					}
-					if strings.EqualFold(cvKey, "ha_rt_table_ids") {
-						if rtTblIDs, ok := cvVal.(map[string]interface{}); ok {
-							for rtKey, val := range rtTblIDs {
-								if strings.EqualFold(rtKey, "public") {
-									for _, id := range val.([]interface{}) {
-										publicRtTblID = append(publicRtTblID, id.(string))
-									}
-								}
-								if strings.EqualFold(rtKey, "private") {
-									for _, id := range val.([]interface{}) {
-										privateRtTblID = append(privateRtTblID, id.(string))
-									}
-								}
-								if strings.EqualFold(rtKey, "internal") {
-									for _, id := range val.([]interface{}) {
-										internalRtTblID = append(internalRtTblID, id.(string))
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+	bootstrapCfg = ent.GetCvInfo().GetBootstrapCfg().GetValue()
+	haRtrID = ent.GetCvInfo().GetHaRtrId().GetValue()
+	for _, id := range ent.GetCvInfo().GetPeerVpcRtTableId().GetValues() {
+		peerRtTblID = append(peerRtTblID, id)
+	}
+
+	for _, id := range ent.GetCvInfo().GetHaRtTableIds().GetInternal().GetValues() {
+		internalRtTblID = append(internalRtTblID, id)
+	}
+
+	for _, id := range ent.GetCvInfo().GetHaRtTableIds().GetPublic().GetValues() {
+		publicRtTblID = append(publicRtTblID, id)
+	}
+	for _, id := range ent.GetCvInfo().GetHaRtTableIds().GetPrivate().GetValues() {
+		privateRtTblID = append(privateRtTblID, id)
 	}
 
 	// set bootstrap_cfg

@@ -2,25 +2,27 @@ package cloudeos
 
 import (
 	"context"
-	"errors"
 	"fmt"
+	"log"
+	"time"
 
-	cvgrpc "github.com/aristanetworks/cloudvision-go/grpc"
+	api "terraform-provider-cloudeos/cloudeos/arista/clouddeploy.v1"
+	fmp "terraform-provider-cloudeos/cloudeos/fmp"
+
 	"github.com/golang/protobuf/ptypes/wrappers"
-	api "github.com/terraform-providers/terraform-provider-cloudeos/cloudeos/internal/api"
-	fmp "github.com/terraform-providers/terraform-provider-cloudeos/cloudeos/internal/fmp"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func (p *CloudeosProvider) DeleteAwsVpnConfig(d *schema.ResourceData) error {
-	client, err := cvgrpc.DialWithToken(context.Background(), p.server+":443", p.srvcAcctToken)
-	if err != nil || client == nil {
+	client, err := p.grpcClient()
+	if err != nil {
+		log.Printf("DeleteAwsVpnConfig: Failed to create new CVaaS Grpc client, err: %v", err)
 		return err
 	}
-	c := api.NewAWSVpnConfigServiceClient(client)
 	defer client.Close()
 
+	awsVpnClient := api.NewAWSVpnConfigServiceClient(client)
 	awsVpnKey := &api.AWSVpnKey{
 		TfId: &wrappers.StringValue{Value: d.Get("tf_id").(string)},
 	}
@@ -28,7 +30,9 @@ func (p *CloudeosProvider) DeleteAwsVpnConfig(d *schema.ResourceData) error {
 		Key: awsVpnKey,
 	}
 
-	resp, err := c.Delete(context.Background(), &awsVpnConfigDeleteRequest)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(requestTimeout*time.Second))
+	defer cancel()
+	resp, err := awsVpnClient.Delete(ctx, &awsVpnConfigDeleteRequest)
 	if err != nil && resp != nil && resp.Key.GetTfId().GetValue() != d.Get("tf_id").(string) {
 		return fmt.Errorf("Deleted key %v, tf_id %v", resp.GetKey().GetTfId().GetValue(),
 			d.Get("tf_id").(string))
@@ -38,15 +42,14 @@ func (p *CloudeosProvider) DeleteAwsVpnConfig(d *schema.ResourceData) error {
 }
 
 func (p *CloudeosProvider) AddAwsVpnConfig(d *schema.ResourceData) error {
-	client, err := cvgrpc.DialWithToken(context.Background(), p.server+":443", p.srvcAcctToken)
+	client, err := p.grpcClient()
 	if err != nil {
+		log.Printf("AddAwsVpnConfig: Failed to create new CVaaS Grpc client, err: %v", err)
 		return err
 	}
-	c := api.NewAWSVpnConfigServiceClient(client)
-	if c == nil {
-		return errors.New("Failed to create the CVaaS GRPC client")
-	}
+
 	defer client.Close()
+	awsVpnClient := api.NewAWSVpnConfigServiceClient(client)
 
 	var tunnels []*api.TunnelInfo
 	var tunnel1 api.TunnelInfo
@@ -81,7 +84,7 @@ func (p *CloudeosProvider) AddAwsVpnConfig(d *schema.ResourceData) error {
 	tunnels = append(tunnels, &tunnel2)
 
 	tunnelInfoList := &api.TunnelInfoList{
-		TunnelInfo: tunnels,
+		Values: tunnels,
 	}
 	awsVpnKey := &api.AWSVpnKey{
 		TfId: &wrappers.StringValue{Value: d.Get("tf_id").(string)},
@@ -104,7 +107,10 @@ func (p *CloudeosProvider) AddAwsVpnConfig(d *schema.ResourceData) error {
 	awsVpnConfigSetRequest := api.AWSVpnConfigSetRequest{
 		Value: awsVpnConfigInfo,
 	}
-	resp, err := c.Set(context.Background(), &awsVpnConfigSetRequest)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(requestTimeout*time.Second))
+	defer cancel()
+	resp, err := awsVpnClient.Set(ctx, &awsVpnConfigSetRequest)
 	if err != nil && resp == nil {
 		return err
 	}

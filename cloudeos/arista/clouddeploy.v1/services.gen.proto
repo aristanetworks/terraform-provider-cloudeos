@@ -1,0 +1,767 @@
+// Copyright (c) 2020 Arista Networks, Inc.
+// Use of this source code is governed by the Mozilla Public License Version 2.0
+// that can be found in the LICENSE file.
+
+syntax = "proto3";
+
+package arista.clouddeploy.v1;
+option go_package = "cloudeos-terraform-provider/cloudeos/arista/clouddeploy.v1;clouddeploy_v1";
+
+import "arista/clouddeploy.v1/clouddeploy.proto";
+import "arista/time_v1/time.proto";
+import "arista/subscriptions/subscriptions.proto";
+import "fmp/deletes.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+message AWSTgwRequest {
+	// Key uniquely identifies a AWSTgw instance to retrieve.
+	// This value must be populated.
+	AWSTgwKey key = 1;
+
+	// Time indicates the time for which you are interested in the data.
+	// If no time is given, the server will use the time at which it makes the request.
+	google.protobuf.Timestamp time = 2;
+};
+
+message AWSTgwResponse {
+	// Value is the value requested.
+	// This structure will be fully-populated as it exists in the datastore. If
+	// optional fields were not given at creation, these fields will be empty or
+	// set to default values.
+	AWSTgw value = 1;
+
+	// Time carries the (UTC) timestamp of the last-modification of the
+	// AWSTgw instance in this response.
+	google.protobuf.Timestamp time = 2;
+};
+
+message AWSTgwStreamRequest {
+	// PartialEqFilter provides a way to server-side filter a GetAll/Subscribe.
+	// This requires all provided fields to be equal to the response.
+	//
+	// While transparent to users, this field also allows services to optimize internal
+	// subscriptions if filter(s) are sufficiently specific.
+	repeated AWSTgw partial_eq_filter = 1;
+
+	// TimeRange allows limiting response data to within a specified time window.
+	// If this field is populated, at least one of the two time fields are required.
+	//
+	// This field is not allowed in the Subscribe RPC.
+	arista.time.TimeBounds time = 3;
+};
+
+message AWSTgwStreamResponse {
+	// Value is a value deemed relevant to the initiating request.
+	// This structure will always have its key-field populated. Which other fields are
+	// populated, and why, depends on the value of Operation and what triggered this notification.
+	AWSTgw value = 1;
+
+	// Time holds the timestamp of this AWSTgw's last modification.
+	google.protobuf.Timestamp time = 2;
+
+	// Operation indicates how the AWSTgw value in this response should be considered.
+	// Under non-subscribe requests, this value should always be INITIAL. In a subscription,
+	// once all initial data is streamed and the client begins to receive modification updates,
+	// you should not see INITIAL again.
+	arista.subscriptions.Operation type = 3;
+};
+
+service AWSTgwService {
+	rpc GetOne (AWSTgwRequest) returns (AWSTgwResponse);
+	rpc GetAll (AWSTgwStreamRequest) returns (stream AWSTgwStreamResponse);
+	rpc Subscribe (AWSTgwStreamRequest) returns (stream AWSTgwStreamResponse);
+}
+
+message AWSTgwAttachmentRequest {
+	// Key uniquely identifies a AWSTgwAttachment instance to retrieve.
+	// This value must be populated.
+	AWSTgwAttachmentKey key = 1;
+
+	// Time indicates the time for which you are interested in the data.
+	// If no time is given, the server will use the time at which it makes the request.
+	google.protobuf.Timestamp time = 2;
+};
+
+message AWSTgwAttachmentResponse {
+	// Value is the value requested.
+	// This structure will be fully-populated as it exists in the datastore. If
+	// optional fields were not given at creation, these fields will be empty or
+	// set to default values.
+	AWSTgwAttachment value = 1;
+
+	// Time carries the (UTC) timestamp of the last-modification of the
+	// AWSTgwAttachment instance in this response.
+	google.protobuf.Timestamp time = 2;
+};
+
+message AWSTgwAttachmentStreamRequest {
+	// PartialEqFilter provides a way to server-side filter a GetAll/Subscribe.
+	// This requires all provided fields to be equal to the response.
+	//
+	// While transparent to users, this field also allows services to optimize internal
+	// subscriptions if filter(s) are sufficiently specific.
+	repeated AWSTgwAttachment partial_eq_filter = 1;
+
+	// TimeRange allows limiting response data to within a specified time window.
+	// If this field is populated, at least one of the two time fields are required.
+	//
+	// This field is not allowed in the Subscribe RPC.
+	arista.time.TimeBounds time = 3;
+};
+
+message AWSTgwAttachmentStreamResponse {
+	// Value is a value deemed relevant to the initiating request.
+	// This structure will always have its key-field populated. Which other fields are
+	// populated, and why, depends on the value of Operation and what triggered this notification.
+	AWSTgwAttachment value = 1;
+
+	// Time holds the timestamp of this AWSTgwAttachment's last modification.
+	google.protobuf.Timestamp time = 2;
+
+	// Operation indicates how the AWSTgwAttachment value in this response should be considered.
+	// Under non-subscribe requests, this value should always be INITIAL. In a subscription,
+	// once all initial data is streamed and the client begins to receive modification updates,
+	// you should not see INITIAL again.
+	arista.subscriptions.Operation type = 3;
+};
+
+service AWSTgwAttachmentService {
+	rpc GetOne (AWSTgwAttachmentRequest) returns (AWSTgwAttachmentResponse);
+	rpc GetAll (AWSTgwAttachmentStreamRequest) returns (stream AWSTgwAttachmentStreamResponse);
+	rpc Subscribe (AWSTgwAttachmentStreamRequest) returns (stream AWSTgwAttachmentStreamResponse);
+}
+
+message AWSVpnConfigRequest {
+	// Key uniquely identifies a AWSVpnConfig instance to retrieve.
+	// This value must be populated.
+	AWSVpnKey key = 1;
+
+	// Time indicates the time for which you are interested in the data.
+	// If no time is given, the server will use the time at which it makes the request.
+	google.protobuf.Timestamp time = 2;
+};
+
+message AWSVpnConfigResponse {
+	// Value is the value requested.
+	// This structure will be fully-populated as it exists in the datastore. If
+	// optional fields were not given at creation, these fields will be empty or
+	// set to default values.
+	AWSVpnConfig value = 1;
+
+	// Time carries the (UTC) timestamp of the last-modification of the
+	// AWSVpnConfig instance in this response.
+	google.protobuf.Timestamp time = 2;
+};
+
+message AWSVpnConfigStreamRequest {
+	// PartialEqFilter provides a way to server-side filter a GetAll/Subscribe.
+	// This requires all provided fields to be equal to the response.
+	//
+	// While transparent to users, this field also allows services to optimize internal
+	// subscriptions if filter(s) are sufficiently specific.
+	repeated AWSVpnConfig partial_eq_filter = 1;
+
+	// TimeRange allows limiting response data to within a specified time window.
+	// If this field is populated, at least one of the two time fields are required.
+	//
+	// This field is not allowed in the Subscribe RPC.
+	arista.time.TimeBounds time = 3;
+};
+
+message AWSVpnConfigStreamResponse {
+	// Value is a value deemed relevant to the initiating request.
+	// This structure will always have its key-field populated. Which other fields are
+	// populated, and why, depends on the value of Operation and what triggered this notification.
+	AWSVpnConfig value = 1;
+
+	// Time holds the timestamp of this AWSVpnConfig's last modification.
+	google.protobuf.Timestamp time = 2;
+
+	// Operation indicates how the AWSVpnConfig value in this response should be considered.
+	// Under non-subscribe requests, this value should always be INITIAL. In a subscription,
+	// once all initial data is streamed and the client begins to receive modification updates,
+	// you should not see INITIAL again.
+	arista.subscriptions.Operation type = 3;
+};
+
+message AWSVpnConfigSetRequest {
+	// AWSVpnConfig carries the value to set into the datastore.
+	// See the documentation on the AWSVpnConfig struct for which fields are required.
+	AWSVpnConfig value = 1;
+};
+
+message AWSVpnConfigSetResponse {
+	// Value carries all the values given in the AWSVpnConfigSetRequest as well
+	// as any server-generated values.
+	AWSVpnConfig value = 1;
+
+	// Time indicates the (UTC) timestamp at which the system recognizes the
+	// creation. The only guarantees made about this timestamp are:
+	//
+	//    - it is after the time the request was received
+	//    - a time-ranged query with StartTime==CreatedAt will include this instance.
+	//
+	google.protobuf.Timestamp time = 2;
+};
+
+message AWSVpnConfigDeleteRequest {
+	// Key indicates which AWSVpnConfig instance to remove.
+	// This field must always be set.
+	AWSVpnKey key = 1;
+};
+
+message AWSVpnConfigDeleteResponse {
+	// Key echoes back the key of the deleted AWSVpnConfig instance.
+	AWSVpnKey key = 1;
+
+	// Time indicates the (UTC) timestamp at which the system recognizes the
+	// deletion. The only guarantees made about this timestamp are:
+	//
+	//    - it is after the time the request was received
+	//    - a time-ranged query with StartTime==DeletedAt will not include this instance.
+	//
+	google.protobuf.Timestamp time = 2;
+};
+
+message AWSVpnConfigDeleteAllRequest {
+};
+
+message AWSVpnConfigDeleteAllResponse {
+	// This describes the class of delete error.
+	fmp.DeleteError type = 1;
+	// This indicates the error message from the delete failure.
+	google.protobuf.StringValue error = 2;
+	// This is the key of the AWSVpnConfig instance that failed to be deleted.
+	AWSVpnKey key = 3;
+	// Time indicates the (UTC) timestamp when the key was being deleted.
+	google.protobuf.Timestamp time = 4;
+};
+
+service AWSVpnConfigService {
+	rpc GetOne (AWSVpnConfigRequest) returns (AWSVpnConfigResponse);
+	rpc GetAll (AWSVpnConfigStreamRequest) returns (stream AWSVpnConfigStreamResponse);
+	rpc Subscribe (AWSVpnConfigStreamRequest) returns (stream AWSVpnConfigStreamResponse);
+	rpc Set (AWSVpnConfigSetRequest) returns (AWSVpnConfigSetResponse);
+	rpc Delete (AWSVpnConfigDeleteRequest) returns (AWSVpnConfigDeleteResponse);
+	rpc DeleteAll (AWSVpnConfigDeleteAllRequest) returns (stream AWSVpnConfigDeleteAllResponse);
+}
+
+message PathRequest {
+	// Key uniquely identifies a Path instance to retrieve.
+	// This value must be populated.
+	PathKey key = 1;
+
+	// Time indicates the time for which you are interested in the data.
+	// If no time is given, the server will use the time at which it makes the request.
+	google.protobuf.Timestamp time = 2;
+};
+
+message PathResponse {
+	// Value is the value requested.
+	// This structure will be fully-populated as it exists in the datastore. If
+	// optional fields were not given at creation, these fields will be empty or
+	// set to default values.
+	Path value = 1;
+
+	// Time carries the (UTC) timestamp of the last-modification of the
+	// Path instance in this response.
+	google.protobuf.Timestamp time = 2;
+};
+
+message PathStreamRequest {
+	// PartialEqFilter provides a way to server-side filter a GetAll/Subscribe.
+	// This requires all provided fields to be equal to the response.
+	//
+	// While transparent to users, this field also allows services to optimize internal
+	// subscriptions if filter(s) are sufficiently specific.
+	repeated Path partial_eq_filter = 1;
+
+	// TimeRange allows limiting response data to within a specified time window.
+	// If this field is populated, at least one of the two time fields are required.
+	//
+	// This field is not allowed in the Subscribe RPC.
+	arista.time.TimeBounds time = 3;
+};
+
+message PathStreamResponse {
+	// Value is a value deemed relevant to the initiating request.
+	// This structure will always have its key-field populated. Which other fields are
+	// populated, and why, depends on the value of Operation and what triggered this notification.
+	Path value = 1;
+
+	// Time holds the timestamp of this Path's last modification.
+	google.protobuf.Timestamp time = 2;
+
+	// Operation indicates how the Path value in this response should be considered.
+	// Under non-subscribe requests, this value should always be INITIAL. In a subscription,
+	// once all initial data is streamed and the client begins to receive modification updates,
+	// you should not see INITIAL again.
+	arista.subscriptions.Operation type = 3;
+};
+
+service PathService {
+	rpc GetOne (PathRequest) returns (PathResponse);
+	rpc GetAll (PathStreamRequest) returns (stream PathStreamResponse);
+	rpc Subscribe (PathStreamRequest) returns (stream PathStreamResponse);
+}
+
+message RouterConfigRequest {
+	// Key uniquely identifies a RouterConfig instance to retrieve.
+	// This value must be populated.
+	RouterKey key = 1;
+
+	// Time indicates the time for which you are interested in the data.
+	// If no time is given, the server will use the time at which it makes the request.
+	google.protobuf.Timestamp time = 2;
+};
+
+message RouterConfigResponse {
+	// Value is the value requested.
+	// This structure will be fully-populated as it exists in the datastore. If
+	// optional fields were not given at creation, these fields will be empty or
+	// set to default values.
+	RouterConfig value = 1;
+
+	// Time carries the (UTC) timestamp of the last-modification of the
+	// RouterConfig instance in this response.
+	google.protobuf.Timestamp time = 2;
+};
+
+message RouterConfigStreamRequest {
+	// PartialEqFilter provides a way to server-side filter a GetAll/Subscribe.
+	// This requires all provided fields to be equal to the response.
+	//
+	// While transparent to users, this field also allows services to optimize internal
+	// subscriptions if filter(s) are sufficiently specific.
+	repeated RouterConfig partial_eq_filter = 1;
+
+	// TimeRange allows limiting response data to within a specified time window.
+	// If this field is populated, at least one of the two time fields are required.
+	//
+	// This field is not allowed in the Subscribe RPC.
+	arista.time.TimeBounds time = 3;
+};
+
+message RouterConfigStreamResponse {
+	// Value is a value deemed relevant to the initiating request.
+	// This structure will always have its key-field populated. Which other fields are
+	// populated, and why, depends on the value of Operation and what triggered this notification.
+	RouterConfig value = 1;
+
+	// Time holds the timestamp of this RouterConfig's last modification.
+	google.protobuf.Timestamp time = 2;
+
+	// Operation indicates how the RouterConfig value in this response should be considered.
+	// Under non-subscribe requests, this value should always be INITIAL. In a subscription,
+	// once all initial data is streamed and the client begins to receive modification updates,
+	// you should not see INITIAL again.
+	arista.subscriptions.Operation type = 3;
+};
+
+message RouterConfigSetRequest {
+	// RouterConfig carries the value to set into the datastore.
+	// See the documentation on the RouterConfig struct for which fields are required.
+	RouterConfig value = 1;
+};
+
+message RouterConfigSetResponse {
+	// Value carries all the values given in the RouterConfigSetRequest as well
+	// as any server-generated values.
+	RouterConfig value = 1;
+
+	// Time indicates the (UTC) timestamp at which the system recognizes the
+	// creation. The only guarantees made about this timestamp are:
+	//
+	//    - it is after the time the request was received
+	//    - a time-ranged query with StartTime==CreatedAt will include this instance.
+	//
+	google.protobuf.Timestamp time = 2;
+};
+
+message RouterConfigDeleteRequest {
+	// Key indicates which RouterConfig instance to remove.
+	// This field must always be set.
+	RouterKey key = 1;
+};
+
+message RouterConfigDeleteResponse {
+	// Key echoes back the key of the deleted RouterConfig instance.
+	RouterKey key = 1;
+
+	// Time indicates the (UTC) timestamp at which the system recognizes the
+	// deletion. The only guarantees made about this timestamp are:
+	//
+	//    - it is after the time the request was received
+	//    - a time-ranged query with StartTime==DeletedAt will not include this instance.
+	//
+	google.protobuf.Timestamp time = 2;
+};
+
+message RouterConfigDeleteAllRequest {
+};
+
+message RouterConfigDeleteAllResponse {
+	// This describes the class of delete error.
+	fmp.DeleteError type = 1;
+	// This indicates the error message from the delete failure.
+	google.protobuf.StringValue error = 2;
+	// This is the key of the RouterConfig instance that failed to be deleted.
+	RouterKey key = 3;
+	// Time indicates the (UTC) timestamp when the key was being deleted.
+	google.protobuf.Timestamp time = 4;
+};
+
+service RouterConfigService {
+	rpc GetOne (RouterConfigRequest) returns (RouterConfigResponse);
+	rpc GetAll (RouterConfigStreamRequest) returns (stream RouterConfigStreamResponse);
+	rpc Subscribe (RouterConfigStreamRequest) returns (stream RouterConfigStreamResponse);
+	rpc Set (RouterConfigSetRequest) returns (RouterConfigSetResponse);
+	rpc Delete (RouterConfigDeleteRequest) returns (RouterConfigDeleteResponse);
+	rpc DeleteAll (RouterConfigDeleteAllRequest) returns (stream RouterConfigDeleteAllResponse);
+}
+
+message SubnetConfigRequest {
+	// Key uniquely identifies a SubnetConfig instance to retrieve.
+	// This value must be populated.
+	SubnetKey key = 1;
+
+	// Time indicates the time for which you are interested in the data.
+	// If no time is given, the server will use the time at which it makes the request.
+	google.protobuf.Timestamp time = 2;
+};
+
+message SubnetConfigResponse {
+	// Value is the value requested.
+	// This structure will be fully-populated as it exists in the datastore. If
+	// optional fields were not given at creation, these fields will be empty or
+	// set to default values.
+	SubnetConfig value = 1;
+
+	// Time carries the (UTC) timestamp of the last-modification of the
+	// SubnetConfig instance in this response.
+	google.protobuf.Timestamp time = 2;
+};
+
+message SubnetConfigStreamRequest {
+	// PartialEqFilter provides a way to server-side filter a GetAll/Subscribe.
+	// This requires all provided fields to be equal to the response.
+	//
+	// While transparent to users, this field also allows services to optimize internal
+	// subscriptions if filter(s) are sufficiently specific.
+	repeated SubnetConfig partial_eq_filter = 1;
+
+	// TimeRange allows limiting response data to within a specified time window.
+	// If this field is populated, at least one of the two time fields are required.
+	//
+	// This field is not allowed in the Subscribe RPC.
+	arista.time.TimeBounds time = 3;
+};
+
+message SubnetConfigStreamResponse {
+	// Value is a value deemed relevant to the initiating request.
+	// This structure will always have its key-field populated. Which other fields are
+	// populated, and why, depends on the value of Operation and what triggered this notification.
+	SubnetConfig value = 1;
+
+	// Time holds the timestamp of this SubnetConfig's last modification.
+	google.protobuf.Timestamp time = 2;
+
+	// Operation indicates how the SubnetConfig value in this response should be considered.
+	// Under non-subscribe requests, this value should always be INITIAL. In a subscription,
+	// once all initial data is streamed and the client begins to receive modification updates,
+	// you should not see INITIAL again.
+	arista.subscriptions.Operation type = 3;
+};
+
+message SubnetConfigSetRequest {
+	// SubnetConfig carries the value to set into the datastore.
+	// See the documentation on the SubnetConfig struct for which fields are required.
+	SubnetConfig value = 1;
+};
+
+message SubnetConfigSetResponse {
+	// Value carries all the values given in the SubnetConfigSetRequest as well
+	// as any server-generated values.
+	SubnetConfig value = 1;
+
+	// Time indicates the (UTC) timestamp at which the system recognizes the
+	// creation. The only guarantees made about this timestamp are:
+	//
+	//    - it is after the time the request was received
+	//    - a time-ranged query with StartTime==CreatedAt will include this instance.
+	//
+	google.protobuf.Timestamp time = 2;
+};
+
+message SubnetConfigDeleteRequest {
+	// Key indicates which SubnetConfig instance to remove.
+	// This field must always be set.
+	SubnetKey key = 1;
+};
+
+message SubnetConfigDeleteResponse {
+	// Key echoes back the key of the deleted SubnetConfig instance.
+	SubnetKey key = 1;
+
+	// Time indicates the (UTC) timestamp at which the system recognizes the
+	// deletion. The only guarantees made about this timestamp are:
+	//
+	//    - it is after the time the request was received
+	//    - a time-ranged query with StartTime==DeletedAt will not include this instance.
+	//
+	google.protobuf.Timestamp time = 2;
+};
+
+message SubnetConfigDeleteAllRequest {
+};
+
+message SubnetConfigDeleteAllResponse {
+	// This describes the class of delete error.
+	fmp.DeleteError type = 1;
+	// This indicates the error message from the delete failure.
+	google.protobuf.StringValue error = 2;
+	// This is the key of the SubnetConfig instance that failed to be deleted.
+	SubnetKey key = 3;
+	// Time indicates the (UTC) timestamp when the key was being deleted.
+	google.protobuf.Timestamp time = 4;
+};
+
+service SubnetConfigService {
+	rpc GetOne (SubnetConfigRequest) returns (SubnetConfigResponse);
+	rpc GetAll (SubnetConfigStreamRequest) returns (stream SubnetConfigStreamResponse);
+	rpc Subscribe (SubnetConfigStreamRequest) returns (stream SubnetConfigStreamResponse);
+	rpc Set (SubnetConfigSetRequest) returns (SubnetConfigSetResponse);
+	rpc Delete (SubnetConfigDeleteRequest) returns (SubnetConfigDeleteResponse);
+	rpc DeleteAll (SubnetConfigDeleteAllRequest) returns (stream SubnetConfigDeleteAllResponse);
+}
+
+message TopologyInfoConfigRequest {
+	// Key uniquely identifies a TopologyInfoConfig instance to retrieve.
+	// This value must be populated.
+	TopologyInfoKey key = 1;
+
+	// Time indicates the time for which you are interested in the data.
+	// If no time is given, the server will use the time at which it makes the request.
+	google.protobuf.Timestamp time = 2;
+};
+
+message TopologyInfoConfigResponse {
+	// Value is the value requested.
+	// This structure will be fully-populated as it exists in the datastore. If
+	// optional fields were not given at creation, these fields will be empty or
+	// set to default values.
+	TopologyInfoConfig value = 1;
+
+	// Time carries the (UTC) timestamp of the last-modification of the
+	// TopologyInfoConfig instance in this response.
+	google.protobuf.Timestamp time = 2;
+};
+
+message TopologyInfoConfigStreamRequest {
+	// PartialEqFilter provides a way to server-side filter a GetAll/Subscribe.
+	// This requires all provided fields to be equal to the response.
+	//
+	// While transparent to users, this field also allows services to optimize internal
+	// subscriptions if filter(s) are sufficiently specific.
+	repeated TopologyInfoConfig partial_eq_filter = 1;
+
+	// TimeRange allows limiting response data to within a specified time window.
+	// If this field is populated, at least one of the two time fields are required.
+	//
+	// This field is not allowed in the Subscribe RPC.
+	arista.time.TimeBounds time = 3;
+};
+
+message TopologyInfoConfigStreamResponse {
+	// Value is a value deemed relevant to the initiating request.
+	// This structure will always have its key-field populated. Which other fields are
+	// populated, and why, depends on the value of Operation and what triggered this notification.
+	TopologyInfoConfig value = 1;
+
+	// Time holds the timestamp of this TopologyInfoConfig's last modification.
+	google.protobuf.Timestamp time = 2;
+
+	// Operation indicates how the TopologyInfoConfig value in this response should be considered.
+	// Under non-subscribe requests, this value should always be INITIAL. In a subscription,
+	// once all initial data is streamed and the client begins to receive modification updates,
+	// you should not see INITIAL again.
+	arista.subscriptions.Operation type = 3;
+};
+
+message TopologyInfoConfigSetRequest {
+	// TopologyInfoConfig carries the value to set into the datastore.
+	// See the documentation on the TopologyInfoConfig struct for which fields are required.
+	TopologyInfoConfig value = 1;
+};
+
+message TopologyInfoConfigSetResponse {
+	// Value carries all the values given in the TopologyInfoConfigSetRequest as well
+	// as any server-generated values.
+	TopologyInfoConfig value = 1;
+
+	// Time indicates the (UTC) timestamp at which the system recognizes the
+	// creation. The only guarantees made about this timestamp are:
+	//
+	//    - it is after the time the request was received
+	//    - a time-ranged query with StartTime==CreatedAt will include this instance.
+	//
+	google.protobuf.Timestamp time = 2;
+};
+
+message TopologyInfoConfigDeleteRequest {
+	// Key indicates which TopologyInfoConfig instance to remove.
+	// This field must always be set.
+	TopologyInfoKey key = 1;
+};
+
+message TopologyInfoConfigDeleteResponse {
+	// Key echoes back the key of the deleted TopologyInfoConfig instance.
+	TopologyInfoKey key = 1;
+
+	// Time indicates the (UTC) timestamp at which the system recognizes the
+	// deletion. The only guarantees made about this timestamp are:
+	//
+	//    - it is after the time the request was received
+	//    - a time-ranged query with StartTime==DeletedAt will not include this instance.
+	//
+	google.protobuf.Timestamp time = 2;
+};
+
+message TopologyInfoConfigDeleteAllRequest {
+};
+
+message TopologyInfoConfigDeleteAllResponse {
+	// This describes the class of delete error.
+	fmp.DeleteError type = 1;
+	// This indicates the error message from the delete failure.
+	google.protobuf.StringValue error = 2;
+	// This is the key of the TopologyInfoConfig instance that failed to be deleted.
+	TopologyInfoKey key = 3;
+	// Time indicates the (UTC) timestamp when the key was being deleted.
+	google.protobuf.Timestamp time = 4;
+};
+
+service TopologyInfoConfigService {
+	rpc GetOne (TopologyInfoConfigRequest) returns (TopologyInfoConfigResponse);
+	rpc GetAll (TopologyInfoConfigStreamRequest) returns (stream TopologyInfoConfigStreamResponse);
+	rpc Subscribe (TopologyInfoConfigStreamRequest) returns (stream TopologyInfoConfigStreamResponse);
+	rpc Set (TopologyInfoConfigSetRequest) returns (TopologyInfoConfigSetResponse);
+	rpc Delete (TopologyInfoConfigDeleteRequest) returns (TopologyInfoConfigDeleteResponse);
+	rpc DeleteAll (TopologyInfoConfigDeleteAllRequest) returns (stream TopologyInfoConfigDeleteAllResponse);
+}
+
+message VpcConfigRequest {
+	// Key uniquely identifies a VpcConfig instance to retrieve.
+	// This value must be populated.
+	VpcKey key = 1;
+
+	// Time indicates the time for which you are interested in the data.
+	// If no time is given, the server will use the time at which it makes the request.
+	google.protobuf.Timestamp time = 2;
+};
+
+message VpcConfigResponse {
+	// Value is the value requested.
+	// This structure will be fully-populated as it exists in the datastore. If
+	// optional fields were not given at creation, these fields will be empty or
+	// set to default values.
+	VpcConfig value = 1;
+
+	// Time carries the (UTC) timestamp of the last-modification of the
+	// VpcConfig instance in this response.
+	google.protobuf.Timestamp time = 2;
+};
+
+message VpcConfigStreamRequest {
+	// PartialEqFilter provides a way to server-side filter a GetAll/Subscribe.
+	// This requires all provided fields to be equal to the response.
+	//
+	// While transparent to users, this field also allows services to optimize internal
+	// subscriptions if filter(s) are sufficiently specific.
+	repeated VpcConfig partial_eq_filter = 1;
+
+	// TimeRange allows limiting response data to within a specified time window.
+	// If this field is populated, at least one of the two time fields are required.
+	//
+	// This field is not allowed in the Subscribe RPC.
+	arista.time.TimeBounds time = 3;
+};
+
+message VpcConfigStreamResponse {
+	// Value is a value deemed relevant to the initiating request.
+	// This structure will always have its key-field populated. Which other fields are
+	// populated, and why, depends on the value of Operation and what triggered this notification.
+	VpcConfig value = 1;
+
+	// Time holds the timestamp of this VpcConfig's last modification.
+	google.protobuf.Timestamp time = 2;
+
+	// Operation indicates how the VpcConfig value in this response should be considered.
+	// Under non-subscribe requests, this value should always be INITIAL. In a subscription,
+	// once all initial data is streamed and the client begins to receive modification updates,
+	// you should not see INITIAL again.
+	arista.subscriptions.Operation type = 3;
+};
+
+message VpcConfigSetRequest {
+	// VpcConfig carries the value to set into the datastore.
+	// See the documentation on the VpcConfig struct for which fields are required.
+	VpcConfig value = 1;
+};
+
+message VpcConfigSetResponse {
+	// Value carries all the values given in the VpcConfigSetRequest as well
+	// as any server-generated values.
+	VpcConfig value = 1;
+
+	// Time indicates the (UTC) timestamp at which the system recognizes the
+	// creation. The only guarantees made about this timestamp are:
+	//
+	//    - it is after the time the request was received
+	//    - a time-ranged query with StartTime==CreatedAt will include this instance.
+	//
+	google.protobuf.Timestamp time = 2;
+};
+
+message VpcConfigDeleteRequest {
+	// Key indicates which VpcConfig instance to remove.
+	// This field must always be set.
+	VpcKey key = 1;
+};
+
+message VpcConfigDeleteResponse {
+	// Key echoes back the key of the deleted VpcConfig instance.
+	VpcKey key = 1;
+
+	// Time indicates the (UTC) timestamp at which the system recognizes the
+	// deletion. The only guarantees made about this timestamp are:
+	//
+	//    - it is after the time the request was received
+	//    - a time-ranged query with StartTime==DeletedAt will not include this instance.
+	//
+	google.protobuf.Timestamp time = 2;
+};
+
+message VpcConfigDeleteAllRequest {
+};
+
+message VpcConfigDeleteAllResponse {
+	// This describes the class of delete error.
+	fmp.DeleteError type = 1;
+	// This indicates the error message from the delete failure.
+	google.protobuf.StringValue error = 2;
+	// This is the key of the VpcConfig instance that failed to be deleted.
+	VpcKey key = 3;
+	// Time indicates the (UTC) timestamp when the key was being deleted.
+	google.protobuf.Timestamp time = 4;
+};
+
+service VpcConfigService {
+	rpc GetOne (VpcConfigRequest) returns (VpcConfigResponse);
+	rpc GetAll (VpcConfigStreamRequest) returns (stream VpcConfigStreamResponse);
+	rpc Subscribe (VpcConfigStreamRequest) returns (stream VpcConfigStreamResponse);
+	rpc Set (VpcConfigSetRequest) returns (VpcConfigSetResponse);
+	rpc Delete (VpcConfigDeleteRequest) returns (VpcConfigDeleteResponse);
+	rpc DeleteAll (VpcConfigDeleteAllRequest) returns (stream VpcConfigDeleteAllResponse);
+}

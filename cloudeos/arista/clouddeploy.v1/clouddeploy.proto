@@ -1,0 +1,491 @@
+// Copyright (c) 2020 Arista Networks, Inc.
+// Use of this source code is governed by the Mozilla Public License Version 2.0
+// that can be found in the LICENSE file.
+
+syntax = "proto3";
+
+package arista.clouddeploy.v1;
+
+option go_package = "terraform-provider-cloudeos/cloudeos/arista/clouddeploy.v1;clouddeploy_v1";
+
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/timestamp.proto";
+
+import "fmp/extensions.proto";
+import "fmp/inet.proto";
+import "fmp/wrappers.proto";
+
+message IpsecInfo {
+   google.protobuf.StringValue ike_integrity = 1;
+   google.protobuf.StringValue ike_encryption = 2;
+   google.protobuf.StringValue ike_lifetime = 3;
+   google.protobuf.StringValue ike_pfs = 4;
+   google.protobuf.StringValue ike_preshared_key = 5;
+   google.protobuf.StringValue ipsec_integrity = 6;
+   google.protobuf.StringValue ipsec_encryption = 7;
+   google.protobuf.StringValue ipsec_pfs = 8;
+   google.protobuf.StringValue ipsec_mode = 9;
+   google.protobuf.StringValue dpd_interval = 10;
+   google.protobuf.StringValue dpd_retries = 11;
+}
+
+message TunnelInfo {
+   fmp.IPAddress               tunnel_aws_endpoint_ip = 1;
+   google.protobuf.StringValue tunnel_bgp_asn = 2;
+   fmp.IPAddress               tunnel_router_overlay_ip = 3;
+   fmp.IPAddress               tunnel_aws_overlay_ip = 4;
+   google.protobuf.StringValue tunnel_bgp_holdtime = 5;
+   google.protobuf.StringValue tunnel_preshared_key = 6;
+   IpsecInfo ipsec_info = 7;
+}
+
+message TunnelInfoList {
+    repeated TunnelInfo values = 1;
+}
+
+message AWSVpnConfig {
+   option (fmp.model) = "rw";
+
+   AWSVpnKey key = 1;
+   google.protobuf.StringValue tgw_id = 2;
+   google.protobuf.StringValue vpn_connection_id = 3;
+   google.protobuf.StringValue cgw_id = 4;
+   google.protobuf.StringValue cloudeos_router_id = 5;
+   google.protobuf.StringValue cloudeos_vpc_id = 6;
+   google.protobuf.StringValue vpn_tgw_attachment_id = 7;
+   TunnelInfoList tunnel_info_list = 8;
+   google.protobuf.StringValue cnps = 9;
+   google.protobuf.StringValue vpn_gateway_id = 10;
+}
+
+message AWSVpnKey {
+   option (fmp.model_key) = true;
+   google.protobuf.StringValue tf_id = 1;
+}
+
+message TgwStats {
+   google.protobuf.DoubleValue bytes_in = 1;
+   google.protobuf.DoubleValue bytes_out = 2;
+   google.protobuf.DoubleValue packets_in = 3;
+   google.protobuf.DoubleValue packets_out = 4;
+   google.protobuf.DoubleValue packet_drop_count_blackhole = 5;
+   google.protobuf.DoubleValue packet_drop_count_no_route = 6;
+   google.protobuf.DoubleValue bandwidth_in = 7;
+   google.protobuf.DoubleValue bandwidth_out = 8;
+   google.protobuf.Timestamp stats_time = 9;
+}
+
+message AWSTgw {
+   option (fmp.model) = "ro";
+
+   AWSTgwKey key = 1;
+   google.protobuf.StringValue name = 2;
+   google.protobuf.StringValue state = 3;
+   google.protobuf.StringValue region = 4;
+   google.protobuf.StringValue account_id = 5;
+   google.protobuf.StringValue topology_name = 6;
+   fmp.RepeatedString attachment_ids = 7;
+   fmp.MapStringString cnps_to_route_table_id = 8;
+   TgwStats stats = 9;
+}
+
+message AWSTgwKey {
+   option (fmp.model_key) = true;
+   google.protobuf.StringValue tgw_id = 1;
+}
+
+message AWSTgwAttachment {
+   option (fmp.model) = "ro";
+
+   AWSTgwAttachmentKey key = 1;
+   google.protobuf.StringValue state = 2;
+   google.protobuf.StringValue region = 3;
+   google.protobuf.StringValue account_id = 4;
+   google.protobuf.StringValue topology_name = 5;
+   google.protobuf.StringValue tgw_id = 6;
+   google.protobuf.StringValue route_table_id = 7;
+   google.protobuf.StringValue cnps = 8;
+   google.protobuf.StringValue resource_id = 9;
+   google.protobuf.StringValue vpc_id = 10;
+   google.protobuf.StringValue tun1_state = 11;
+   google.protobuf.StringValue tun2_state = 12;
+   fmp.IPAddress tun1_local_ip_outside = 13;
+   fmp.IPAddress tun1_local_ip_inside = 14;
+   fmp.IPAddress tun1_remote_ip_outside = 15;
+   fmp.IPAddress tun1_remote_ip_inside = 16;
+   fmp.IPAddress tun2_local_ip_outside = 17;
+   fmp.IPAddress tun2_local_ip_inside = 18;
+   fmp.IPAddress tun2_remote_ip_outside = 19;
+   fmp.IPAddress tun2_remote_ip_inside = 20;
+   fmp.RepeatedString peer_attachment_ids = 21;
+   TgwStats stats = 22;
+   google.protobuf.StringValue tgw_name = 23;
+}
+
+message AWSTgwAttachmentKey {
+   option (fmp.model_key) = true;
+   google.protobuf.StringValue attachment_id = 1;
+}
+
+// ------------------------------ ENUMS --------------------------------
+
+enum TopologyInfoType {
+   TOPOLOGY_INFO_TYPE_UNSPECIFIED = 0;
+   // Topology meta info
+   TOPOLOGY_INFO_TYPE_META = 1;
+   TOPOLOGY_INFO_TYPE_WAN = 2;
+   TOPOLOGY_INFO_TYPE_CLOS = 3;
+}
+
+enum FabricType {
+   FABRIC_TYPE_UNSPECIFIED = 0;
+   FABRIC_TYPE_FULL_MESH = 1;
+   FABRIC_TYPE_HUB_SPOKE = 2;
+}
+
+enum CloudProviderType {
+   CLOUD_PROVIDER_TYPE_UNSPECIFIED = 0;
+   CLOUD_PROVIDER_TYPE_AWS = 1;
+   CLOUD_PROVIDER_TYPE_AZURE = 2;
+   CLOUD_PROVIDER_TYPE_GCP = 3;
+}
+
+
+enum UnderlayConnectionType {
+   UNDERLAY_CONNECTION_TYPE_UNSPECIFIED = 0;
+   UNDERLAY_CONNECTION_TYPE_IGW = 1;
+   UNDERLAY_CONNECTION_TYPE_PEERING = 2;
+   UNDERLAY_CONNECTION_TYPE_TGW = 3;
+}
+
+enum OverlayConnectionType {
+   OVERLAY_CONNECTION_TYPE_UNSPECIFIED = 0;
+   OVERLAY_CONNECTION_TYPE_DPS = 1;
+   OVERLAY_CONNECTION_TYPE_VXLAN = 2;
+   OVERLAY_CONNECTION_TYPE_IPSEC = 3;
+}
+
+enum RoleType {
+   ROLE_TYPE_UNSPECIFIED = 0;
+   ROLE_TYPE_EDGE = 1;
+   ROLE_TYPE_SPINE = 2;
+   ROLE_TYPE_LEAF = 3;
+}
+
+
+enum CVStatusCode {
+   CV_STATUS_CODE_UNSPECIFIED = 0;
+   // Rtr object is created. Waiting for router to start streaming
+   CV_STATUS_CODE_RTR_CREATED = 1;
+   // Router is streaming, waiting for router to be provisioned
+   CV_STATUS_CODE_RTR_DISCOVERED = 2;
+   // Router is provisioned. It is in the undefined container
+   CV_STATUS_CODE_RTR_PROVISIONED = 3;
+   // A config is being applied to the router
+   CV_STATUS_CODE_RTR_CONFIG_WIP = 4;
+   // Rtr is ready for futher action/operation
+   CV_STATUS_CODE_RTR_READY = 5;
+    // Rtr could not be created
+   CV_STATUS_CODE_RTR_FAILED = 6;
+   // Rtr stopped streaming after it is provisioned
+   CV_STATUS_CODE_RTR_INACTIVE = 7;
+}
+
+enum DeviceStatusCode {
+   DEVICE_STATUS_CODE_UNSPECIFIED = 0;
+   DEVICE_STATUS_CODE_WORK_IN_PROGRESS = 1;
+   DEVICE_STATUS_CODE_SUCCESS = 2;
+   DEVICE_STATUS_CODE_ERROR = 3;
+}
+
+
+enum DeploymentStatusCode {
+   // TF or any other client that invokes Router message
+   // should inform about deployment status
+   // of the router instance
+   DEPLOYMENT_STATUS_CODE_UNSPECIFIED = 0;
+   DEPLOYMENT_STATUS_CODE_IN_PROGRESS = 1;
+   DEPLOYMENT_STATUS_CODE_SUCCESS = 2;
+   DEPLOYMENT_STATUS_CODE_ERR = 3;
+}
+
+enum NetworkInterfaceType {
+   NETWORK_INTERFACE_TYPE_UNSPECIFIED = 0;
+   NETWORK_INTERFACE_TYPE_PRIVATE = 1;
+   NETWORK_INTERFACE_TYPE_PUBLIC = 2;
+   NETWORK_INTERFACE_TYPE_INTERNAL = 3;
+}
+
+enum VpcStatusCode {
+   VPC_STATUS_CODE_UNSPECIFIED = 0;
+   VPC_STATUS_CODE_SUCCESS = 1;
+   VPC_STATUS_CODE_FAILURE = 2;
+}
+
+// -------------------- Subnets --------------------------------------------------
+
+message SubnetKey{
+   option (fmp.model_key) = true;
+   // An ID can be generated by the client to track resource
+   google.protobuf.StringValue id=1;
+}
+
+
+message SubnetConfig {
+   option (fmp.model) = "rw";
+   SubnetKey key = 1;
+   google.protobuf.StringValue subnet_id = 2;
+   CloudProviderType cp_t = 3;
+   google.protobuf.StringValue cidr = 4;
+   google.protobuf.StringValue vpc_id = 5;
+   google.protobuf.StringValue avail_zone = 6;
+   google.protobuf.StringValue prim_gw = 7;
+   google.protobuf.StringValue sec_gw = 8;
+}
+
+
+// -------------------- Vpcs --------------------------------------------------
+
+message AzureVnetInfo {
+   fmp.RepeatedString nsg = 1;
+   google.protobuf.StringValue resource_group = 2;
+   google.protobuf.StringValue cidr = 3;
+   fmp.RepeatedString avail_set = 4;
+   fmp.RepeatedString peering_conn_id = 5;
+}
+
+message AwsVpcInfo {
+   fmp.RepeatedString  security_group = 1;
+   google.protobuf.StringValue cidr = 2;
+   google.protobuf.StringValue igw_id = 3;
+   fmp.RepeatedString  peering_conn_id = 4;
+}
+
+message PeerVpcInfo {
+   fmp.MapStringString  peer_vpc_cidr = 1;
+   google.protobuf.StringValue peer_rg_name = 2;
+   google.protobuf.StringValue peer_vnet_name = 3;
+   google.protobuf.StringValue peer_vnet_id = 4;
+}
+
+message VpcKey{
+   option (fmp.model_key) = true;
+   google.protobuf.StringValue id=1;
+}
+
+
+message VpcConfig {
+   option (fmp.model) = "rw";
+   VpcKey key=1;
+   google.protobuf.StringValue name = 2;
+   google.protobuf.StringValue vpc_id = 3;
+   CloudProviderType cp_t  = 4;
+   google.protobuf.StringValue region = 5;
+
+   // Topology related attributes
+   RoleType role_type = 6;
+   google.protobuf.StringValue topology_name = 7;
+   google.protobuf.StringValue clos_name = 8;
+   google.protobuf.StringValue wan_name = 9;
+
+   AzureVnetInfo az_vnet_info = 10;
+   AwsVpcInfo aws_vpc_info = 11;
+   google.protobuf.StringValue cnps = 12;
+   google.protobuf.BoolValue route_reflector = 13;
+   // Other tags that can be used in queries
+   fmp.MapStringString  tags = 14;
+
+   // mapping between vpc_id -> cidr
+   fmp.MapStringString  peer_vpc_cidr = 15;
+   // Vpc creation status
+   VpcStatusCode status_code = 16;
+   // account information
+   google.protobuf.StringValue account = 17;
+   PeerVpcInfo peer_vpc_info = 18;
+
+   google.protobuf.BoolValue tgw_connected = 19;
+   google.protobuf.BoolValue cloudeos = 20;
+   google.protobuf.StringValue managed_by = 21;
+   google.protobuf.StringValue deploy_mode = 22;
+}
+
+// --------------------Topology Info--------------------------------------------------
+
+message WanInfo {
+   google.protobuf.StringValue wan_name = 1;
+   CloudProviderType cp_type = 2;
+   fmp.RepeatedString  peer_names = 3;
+   google.protobuf.BoolValue edge_edge_peering = 4;
+   google.protobuf.BoolValue edge_edge_igw = 5;
+   google.protobuf.BoolValue edge_dedicated_connect = 6; // DirectConnect
+   google.protobuf.StringValue cvp_container_name = 7;
+}
+
+message ClosInfo {
+   google.protobuf.StringValue clos_name = 1;
+   CloudProviderType cp_type = 2;
+   FabricType fabric = 3; // for Leaf connectivity
+   google.protobuf.BoolValue leaf_edge_peering = 4; // VPC peering b/w leaf and edge
+   google.protobuf.BoolValue leaf_edge_igw = 5; // IGW b/w leaf and edge
+   google.protobuf.BoolValue leaf_encryption = 6; // IPSec b/w leaf and edge
+   google.protobuf.StringValue  cvp_container_name = 7;
+}
+
+message TopologyInfoKey {
+   option (fmp.model_key) = true;
+   google.protobuf.StringValue id=1;
+}
+
+message TopologyInfoConfig {
+   option (fmp.model) = "rw";
+   TopologyInfoKey key=1;
+
+   google.protobuf.StringValue name = 2;
+   TopologyInfoType topo_type = 3;
+   google.protobuf.Int32Value bgp_asn_low = 4;
+   google.protobuf.Int32Value bgp_asn_high = 5;
+   google.protobuf.StringValue vtep_ip_cidr = 6; // CIDR block for VTEP IPs on vEOS
+   google.protobuf.StringValue terminattr_ip_cidr = 7; // Loopback IP range on vEOS
+   google.protobuf.StringValue dps_control_plane_cidr = 8; // Dps Control Plane IP Cidr
+   fmp.RepeatedString  managed_devices = 9; // Hostnames of existing vEOS instances
+   google.protobuf.StringValue cvaas_domain = 10; //CVaaS Domain Name
+   google.protobuf.StringValue cvaas_server = 11;
+   WanInfo wan_info = 12;
+   ClosInfo clos_info = 13;
+   google.protobuf.StringValue version = 14;
+   google.protobuf.StringValue deploy_mode = 15;
+}
+
+
+// -------------------- Router --------------------------------------------------
+
+message RouteTableIds {
+   fmp.RepeatedString  public = 1;
+   fmp.RepeatedString  private = 2;
+   fmp.RepeatedString  internal = 3;
+}
+
+message NetworkInterface {
+   google.protobuf.StringValue intf_id = 1;
+   google.protobuf.StringValue name = 2;
+   NetworkInterfaceType intf_type = 3;
+   fmp.RepeatedString private_ip_addr = 4;
+   google.protobuf.StringValue  public_ip_addr = 5;
+   google.protobuf.StringValue  subnet = 6;
+   google.protobuf.StringValue security_group = 7;
+}
+
+message CVInfo {
+   // CloudVision reports status of the deployment
+   // using this message. This is ReadOnly for the
+   // clients.
+   CVStatusCode cv_status_code = 1;
+   google.protobuf.StringValue bootstrap_cfg = 2;
+   google.protobuf.StringValue ha_rtr_id = 3;
+   fmp.RepeatedString peer_vpc_rt_table_id = 4;
+   RouteTableIds ha_rt_table_ids = 5;
+   google.protobuf.StringValue cv_status_desc = 6;
+   google.protobuf.StringValue cv_status_recommended_action = 7;
+   DeviceStatusCode device_status = 8;
+}
+
+message AzureRouterDetail {
+   google.protobuf.StringValue avail_zone = 1;
+   google.protobuf.StringValue res_group = 2;
+   google.protobuf.StringValue instance_type = 3;
+   google.protobuf.StringValue avail_set = 4;
+}
+
+message AwsRouterDetail {
+   google.protobuf.StringValue avail_zone = 1;
+   google.protobuf.StringValue instance_type = 2;
+}
+
+// Id is the router key in aeris
+message RouterKey {
+   option (fmp.model_key) = true;
+   // an ID can be generated by the client to track resource
+   google.protobuf.StringValue id = 1;
+}
+
+message RepeatedNetworkInterfaces {
+   repeated NetworkInterface values = 1;
+}
+
+message RouterConfig {
+   option (fmp.model) = "rw";
+   RouterKey key=1;
+   google.protobuf.StringValue name = 2;
+   google.protobuf.StringValue vpc_id = 3;
+   CloudProviderType cp_t = 4;
+   google.protobuf.StringValue region = 5;
+
+   google.protobuf.StringValue instance_id = 6;
+   google.protobuf.StringValue ha_name = 7;
+   // CNPS tag that identifies vrf
+   google.protobuf.StringValue cnps = 8;
+   // Other tags that can be used in queries
+   fmp.MapStringString tags = 9;
+   google.protobuf.StringValue device_enrollment_token = 10;
+   RouteTableIds rt_table_ids = 11;
+   google.protobuf.BoolValue route_reflector = 12;
+
+   // Based upon cp_t, either one of the following two fields will be set
+   AwsRouterDetail aws_rtr_detail = 13;
+   AzureRouterDetail az_rtr_detail = 14;
+
+   RepeatedNetworkInterfaces intf = 15;
+   DeploymentStatusCode dep_status = 16;
+   // Field filled in by CVP. Client should never set this
+   CVInfo cv_info = 17;
+   // Field set by clouddeploy app for UI, client should never set this
+   google.protobuf.StringValue device_serial_num = 18;
+   // Bgp ASN generated by clouddeploy app, client should never set this
+   google.protobuf.Int32Value  bgp_asn = 19;
+   google.protobuf.StringValue managed_by = 20;
+   google.protobuf.StringValue deploy_mode = 21;
+}
+
+
+// -------------------- Path -----------------------------------------------
+
+message PathKey {
+   option (fmp.model_key) = true;
+
+   google.protobuf.StringValue  src_vpc_uuid=1;
+   google.protobuf.StringValue  local_rtr_uuid=2;
+   google.protobuf.StringValue  dst_vpc_uuid=3;
+   google.protobuf.StringValue  remote_rtr_uuid=4;
+   UnderlayConnectionType ul_t=5;
+}
+
+message PathCharacteristics {
+   google.protobuf.Int64Value latency_ms = 1;
+   google.protobuf.Int64Value jitter_ms = 2;
+   google.protobuf.Int64Value pkt_loss_pc = 3;
+   google.protobuf.Int64Value bw_mbps = 4;
+   google.protobuf.BoolValue up = 5;
+   google.protobuf.Int64Value uptime = 6;
+}
+
+message Path {
+   option (fmp.model) = "ro";
+
+   PathKey key =1;
+   google.protobuf.StringValue src_vpc_cloud_id = 2;
+   google.protobuf.StringValue src_vpc_name = 3;
+   google.protobuf.StringValue local_rtr_cloud_id = 4;
+   google.protobuf.StringValue local_rtr_name = 5;
+   google.protobuf.StringValue local_intf_ip_addr = 6;
+   google.protobuf.StringValue src_region = 7;
+   CloudProviderType src_cp_t = 8;
+   google.protobuf.StringValue dst_vpc_cloud_id = 9;
+   google.protobuf.StringValue dst_vpc_name = 10;
+   google.protobuf.StringValue remote_rtr_cloud_id = 11;
+   google.protobuf.StringValue remote_rtr_name = 12;
+   google.protobuf.StringValue remote_intf_ip_addr = 13;
+   google.protobuf.StringValue dst_region = 14;
+   CloudProviderType dst_cp_t = 15;
+   google.protobuf.StringValue topology_name = 16;
+   PathCharacteristics path_char = 17;
+}

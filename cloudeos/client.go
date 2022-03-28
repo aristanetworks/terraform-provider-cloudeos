@@ -5,9 +5,11 @@
 package cloudeos
 
 import (
+	"context"
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -15,7 +17,15 @@ import (
 	"strings"
 	"time"
 
-	api "github.com/terraform-providers/terraform-provider-cloudeos/cloudeos/internal/api"
+	api "terraform-provider-cloudeos/cloudeos/arista/api"
+	cdv1_api "terraform-provider-cloudeos/cloudeos/arista/clouddeploy.v1"
+	fmp "terraform-provider-cloudeos/cloudeos/fmp"
+
+	cvgrpc "github.com/aristanetworks/cloudvision-go/grpc"
+	grpc_retry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/gorilla/websocket"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -161,6 +171,23 @@ func (c *Client) wrpcSend(request *wrpcRequest) (map[string]interface{}, error) 
 	log.Printf("Received success response for %s, Response: %v",
 		request.Params["method"].(string), resp)
 	return resp, nil
+}
+
+// Decide what should be time limit for request timeout
+// currently 60 sec
+const requestTimeout = 60
+
+func (p *CloudeosProvider) grpcClient() (*grpc.ClientConn, error) {
+	opts := []grpc_retry.CallOption{
+		grpc_retry.WithMax(5),
+		grpc_retry.WithBackoff(grpc_retry.BackoffExponential(100 * time.Millisecond)),
+		grpc_retry.WithCodes(codes.Unavailable),
+	}
+
+	return cvgrpc.DialWithToken(context.Background(), p.server+":443", p.srvcAcctToken,
+		grpc.WithStreamInterceptor(grpc_retry.StreamClientInterceptor(opts...)),
+		grpc.WithUnaryInterceptor(grpc_retry.UnaryClientInterceptor(opts...)))
+
 }
 
 func (p *CloudeosProvider) getDeviceEnrollmentToken() (string, error) {
@@ -1723,147 +1750,29 @@ func (p *CloudeosProvider) DeleteSubnet(d *schema.ResourceData) error {
 	return nil
 }
 
-//ListRouter gets router details from CloudDeploy
-func (p *CloudeosProvider) ListRouter(d *schema.ResourceData) error {
-	// create new client
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
-	if err != nil {
-		log.Printf("Failed to create new client to execute ListRouter message")
-		return err
-	}
-	defer client.wrpcClient.Close()
-
-	// Get params needed for Router msg
-	routerName, err := getRouterNameFromSchema(d)
-	if err != nil {
-		return err
-	}
-
-	cpType := getCloudProviderType(d)
-	rtr := &api.Router{
-		Name:   routerName,
-		Id:     d.Get("tf_id").(string),
-		VpcId:  d.Get("vpc_id").(string),
-		CpT:    cpType,
-		Region: d.Get("region").(string),
-		Cnps:   d.Get("cnps").(string),
-	}
-
-	fieldMask, err := getOuterFieldMask(rtr)
-	if err != nil {
-		log.Print("ListRouter: Failed to get field mask")
-		return err
-	}
-	rtr.FieldMask = fieldMask
-
-	log.Printf("[CVaaS-INFO]ListRouterRequestPb:%v", rtr)
-
-	listRouterRequest := api.ListRouterRequest{
-		Filter: []*api.Router{rtr},
-	}
-
-	request := wrpcRequest{
-		Token:   "RPC_Token_List_" + routerName + "_" + d.Get("region").(string),
-		Command: "serviceRequest",
-		Params: map[string]interface{}{
-			"service": "clouddeploy.Routers",
-			"method":  "ListRouter",
-			"body":    &listRouterRequest,
-		},
-	}
-
-	err = client.wrpcClient.WriteJSON(request)
-	if err != nil {
-		log.Printf("Failed to send %s request to CVaaS : %s",
-			request.Params["method"].(string), err)
-		return err
-	}
-	log.Printf("Successfully sent %s request for %s",
-		request.Params["method"].(string), request.Token)
-
-	resp := make(map[string]interface{})
-	err = client.wrpcClient.ReadJSON(&resp)
-	if err != nil {
-		return err
-	}
-
-	if res, ok := resp["result"]; ok {
-		if res, ok := res.(map[string]interface{}); ok {
-			for key, val := range res {
-				if strings.EqualFold(key, "router") {
-					if rtr, ok := val.(map[string]interface{}); ok {
-						err = parseRtrResponse(rtr, d)
-						if err != nil {
-							return err
-						}
-					}
-				}
-			}
-		}
-	} else {
-		// bootstrap_cfg can't be null. This will result in not
-		// creation of aws_instance.cloudeosVm.
-		if err := setBootStrapCfg(d, ""); err != nil {
-			return err
-		}
-	}
-	log.Printf("Received Resp: %v", resp)
-	return nil
-}
-
 //GetRouterResponse - Common function to get the response from Clouddeploy.
-func (p *CloudeosProvider) GetRouterResponse(d *schema.ResourceData) (map[string]interface{},
+func (p *CloudeosProvider) GetRouterResponse(d *schema.ResourceData) (*cdv1_api.RouterConfigResponse,
 	error) {
-	// create new client
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
+	client, err := p.grpcClient()
 	if err != nil {
-		log.Printf("Failed to create new client to execute GetRouter message")
+		log.Printf("GetRouterResponse: Failed to create new CVaaS Grpc client, err: %v", err)
 		return nil, err
 	}
-	defer client.wrpcClient.Close()
 
-	rtr := &api.Router{
-		Id: d.Get("tf_id").(string),
+	defer client.Close()
+	rtrClient := cdv1_api.NewRouterConfigServiceClient(client)
+
+	routerKey := cdv1_api.RouterKey{
+		Id: &wrapperspb.StringValue{Value: d.Get("tf_id").(string)},
+	}
+	getRouterRequest := cdv1_api.RouterConfigRequest{
+		Key: &routerKey,
 	}
 
-	fieldMask, err := getOuterFieldMask(rtr)
-	if err != nil {
-		log.Print("GetRouter: Failed to get field mask")
-		return nil, err
-	}
-	rtr.FieldMask = fieldMask
-
-	log.Printf("[CVaaS-INFO]GetRouterRequestPb:%s", rtr)
-
-	getRouterRequest := api.GetRouterRequest{
-		Router: rtr,
-	}
-
-	request := wrpcRequest{
-		Token:   "RPC_Token_Get_" + d.Get("tf_id").(string),
-		Command: "serviceRequest",
-		Params: map[string]interface{}{
-			"service": "clouddeploy.Routers",
-			"method":  "GetRouter",
-			"body":    &getRouterRequest,
-		},
-	}
-
-	err = client.wrpcClient.WriteJSON(request)
-	if err != nil {
-		log.Printf("Failed to send %s request to CVaaS : %s",
-			request.Params["method"].(string), err)
-		return nil, err
-	}
-	log.Printf("Successfully sent %s request for %s",
-		request.Params["method"].(string), request.Token)
-
-	resp := make(map[string]interface{})
-	err = client.wrpcClient.ReadJSON(&resp)
-	if err != nil {
-		return nil, err
-	}
-	return resp, nil
+	log.Printf("[CVaaS-INFO] GetRouterRequest: %v", &getRouterRequest)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(requestTimeout*time.Second))
+	defer cancel()
+	return rtrClient.GetOne(ctx, &getRouterRequest)
 }
 
 //GetRouter gets router details from CloudDeploy
@@ -1871,21 +1780,15 @@ func (p *CloudeosProvider) GetRouter(d *schema.ResourceData) error {
 	// create new client
 	resp, err := p.GetRouterResponse(d)
 	if err != nil {
+		log.Printf("GetRouterResponse returned error: %v", err)
 		return err
 	}
 
-	if res, ok := resp["result"]; ok {
-		if res, ok := res.(map[string]interface{}); ok {
-			for key, val := range res {
-				if strings.EqualFold(key, "router") {
-					if rtr, ok := val.(map[string]interface{}); ok {
-						err = parseRtrResponse(rtr, d)
-						if err != nil {
-							return err
-						}
-					}
-				}
-			}
+	log.Printf("[CVaaS-INFO] Received GetRouterResponse: %v", resp)
+
+	if resp.GetValue() != nil {
+		if err = parseRtrResponse(resp.GetValue(), d); err != nil {
+			return err
 		}
 	} else {
 		// bootstrap_cfg can't be null. This will result in not
@@ -1894,111 +1797,62 @@ func (p *CloudeosProvider) GetRouter(d *schema.ResourceData) error {
 			return err
 		}
 	}
-	log.Printf("Received GetRouter Resp: %v", resp)
+
 	return nil
 }
 
 func (p *CloudeosProvider) GetRouterStatusAndSetBgpAsn(d *schema.ResourceData) error {
 	resp, err := p.GetRouterResponse(d)
 	if err != nil {
+		log.Printf("GetRouterResponse returned error: %v", err)
 		return err
 	}
 
-	if res, ok := resp["result"]; ok {
-		if res, ok := res.(map[string]interface{}); ok {
-			for key, val := range res {
-				if strings.EqualFold(key, "router") {
-					if rtr, ok := val.(map[string]interface{}); ok {
-						for k, v := range rtr {
-							if strings.EqualFold(k, "bgp_asn") {
-								routerBgpAsn := fmt.Sprint(v)
-								err := d.Set("router_bgp_asn", routerBgpAsn)
-								if err != nil {
-									return err
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+	log.Printf("[CVaaS-INFO] Received GetRouterResponse: %v", resp)
+	routerBgpAsn := fmt.Sprint(resp.GetValue().GetBgpAsn().GetValue())
+	if err = d.Set("router_bgp_asn", routerBgpAsn); err != nil {
+		return err
 	}
+
 	return nil
 }
 
 //CheckRouterDeletionStatus returns nil if Router doesn't exist
 func (p *CloudeosProvider) CheckRouterDeletionStatus(d *schema.ResourceData) error {
-	// create new client
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
+	client, err := p.grpcClient()
 	if err != nil {
-		log.Printf("Failed to create new client in CheckRouterDeletionStatus")
+		log.Printf("CheckRouterDeletionStatus: Failed to create new CVaaS Grpc client, err: %v", err)
 		return err
 	}
-	defer client.wrpcClient.Close()
+	defer client.Close()
+	rtrClient := cdv1_api.NewRouterConfigServiceClient(client)
 
-	rtr := &api.Router{
-		Id: d.Get("tf_id").(string),
+	routerKey := cdv1_api.RouterKey{
+		Id: &wrapperspb.StringValue{Value: d.Get("tf_id").(string)},
 	}
+	getRouterRequest := cdv1_api.RouterConfigRequest{
+		Key: &routerKey,
+	}
+	log.Printf("[CVaaS-INFO] GetRouterRequest: %v", &getRouterRequest)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(requestTimeout*time.Second))
+	defer cancel()
 
-	fieldMask, err := getOuterFieldMask(rtr)
+	resp, err := rtrClient.GetOne(ctx, &getRouterRequest)
 	if err != nil {
-		log.Print("CheckRouterDeletionStatus: Failed to get field mask")
+		log.Printf("GetRouterRequest failed, error: %v", err)
 		return err
 	}
-	rtr.FieldMask = fieldMask
 
-	log.Printf("[CVaaS-INFO]GetRouterRequestPb:%s", rtr)
-
-	getRouterRequest := api.GetRouterRequest{
-		Router: rtr,
-	}
-
-	request := wrpcRequest{
-		Token:   "RPC_Token_Get_" + d.Get("tf_id").(string),
-		Command: "serviceRequest",
-		Params: map[string]interface{}{
-			"service": "clouddeploy.Routers",
-			"method":  "GetRouter",
-			"body":    &getRouterRequest,
-		},
-	}
-
-	err = client.wrpcClient.WriteJSON(request)
-	if err != nil {
-		log.Printf("Failed to send %s request to CVaaS : %s",
-			request.Params["method"].(string), err)
-		return err
-	}
-	log.Printf("Successfully sent %s request for %s",
-		request.Params["method"].(string), request.Token)
-
-	resp := make(map[string]interface{})
-	err = client.wrpcClient.ReadJSON(&resp)
-	if err != nil {
-		return err
-	}
-	log.Printf("Received GetRouter Resp: %v", resp)
-
-	routerExists := false
-	/* A response with no Router looks like:
-	   map[error:rpc error: code = NotFound desc = did not find resource "xxx"
-	       status:map[code:5 message:did not find resource "xxx"] token: ... ] */
-
-	// parse response to check if Router exist
-	if res, ok := resp["result"]; ok {
-		if res, ok := res.(map[string]interface{}); ok {
-			for key := range res {
-				if strings.EqualFold(key, "router") {
-					routerExists = true
-				}
-			}
-		}
-	}
-
-	log.Printf("routerExist: %v", routerExists)
-	if routerExists {
+	log.Printf("[CVaaS-INFO] Received GetRouter Resp: %v", resp)
+	// In case of object not existing in aeris, the server returns an empty response
+	// i.e router protobuf with all fields empty, so checking if key is not present
+	// should be sufficient to confirm that router is deleted from aeris
+	if resp.GetValue().GetKey().GetId().GetValue() != "" {
+		log.Printf("Router Exists")
 		return errors.New("Router resource exists")
+
 	}
+
 	return nil
 }
 
@@ -2006,109 +1860,85 @@ func (p *CloudeosProvider) CheckRouterDeletionStatus(d *schema.ResourceData) err
 func (p *CloudeosProvider) AddRouterConfig(d *schema.ResourceData) error {
 	enrollmentToken, err := p.getDeviceEnrollmentToken()
 	if err != nil {
-		log.Printf("%v", err)
+		log.Printf("Error getting device enrollment token, error: %v", err)
 		return err
 	}
 
-	// Create new client.
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
+	client, err := p.grpcClient()
 	if err != nil {
-		log.Printf("Failed to create new client to execute AddRouter message")
+		log.Printf("AddRouterConfig: Failed to create new CVaaS Grpc client, err: %v", err)
 		return err
 	}
-	defer client.wrpcClient.Close()
+	defer client.Close()
 
+	rtrClient := cdv1_api.NewRouterConfigServiceClient(client)
 	routerName, err := getRouterNameFromSchema(d)
 	if err != nil {
+		log.Printf("Error getting router name from schema, error: %v", err)
 		return err
 	}
 
 	//Adding Intf Private IP, Type and Name to the first message.
-	var intfs []*api.NetworkInterface
+	var intfs []*cdv1_api.NetworkInterface
 	intfNameList := d.Get("intf_name").([]interface{})
 	privateIPList := d.Get("intf_private_ip").([]interface{})
 	intfTypeList := d.Get("intf_type").([]interface{})
 	intfCount := len(intfNameList)
 	for i := 0; i < intfCount; i++ {
-		var intf api.NetworkInterface
-		intf.Name = intfNameList[i].(string)
-		intf.PrivateIpAddr = []string{privateIPList[i].(string)}
+		intf := &cdv1_api.NetworkInterface{
+			Name:          &wrapperspb.StringValue{Value: intfNameList[i].(string)},
+			PrivateIpAddr: &fmp.RepeatedString{Values: []string{privateIPList[i].(string)}},
+		}
+
 		switch {
 		case strings.EqualFold(intfTypeList[i].(string), "public"):
-			intf.IntfType = api.NetworkInterfaceType_INTF_TYPE_PUBLIC
+			intf.IntfType = cdv1_api.NetworkInterfaceType_NETWORK_INTERFACE_TYPE_PUBLIC
 		case strings.EqualFold(intfTypeList[i].(string), "private"):
-			intf.IntfType = api.NetworkInterfaceType_INTF_TYPE_PRIVATE
+			intf.IntfType = cdv1_api.NetworkInterfaceType_NETWORK_INTERFACE_TYPE_PRIVATE
 		case strings.EqualFold(intfTypeList[i].(string), "internal"):
-			intf.IntfType = api.NetworkInterfaceType_INTF_TYPE_INTERNAL
+			intf.IntfType = cdv1_api.NetworkInterfaceType_NETWORK_INTERFACE_TYPE_INTERNAL
 		}
-		intf.FieldMask, err = getOuterFieldMask(&intf)
-		if err != nil {
-			log.Print("AddRouterConfig: Failed to get field mask for intf")
-			return err
-		}
-		intfs = append(intfs, &intf)
+		intfs = append(intfs, intf)
 	}
 
 	cpType := getCloudProviderType(d)
-	rtr := &api.Router{
-		Name:                  routerName,
-		Id:                    d.Get("tf_id").(string),
-		VpcId:                 d.Get("vpc_id").(string),
-		CpT:                   cpType,
-		Region:                d.Get("region").(string),
-		Cnps:                  d.Get("cnps").(string),
-		DeviceEnrollmentToken: enrollmentToken,
-		RouteReflector:        d.Get("is_rr").(bool),
-		Intf:                  intfs,
-		DeployMode:            strings.ToLower(d.Get("deploy_mode").(string)),
+
+	rtrKey := &cdv1_api.RouterKey{
+		Id: &wrapperspb.StringValue{Value: d.Get("tf_id").(string)},
 	}
 
-	fieldMask, err := getOuterFieldMask(rtr)
+	rtr := &cdv1_api.RouterConfig{
+		Name:                  &wrapperspb.StringValue{Value: routerName},
+		Key:                   rtrKey,
+		VpcId:                 &wrapperspb.StringValue{Value: d.Get("vpc_id").(string)},
+		CpT:                   cdv1_api.CloudProviderType(cpType),
+		Region:                &wrapperspb.StringValue{Value: d.Get("region").(string)},
+		Cnps:                  &wrapperspb.StringValue{Value: d.Get("cnps").(string)},
+		DeviceEnrollmentToken: &wrapperspb.StringValue{Value: enrollmentToken},
+		RouteReflector:        &wrapperspb.BoolValue{Value: d.Get("is_rr").(bool)},
+		Intf:                  &cdv1_api.RepeatedNetworkInterfaces{Values: intfs},
+		DeployMode:            &wrapperspb.StringValue{Value: strings.ToLower(d.Get("deploy_mode").(string))},
+	}
+
+	addRouterRequest := cdv1_api.RouterConfigSetRequest{
+		Value: rtr,
+	}
+	log.Printf("[CVaaS-INFO] AddRouterRequest: %v", addRouterRequest)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(requestTimeout*time.Second))
+	defer cancel()
+	resp, err := rtrClient.Set(ctx, &addRouterRequest)
 	if err != nil {
-		log.Print("AddRouterConfig: Failed to get field mask")
+		log.Printf("AddRouterRequestFailed, error: %v", err)
 		return err
 	}
-	rtr.FieldMask = fieldMask
 
-	addRouterRequest := api.AddRouterRequest{
-		Router: rtr,
-	}
-
-	log.Printf("AddRouterRequestPb:%s", rtr)
-	request := wrpcRequest{
-		Token:   "RPC_Token_Add_" + routerName + "_" + d.Get("region").(string),
-		Command: "serviceRequest",
-		Params: map[string]interface{}{
-			"service": "clouddeploy.Routers",
-			"method":  "AddRouter",
-			"body":    &addRouterRequest,
-		},
-	}
-
-	resp, err := client.wrpcSend(&request)
-	if err != nil {
-		return err
-	}
-	// Get the primary key, id, from response and set tf_id = id
-	if res, ok := resp["result"]; ok {
-		if res, ok := res.(map[string]interface{}); ok {
-			for key, val := range res {
-				if strings.EqualFold(key, "router") {
-					if router, ok := val.(map[string]interface{}); ok {
-						for k, v := range router {
-							if strings.EqualFold(k, "id") {
-								err = d.Set("tf_id", v)
-								if err != nil {
-									return err
-								}
-							}
-						}
-					}
-				}
-			}
+	log.Printf("[CVaaS-INFO] AddRouterResponse: %v", resp)
+	if resp.GetValue().GetKey().GetId() != nil {
+		tf_id := resp.GetValue().GetKey().GetId().GetValue()
+		if err = d.Set("tf_id", tf_id); err != nil {
+			return err
 		}
 	}
-
 	return nil
 }
 
@@ -2202,78 +2032,55 @@ func (p *CloudeosProvider) CheckEdgeRouterPresence(d *schema.ResourceData) error
 		return errors.New("No edge VPC exists")
 	}
 
+	// for list routers
+	clientRtr, err := p.grpcClient()
+	if err != nil {
+		log.Printf("CheckEdgeRouterPresence: Failed to create new CVaaS Grpc client, err: %v", err)
+		return err
+	}
+	defer clientRtr.Close()
+	cRtr := cdv1_api.NewRouterConfigServiceClient(clientRtr)
+
 	// for each edge VPC check if a leaf router exist
 	for _, edgeVpcID := range edgeVpcIDs {
 		// Code for ListRouter request
-		rtr := &api.Router{
-			VpcId:          edgeVpcID,
-			CpT:            cpType,
-			Region:         d.Get("region").(string),
-			RouteReflector: false,
+		rtr := &cdv1_api.RouterConfig{
+			VpcId:          &wrapperspb.StringValue{Value: edgeVpcID},
+			CpT:            cdv1_api.CloudProviderType(cpType),
+			Region:         &wrapperspb.StringValue{Value: d.Get("region").(string)},
+			RouteReflector: &wrapperspb.BoolValue{Value: false},
 		}
-		fieldMask, err := getOuterFieldMask(rtr)
+
+		GetAllRouterRequest := &cdv1_api.RouterConfigStreamRequest{
+			PartialEqFilter: []*cdv1_api.RouterConfig{rtr},
+		}
+
+		log.Printf("[CVaaS-INFO] GetAllRouterRequest: %v", GetAllRouterRequest)
+
+		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(requestTimeout*time.Second))
+		defer cancel()
+		stream, err := cRtr.GetAll(ctx, GetAllRouterRequest)
 		if err != nil {
-			log.Print("CheckEdgeRouterPresence: Failed to get field mask for router")
 			return err
 		}
-		rtr.FieldMask = fieldMask
-		log.Printf("[CVaaS-INFO]ToResourceListEdgeRouter RequestPb:%s", rtr)
-		listRouterRequest := api.ListRouterRequest{
-			Filter: []*api.Router{rtr},
-		}
 
-		request = wrpcRequest{
-			Token:   "RPC_Token_List_Edge",
-			Command: "serviceRequest",
-			Params: map[string]interface{}{
-				"service": "clouddeploy.Routers",
-				"method":  "ListRouter",
-				"body":    &listRouterRequest,
-			},
-		}
-
-		err = client.wrpcClient.WriteJSON(request)
-		if err != nil {
-			log.Printf("Failed to send %s request to CVaaS : %s",
-				request.Params["method"].(string), err)
-			return err
-		}
-		log.Printf("Successfully sent %s request for %s",
-			request.Params["method"].(string), request.Token)
-
-		var rtrVpcIDs []string // stores vpc_id's of all routers in this region
-		resp := make(map[string]interface{})
+		ents := make([]*cdv1_api.RouterConfig, 0)
 		for {
-			// read response from clouddeploy
-			err = client.wrpcClient.ReadJSON(&resp)
-			if err != nil {
-				log.Printf("Failed to get %s response from CVaaS, Error: %v",
-					request.Params["method"].(string), err)
-				return err
-			}
-			log.Printf("Received ListRouter for checkEdge Resp: %v", resp)
-
-			// parse reponse and get vpc_id
-			if res, ok := resp["result"]; ok {
-				if res, ok := res.(map[string]interface{}); ok {
-					for key, val := range res {
-						if strings.EqualFold(key, "router") {
-							if rtr, ok := val.(map[string]interface{}); ok {
-								for k, v := range rtr {
-									if strings.EqualFold(k, "vpc_id") {
-										rtrVpcIDs = append(rtrVpcIDs, v.(string))
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-			if _, ok := resp["error"].(string); ok {
+			resp, err := stream.Recv()
+			if err == io.EOF {
 				break
 			}
+			if err != nil {
+				return fmt.Errorf("error reading grpc stream: %v", err)
+			}
+			ents = append(ents, resp.GetValue())
 		}
 
+		var rtrVpcIDs []string // stores vpc_id's of all routers in this region
+
+		for _, ent := range ents {
+			rtrVpcIDs = append(rtrVpcIDs, ent.GetVpcId().GetValue())
+		}
 		// check if any rtrVpcIDs is present
 		log.Printf("Checking for edge router")
 		edgeRtrCount := len(rtrVpcIDs)
@@ -2282,25 +2089,28 @@ func (p *CloudeosProvider) CheckEdgeRouterPresence(d *schema.ResourceData) error
 			return nil
 		}
 	}
+
 	return errors.New("No edge router exists")
 }
 
-//AddRouter adds Router resource to Aeris
+// AddRouter adds Router resource to Aeris
 func (p *CloudeosProvider) AddRouter(d *schema.ResourceData) error {
-	// Create new client.
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
+	client, err := p.grpcClient()
 	if err != nil {
-		log.Printf("Failed to create new client to execute AddRouter message")
+		log.Printf("AddRouter: Failed to create new CVaaS Grpc client, err: %v", err)
 		return err
 	}
-	defer client.wrpcClient.Close()
+
+	defer client.Close()
+	rtrClient := cdv1_api.NewRouterConfigServiceClient(client)
 
 	routerName, err := getRouterNameFromSchema(d)
 	if err != nil {
+		log.Printf("Error getting router name from schema, err: %v", err)
 		return err
 	}
 
-	var intfs []*api.NetworkInterface
+	var intfs []*cdv1_api.NetworkInterface
 	publicIP, isPublicIP := d.GetOk("public_ip")
 	intfNameList := d.Get("intf_name").([]interface{})
 	intfIDList := d.Get("intf_id").([]interface{})
@@ -2311,160 +2121,117 @@ func (p *CloudeosProvider) AddRouter(d *schema.ResourceData) error {
 
 	intfCount := len(intfNameList)
 	for i := 0; i < intfCount; i++ {
-		var intf api.NetworkInterface
-		intf.Name = intfNameList[i].(string)
-		intf.IntfId = intfIDList[i].(string)
-		intf.PrivateIpAddr = []string{privateIPList[i].(string)}
-		intf.Subnet = subnetIDList[i].(string)
+		intf := &cdv1_api.NetworkInterface{
+			Name:          &wrapperspb.StringValue{Value: intfNameList[i].(string)},
+			IntfId:        &wrapperspb.StringValue{Value: intfIDList[i].(string)},
+			PrivateIpAddr: &fmp.RepeatedString{Values: []string{privateIPList[i].(string)}},
+			Subnet:        &wrapperspb.StringValue{Value: subnetIDList[i].(string)},
+		}
+
 		if i == 0 && isPublicIP {
-			intf.PublicIpAddr = publicIP.(string)
+			intf.PublicIpAddr = &wrapperspb.StringValue{Value: publicIP.(string)}
 		} else {
-			intf.PublicIpAddr = ""
+			intf.PublicIpAddr = &wrapperspb.StringValue{Value: ""}
 		}
 		switch {
 		case strings.EqualFold(intfTypeList[i].(string), "public"):
-			intf.IntfType = api.NetworkInterfaceType_INTF_TYPE_PUBLIC
+			intf.IntfType = cdv1_api.NetworkInterfaceType_NETWORK_INTERFACE_TYPE_PUBLIC
 		case strings.EqualFold(intfTypeList[i].(string), "private"):
-			intf.IntfType = api.NetworkInterfaceType_INTF_TYPE_PRIVATE
+			intf.IntfType = cdv1_api.NetworkInterfaceType_NETWORK_INTERFACE_TYPE_PRIVATE
 		case strings.EqualFold(intfTypeList[i].(string), "internal"):
-			intf.IntfType = api.NetworkInterfaceType_INTF_TYPE_INTERNAL
+			intf.IntfType = cdv1_api.NetworkInterfaceType_NETWORK_INTERFACE_TYPE_INTERNAL
 		}
-		intf.FieldMask, err = getOuterFieldMask(&intf)
-		if err != nil {
-			log.Print("AddRouter: Failed to get field mask for intf")
-			return err
-		}
-		intfs = append(intfs, &intf)
+
+		intfs = append(intfs, intf)
 	}
 
 	cpType := getCloudProviderType(d)
-	rtr := &api.Router{
-		Name:       routerName,
-		Id:         d.Get("tf_id").(string),
-		VpcId:      d.Get("vpc_id").(string),
-		CpT:        cpType,
-		Cnps:       d.Get("cnps").(string),
-		Region:     d.Get("region").(string),
-		InstanceId: d.Get("instance_id").(string),
-		//Tag: d.Get("tag_id"),
-		DepStatus:      api.DeploymentStatusCode_DEP_STATUS_SUCCESS,
-		Intf:           intfs,
-		RtTableIds:     routeTableList,
-		RouteReflector: d.Get("is_rr").(bool),
-		HaName:         d.Get("ha_name").(string),
-		DeployMode:     strings.ToLower(d.Get("deploy_mode").(string)),
+	rtrKey := &cdv1_api.RouterKey{
+		Id: &wrapperspb.StringValue{Value: d.Get("tf_id").(string)},
 	}
 
-	fieldMask, err := getOuterFieldMask(rtr)
-	if err != nil {
-		log.Print("AddRouter: Failed to get field mask")
-		return err
+	rtr := &cdv1_api.RouterConfig{
+		Name:       &wrapperspb.StringValue{Value: routerName},
+		Key:        rtrKey,
+		VpcId:      &wrapperspb.StringValue{Value: d.Get("vpc_id").(string)},
+		CpT:        cdv1_api.CloudProviderType(cpType),
+		Cnps:       &wrapperspb.StringValue{Value: d.Get("cnps").(string)},
+		Region:     &wrapperspb.StringValue{Value: d.Get("region").(string)},
+		InstanceId: &wrapperspb.StringValue{Value: d.Get("instance_id").(string)},
+		//Tag: d.Get("tag_id"),
+		DepStatus:      cdv1_api.DeploymentStatusCode(cdv1_api.DeploymentStatusCode_DEPLOYMENT_STATUS_CODE_SUCCESS),
+		Intf:           &cdv1_api.RepeatedNetworkInterfaces{Values: intfs},
+		RtTableIds:     routeTableList,
+		RouteReflector: &wrapperspb.BoolValue{Value: d.Get("is_rr").(bool)},
+		HaName:         &wrapperspb.StringValue{Value: d.Get("ha_name").(string)},
+		DeployMode:     &wrapperspb.StringValue{Value: strings.ToLower(d.Get("deploy_mode").(string))},
 	}
 
 	cloudProvider := d.Get("cloud_provider").(string)
 	switch {
 	case strings.EqualFold("aws", cloudProvider):
-		awsRtrDetail := api.AwsRouterDetail{}
-		awsRtrDetail.AvailZone = d.Get("availability_zone").(string)
-		awsRtrDetail.InstanceType = d.Get("instance_type").(string)
+		awsRtrDetail := cdv1_api.AwsRouterDetail{
+			AvailZone:    &wrapperspb.StringValue{Value: d.Get("availability_zone").(string)},
+			InstanceType: &wrapperspb.StringValue{Value: d.Get("instance_type").(string)},
+		}
 		rtr.AwsRtrDetail = &awsRtrDetail
-		err := appendInnerFieldMask(&awsRtrDetail, fieldMask, "awsRtrDetail.")
-		if err != nil {
-			log.Print("AddRouter: Failed to append field mask for awsRtrDetail")
-			return err
-		}
 	case strings.EqualFold("azure", cloudProvider):
-		azrRtrDetail := api.AzureRouterDetail{}
-		azrRtrDetail.AvailZone = d.Get("rg_location").(string)
-		azrRtrDetail.ResGroup = d.Get("rg_name").(string)
-		azrRtrDetail.InstanceType = d.Get("instance_type").(string)
-		rtr.AzRtrDetail = &azrRtrDetail
-		err := appendInnerFieldMask(&azrRtrDetail, fieldMask, "azRtrDetail.")
-		if err != nil {
-			log.Print("AddRouter: Failed to append field mask for azRtrDetail")
-			return err
+		azrRtrDetail := cdv1_api.AzureRouterDetail{
+			AvailZone:    &wrapperspb.StringValue{Value: d.Get("rg_location").(string)},
+			ResGroup:     &wrapperspb.StringValue{Value: d.Get("rg_name").(string)},
+			InstanceType: &wrapperspb.StringValue{Value: d.Get("instance_type").(string)},
 		}
+		rtr.AzRtrDetail = &azrRtrDetail
 	}
 
-	err = appendInnerFieldMask(routeTableList, fieldMask, "rtTableIds.")
+	addRouterRequest := cdv1_api.RouterConfigSetRequest{
+		Value: rtr,
+	}
+
+	log.Printf("[CVaaS-INFO] AddRouterRequest: %v", &addRouterRequest)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(requestTimeout*time.Second))
+	defer cancel()
+	resp, err := rtrClient.Set(ctx, &addRouterRequest)
 	if err != nil {
-		log.Print("AddRouter: Failed to append field mask for rtTableIds")
-		return err
-	}
-	rtr.FieldMask = fieldMask
-	log.Printf("AddRouterRequestPb:%s", rtr)
-
-	addRouterRequest := api.AddRouterRequest{
-		Router: rtr,
-	}
-	request := wrpcRequest{
-		Token:   "RPC_Token_Add_" + d.Get("instance_id").(string),
-		Command: "serviceRequest",
-		Params: map[string]interface{}{
-			"service": "clouddeploy.Routers",
-			"method":  "AddRouter",
-			"body":    &addRouterRequest,
-		},
-	}
-
-	_, err = client.wrpcSend(&request)
-	if err != nil {
+		log.Printf("AddRouterRequest failed, error: %v", err)
 		return err
 	}
 
+	log.Printf("[CVaaS-INFO] AddRouterResponse: %v", resp)
 	return nil
 }
 
-//DeleteRouter deletes Router resource from Aeris
+// DeleteRouter deletes Router resource from Aeris
 func (p *CloudeosProvider) DeleteRouter(d *schema.ResourceData) error {
-	// Create new client, as the client that provider created might have died.
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
+	client, err := p.grpcClient()
 	if err != nil {
-		log.Printf("Failed to create new client to execute DeleteRouter message")
+		log.Printf("DeleteRouter: Failed to create new CVaaS Grpc client, err: %v", err)
 		return err
 	}
-	defer client.wrpcClient.Close()
+	defer client.Close()
+	rtrClient := cdv1_api.NewRouterConfigServiceClient(client)
 
-	cpType := getCloudProviderType(d)
-	routerName, err := getRouterNameFromSchema(d)
+	routerKey := cdv1_api.RouterKey{
+		Id: &wrapperspb.StringValue{Value: d.Get("tf_id").(string)},
+	}
+	delRouterRequest := cdv1_api.RouterConfigDeleteRequest{
+		Key: &routerKey,
+	}
+	log.Printf("[CVaaS-INFO] DeleteRouterRequest : %v", delRouterRequest)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(requestTimeout*time.Second))
+	defer cancel()
+
+	resp, err := rtrClient.Delete(ctx, &delRouterRequest)
 	if err != nil {
-		return err
-	}
-
-	rtr := &api.Router{
-		Name:  routerName,
-		Id:    d.Get("tf_id").(string),
-		VpcId: d.Get("vpc_id").(string),
-		CpT:   cpType,
-	}
-
-	fieldMask, err := getOuterFieldMask(rtr)
-	if err != nil {
-		log.Print("DeleteRouter: Failed to setFieldMask")
-		return err
-	}
-	rtr.FieldMask = fieldMask
-
-	delRouterRequest := api.DeleteRouterRequest{
-		Router: rtr,
-	}
-
-	log.Printf("DeleteRouterRequestPb : %s", rtr)
-
-	request := wrpcRequest{
-		Token:   "RPC_Token_Delete_" + d.Get("tf_id").(string),
-		Command: "serviceRequest",
-		Params: map[string]interface{}{
-			"service": "clouddeploy.Routers",
-			"method":  "DeleteRouter",
-			"body":    &delRouterRequest,
-		},
-	}
-
-	_, err = client.wrpcSend(&request)
-	if err != nil {
+		log.Printf("DeleteRouterRequest failed, error: %v", err)
 		return err
 	}
 
+	log.Printf("[CVaaS-INFO] DeleteRouterResponse: %v", resp)
+	// check if deleted resource matches with terraform resource
+	if resp.GetKey().GetId().GetValue() != d.Get("tf_id").(string) {
+		return fmt.Errorf("Deleted key %v, tf_id %v", resp.GetKey().GetId().GetValue(),
+			d.Get("tf_id").(string))
+	}
 	return nil
 }

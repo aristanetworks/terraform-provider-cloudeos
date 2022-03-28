@@ -12,7 +12,7 @@ import (
 	reflect "reflect"
 	sync "sync"
 
-	time "github.com/terraform-providers/terraform-provider-cloudeos/cloudeos/internal/time"
+	time "terraform-provider-cloudeos/cloudeos/arista/time"
 
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"

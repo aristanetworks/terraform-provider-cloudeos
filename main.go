@@ -5,9 +5,10 @@
 package main
 
 import (
+	"terraform-provider-cloudeos/cloudeos"
+
 	"github.com/hashicorp/terraform-plugin-sdk/plugin"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"github.com/terraform-providers/terraform-provider-cloudeos/cloudeos"
 )
 
 func main() {
