@@ -350,76 +350,52 @@ func (p *CloudeosProvider) IsValidTopoAddition(d *schema.ResourceData,
 	return true, nil
 }
 
-//AddVpcConfig adds VPC resource to Aeris
+// AddVpcConfig adds VPC resource to Aeris
 func (p *CloudeosProvider) AddVpcConfig(d *schema.ResourceData) error {
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
+	client, err := p.grpcClient()
 	if err != nil {
-		log.Printf("Failed to create new client to connect to CVaaS for AddVpcConfig")
+		log.Printf("Failed to create new CVaaS Grpc client to execute AddVpcConfig")
 		return err
 	}
-	defer client.wrpcClient.Close()
 
+	defer client.Close()
+	vpcClient := cdv1_api.NewVpcConfigServiceClient(client)
 	vpcName, cpType := getCpTypeAndVpcName(d)
 	roleType := getRoleType(d.Get("role").(string))
-
-	vpc := &api.Vpc{
-		Name:         vpcName,
-		Id:           d.Get("tf_id").(string),
-		CpT:          cpType,
-		Region:       d.Get("region").(string),
-		RoleType:     roleType,
-		TopologyName: d.Get("topology_name").(string),
-		ClosName:     d.Get("clos_name").(string),
-		WanName:      d.Get("wan_name").(string),
-		Cnps:         d.Get("cnps").(string),
-		DeployMode:   strings.ToLower(d.Get("deploy_mode").(string)),
+	vpcKey := &cdv1_api.VpcKey{
+		Id: &wrapperspb.StringValue{Value: d.Get("tf_id").(string)},
 	}
 
-	fieldMask, err := getOuterFieldMask(vpc)
-	if err != nil {
-		log.Print("AddVpcConfig: Failed to get field mask from protobuf")
-		return err
-	}
-	vpc.FieldMask = fieldMask
-
-	log.Printf("[CVaaS-INFO]AddVpcRequestPb:%s", vpc)
-
-	addVpcRequest := api.AddVpcRequest{
-		Vpc: vpc,
-	}
-
-	request := wrpcRequest{
-		Token:   "RPC_Token_Add_" + vpcName + "_" + d.Get("region").(string),
-		Command: "serviceRequest",
-		Params: map[string]interface{}{
-			"service": "clouddeploy.Vpcs",
-			"method":  "AddVpc",
-			"body":    &addVpcRequest,
-		},
+	vpc := &cdv1_api.VpcConfig{
+		Name:         &wrapperspb.StringValue{Value: vpcName},
+		Key:          vpcKey,
+		CpT:          cdv1_api.CloudProviderType(cpType),
+		Region:       &wrapperspb.StringValue{Value: d.Get("region").(string)},
+		RoleType:     cdv1_api.RoleType(roleType),
+		TopologyName: &wrapperspb.StringValue{Value: d.Get("topology_name").(string)},
+		ClosName:     &wrapperspb.StringValue{Value: d.Get("clos_name").(string)},
+		WanName:      &wrapperspb.StringValue{Value: d.Get("wan_name").(string)},
+		Cnps:         &wrapperspb.StringValue{Value: d.Get("cnps").(string)},
+		DeployMode:   &wrapperspb.StringValue{Value: strings.ToLower(d.Get("deploy_mode").(string))},
 	}
 
-	resp, err := client.wrpcSend(&request)
-	if err != nil {
+	addVpcRequest := cdv1_api.VpcConfigSetRequest{
+		Value: vpc,
+	}
+
+	log.Printf("[CVaaS-INFO] AddVpcRequest: %v", &addVpcRequest)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(requestTimeout*time.Second))
+	defer cancel()
+	resp, err := vpcClient.Set(ctx, &addVpcRequest)
+	if err != nil && resp == nil {
 		return err
 	}
 
-	// Get the primary key, id, from response and set tf_id = id
-	if res, ok := resp["result"]; ok {
-		if res, ok := res.(map[string]interface{}); ok {
-			for key, val := range res {
-				if strings.EqualFold(key, "vpc") {
-					if vpc, ok := val.(map[string]interface{}); ok {
-						for k, v := range vpc {
-							if strings.EqualFold(k, "id") {
-								err = d.Set("tf_id", v)
-								if err != nil {
-									return err
-								}
-							}
-						}
-					}
-				}
-			}
+	if resp.GetValue().GetKey().GetId() != nil {
+		tf_id := resp.GetValue().GetKey().GetId().GetValue()
+		if err = d.Set("tf_id", tf_id); err != nil {
+			return err
 		}
 	}
 
@@ -428,193 +404,103 @@ func (p *CloudeosProvider) AddVpcConfig(d *schema.ResourceData) error {
 
 //GetVpc gets vpc which satisfy the filter
 func (p *CloudeosProvider) GetVpc(d *schema.ResourceData) error {
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
+	client, err := p.grpcClient()
 	if err != nil {
-		log.Printf("Failed to create new client to execute GetVpc message")
+		log.Printf("Failed to create new CVaaS Grpc client to execute GetVpc")
 		return err
 	}
-	defer client.wrpcClient.Close()
 
-	vpc := &api.Vpc{
-		Id: d.Get("tf_id").(string),
+	defer client.Close()
+	vpcClient := cdv1_api.NewVpcConfigServiceClient(client)
+	vpcKey := &cdv1_api.VpcKey{
+		Id: &wrapperspb.StringValue{Value: d.Get("tf_id").(string)},
 	}
 
-	fieldMask, err := getOuterFieldMask(vpc)
-	if err != nil {
-		log.Print("GetVpc: Failed to get field mask")
-		return err
-	}
-	vpc.FieldMask = fieldMask
-
-	getVpcRequest := api.GetVpcRequest{
-		Vpc: vpc,
-	}
-	log.Printf("[CVaaS-INFO]GetVpcRequestPb:%s", vpc)
-
-	request := wrpcRequest{
-		Token:   "RPC_Token_Get_" + d.Get("tf_id").(string),
-		Command: "serviceRequest",
-		Params: map[string]interface{}{
-			"service": "clouddeploy.Vpcs",
-			"method":  "GetVpc",
-			"body":    &getVpcRequest,
-		},
+	getVpcRequest := cdv1_api.VpcConfigRequest{
+		Key: vpcKey,
 	}
 
-	err = client.wrpcClient.WriteJSON(request)
-	if err != nil {
-		log.Printf("Failed to send %s request to CVaaS : %s",
-			request.Params["method"].(string), err)
-		return err
-	}
-	log.Printf("Successfully sent %s request for %s",
-		request.Params["method"].(string), request.Token)
+	log.Printf("[CVaaS-INFO] GetVpcRequest: %v", &getVpcRequest)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(requestTimeout*time.Second))
+	defer cancel()
 
-	resp := make(map[string]interface{})
-	err = client.wrpcClient.ReadJSON(&resp)
-	if err != nil {
-		log.Printf("Failed to get %s response from CVaaS, Error: %v",
-			request.Params["method"].(string), err)
-		return err
-	}
+	resp, err := vpcClient.GetOne(ctx, &getVpcRequest)
 	log.Printf("Received GetVpc Resp: %v", resp)
-	if res, ok := resp["result"]; ok {
-		if res, ok := res.(map[string]interface{}); ok {
-			for key, val := range res {
-				if strings.EqualFold(key, "vpc") {
-					if vpc, ok := val.(map[string]interface{}); ok {
-						for k, v := range vpc {
-							if strings.EqualFold(k, "peer_vpc_cidr") {
-								log.Printf("GetVpc peer_vpc_cidr:%s", v)
-								if peer, ok := v.(map[string]interface{}); ok {
-									for k := range peer {
-										err = d.Set("peer_vpc_id", k)
-										if err != nil {
-											return err
-										}
-										err = d.Set("peervpcidr", peer[k])
-										if err != nil {
-											return err
-										}
-										err = d.Set("peer_vpc_cidr", peer[k])
-										if err != nil {
-											return err
-										}
+	if err != nil && resp == nil {
+		return err
+	}
 
-									}
-								}
-							} else if strings.EqualFold(k, "peer_vpc_info") {
-								if peerVpcInfo, ok := v.(map[string]interface{}); ok {
-									for k := range peerVpcInfo {
-										if strings.EqualFold(k, "peer_rg_name") {
-											err = d.Set("peer_rg_name", peerVpcInfo[k])
-											if err != nil {
-												return err
-											}
-										} else if strings.EqualFold(k, "peer_vnet_name") {
-											err = d.Set("peer_vnet_name", peerVpcInfo[k])
-											if err != nil {
-												return err
-											}
-										} else if strings.EqualFold(k, "peer_vnet_id") {
-											err = d.Set("peer_vnet_id", peerVpcInfo[k])
-											if err != nil {
-												return err
-											}
-										} else if strings.EqualFold(k, "peer_vpc_cidr") {
-											if peer, ok :=
-												peerVpcInfo[k].(map[string]interface{}); ok {
-												for k := range peer {
-													err = d.Set("peer_vpc_id", k)
-													if err != nil {
-														return err
-													}
-													err = d.Set("peervpcidr", peer[k])
-													if err != nil {
-														return err
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
+	if peerVpcInfo := resp.GetValue().GetPeerVpcInfo(); peerVpcInfo != nil {
+		// these fields are only required for azure
+		if resp.GetValue().GetCpT() == cdv1_api.CloudProviderType_CLOUD_PROVIDER_TYPE_AZURE {
+			if err = d.Set("peer_rg_name", peerVpcInfo.GetPeerRgName().GetValue()); err != nil {
+				return err
+			}
+
+			if err = d.Set("peer_vnet_name", peerVpcInfo.GetPeerVnetName().GetValue()); err != nil {
+				return err
+			}
+
+			if err = d.Set("peer_vnet_id", peerVpcInfo.GetPeerVnetId().GetValue()); err != nil {
+				return err
+			}
+		} else {
+			// these fields are only required for azure
+			peerVpcCidrInfoMap := peerVpcInfo.GetPeerVpcCidr().GetValues()
+			for k := range peerVpcCidrInfoMap {
+				if err = d.Set("peer_vpc_id", k); err != nil {
+					return err
+				}
+
+				if err = d.Set("peervpcidr", peerVpcCidrInfoMap[k]); err != nil {
+					return err
+				}
+
+				if err = d.Set("peer_vpc_cidr", peerVpcCidrInfoMap[k]); err != nil {
+					return err
 				}
 			}
 		}
 	}
+
 	return nil
 }
 
 //CheckVpcDeletionStatus returns nil if Vpc doesn't exist
 func (p *CloudeosProvider) CheckVpcDeletionStatus(d *schema.ResourceData) error {
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
+	client, err := p.grpcClient()
 	if err != nil {
-		log.Printf("Failed to create new client in CheckVpcDeletionStatus")
-		return err
-	}
-	defer client.wrpcClient.Close()
-
-	vpc := &api.Vpc{
-		Id: d.Get("tf_id").(string),
-	}
-
-	fieldMask, err := getOuterFieldMask(vpc)
-	if err != nil {
-		log.Print("GetVpc: Failed to get field mask")
+		log.Printf("Failed to create new CVaaS Grpc client to execute CheckVpcDeletionStatus")
 		return err
 	}
 
-	vpc.FieldMask = fieldMask
-
-	getVpcRequest := api.GetVpcRequest{
-		Vpc: vpc,
-	}
-	log.Printf("[CVaaS-INFO]GetVpcRequestPb:%s", vpc)
-
-	request := wrpcRequest{
-		Token:   "RPC_Token_Get_" + d.Get("tf_id").(string),
-		Command: "serviceRequest",
-		Params: map[string]interface{}{
-			"service": "clouddeploy.Vpcs",
-			"method":  "GetVpc",
-			"body":    &getVpcRequest,
-		},
+	defer client.Close()
+	vpcClient := cdv1_api.NewVpcConfigServiceClient(client)
+	vpcKey := &cdv1_api.VpcKey{
+		Id: &wrapperspb.StringValue{Value: d.Get("tf_id").(string)},
 	}
 
-	err = client.wrpcClient.WriteJSON(request)
+	getVpcRequest := cdv1_api.VpcConfigRequest{
+		Key: vpcKey,
+	}
+
+	log.Printf("[CVaaS-INFO] GetVpcRequest: %v", &getVpcRequest)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(requestTimeout*time.Second))
+	defer cancel()
+
+	resp, err := vpcClient.GetOne(ctx, &getVpcRequest)
 	if err != nil {
-		log.Printf("Failed to send %s request to CVaaS : %s",
-			request.Params["method"].(string), err)
 		return err
 	}
-	log.Printf("Successfully sent %s request for %s",
-		request.Params["method"].(string), request.Token)
 
-	resp := make(map[string]interface{})
-	err = client.wrpcClient.ReadJSON(&resp)
-	if err != nil {
-		log.Printf("Failed to get %s response from CVaaS, Error: %v",
-			request.Params["method"].(string), err)
-		return err
-	}
 	log.Printf("Received GetVpc Resp: %v", resp)
-
 	vpcExists := false
-	/* A response with no VPC looks like:
-	   map[error:rpc error: code = NotFound desc = did not find resource "xxx"
-	       status:map[code:5 message:did not find resource "xxx"] token: ... ] */
-	// parse response to check if Vpc exist
-	if res, ok := resp["result"]; ok {
-		if res, ok := res.(map[string]interface{}); ok {
-			for key := range res {
-				if strings.EqualFold(key, "vpc") {
-					vpcExists = true
-				}
-			}
-		}
+
+	// as we are returning an empty resource in case of no objects in aeris
+	// we can assume that if key is emptry then there is no vpc
+	// object in aeris
+	if resp.GetValue().GetKey().GetId().GetValue() != "" {
+		vpcExists = true
 	}
 
 	log.Printf("vpcExist: %v", vpcExists)
@@ -624,292 +510,126 @@ func (p *CloudeosProvider) CheckVpcDeletionStatus(d *schema.ResourceData) error 
 	return nil
 }
 
-//ListVpc gets all vpc which satisfy the filter
-func (p *CloudeosProvider) ListVpc(d *schema.ResourceData) error {
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
-	if err != nil {
-		log.Printf("Failed to create new client to execute ListVpc message")
-		return err
-	}
-	defer client.wrpcClient.Close()
-
-	vpcName, cpType := getCpTypeAndVpcName(d)
-	//roleType := getRoleType(d.Get("role").(string))
-	vpc := &api.Vpc{
-		Name:   vpcName,
-		CpT:    cpType,
-		Region: d.Get("region").(string),
-		//RoleType: api.RoleUnknown, // BUG in clouddeploy
-		//RoleType: roleType,
-	}
-
-	fieldMask, err := getOuterFieldMask(vpc)
-	if err != nil {
-		log.Print("ListVpc: Failed to get field mask")
-		return err
-	}
-	vpc.FieldMask = fieldMask
-
-	listVpcRequest := api.ListVpcRequest{
-		Filter: []*api.Vpc{vpc},
-	}
-	log.Printf("[CVaaS-INFO]ListVpcRequestPb:%s", vpc)
-
-	request := wrpcRequest{
-		Token:   "RPC_Token_List_" + vpcName + "_" + d.Get("region").(string),
-		Command: "serviceRequest",
-		Params: map[string]interface{}{
-			"service": "clouddeploy.Vpcs",
-			"method":  "ListVpc",
-			"body":    &listVpcRequest,
-		},
-	}
-
-	err = client.wrpcClient.WriteJSON(request)
-	if err != nil {
-		log.Printf("Failed to send %s request to CVaaS : %s",
-			request.Params["method"].(string), err)
-		return err
-	}
-	log.Printf("Successfully sent %s request for %s",
-		request.Params["method"].(string), request.Token)
-
-	resp := make(map[string]interface{})
-	err = client.wrpcClient.ReadJSON(&resp)
-	if err != nil {
-		log.Printf("Failed to get %s response from CVaaS, Error: %v",
-			request.Params["method"].(string), err)
-		return err
-	}
-	log.Printf("Received Resp: %v", resp)
-	if res, ok := resp["result"]; ok {
-		if res, ok := res.(map[string]interface{}); ok {
-			for key, val := range res {
-				if strings.EqualFold(key, "vpc") {
-					log.Printf("ListVpc vpc:%s", val)
-					if vpc, ok := val.(map[string]interface{}); ok {
-						for k, v := range vpc {
-							//This check will be removed as soon as the App is updated
-							//with PeerVpcInfo.
-							if strings.EqualFold(k, "peer_vpc_cidr") {
-								log.Printf("ListVpc peer_vpc_cidr:%s", v)
-								// TODO: Read peer_vpc_cidr from map
-								if peer, ok := v.(map[string]interface{}); ok {
-									for k := range peer {
-										err = d.Set("peer_vpc_id", k)
-										if err != nil {
-											return err
-										}
-										err = d.Set("peervpcidr", peer[k])
-										if err != nil {
-											return err
-										}
-									}
-								}
-							} else if strings.EqualFold(k, "peer_vpc_info") {
-								if peerVpcInfo, ok := v.(map[string]interface{}); ok {
-									for k := range peerVpcInfo {
-										if strings.EqualFold(k, "peer_rg_name") {
-											err = d.Set("peer_rg_name", peerVpcInfo[k])
-											if err != nil {
-												return err
-											}
-										} else if strings.EqualFold(k, "peer_vnet_name") {
-											err = d.Set("peer_vnet_name", peerVpcInfo[k])
-											if err != nil {
-												return err
-											}
-										} else if strings.EqualFold(k, "peer_vnet_id") {
-											err = d.Set("peer_vnet_id", peerVpcInfo[k])
-											if err != nil {
-												return err
-											}
-										} else if strings.EqualFold(k, "peer_vpc_cidr") {
-											if peer, ok :=
-												peerVpcInfo[k].(map[string]interface{}); ok {
-												for k := range peer {
-													err = d.Set("peer_vpc_id", k)
-													if err != nil {
-														return err
-													}
-													err = d.Set("peervpcidr", peer[k])
-													if err != nil {
-														return err
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	return nil
-}
-
 //CheckVpcPresenceAndGetDeployMode checks if VPC is created in Aeris status
 //path and returns deploy_mode set for that vpc
 func (p *CloudeosProvider) CheckVpcPresenceAndGetDeployMode(
 	d *schema.ResourceData) (string, error) {
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
+	client, err := p.grpcClient()
 	if err != nil {
-		log.Printf("Failed to create new client to execute CheckVpcPresence")
+		log.Printf("Failed to create new CVaaS Grpc client to execute CheckVpcPresenceAndGetDeployMode")
 		return "", err
 	}
-	defer client.wrpcClient.Close()
 
+	defer client.Close()
+	vpcClient := cdv1_api.NewVpcConfigServiceClient(client)
 	vpcID := d.Get("vpc_id").(string)
 	cpType := getCloudProviderType(d)
-	vpc := &api.Vpc{
-		CpT:    cpType,
-		Region: d.Get("region").(string),
-		VpcId:  vpcID,
+	vpc := &cdv1_api.VpcConfig{
+		CpT:    cdv1_api.CloudProviderType(cpType),
+		Region: &wrapperspb.StringValue{Value: d.Get("region").(string)},
+		VpcId:  &wrapperspb.StringValue{Value: vpcID},
 	}
 
-	fieldMask, err := getOuterFieldMask(vpc)
+	getAllVpcRequest := &cdv1_api.VpcConfigStreamRequest{
+		PartialEqFilter: []*cdv1_api.VpcConfig{vpc},
+	}
+
+	log.Printf("[CVaaS-INFO] GetAllVpcRequest : %v", getAllVpcRequest)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(requestTimeout*time.Second))
+	defer cancel()
+
+	stream, err := vpcClient.GetAll(ctx, getAllVpcRequest)
 	if err != nil {
-		log.Print("CheckVpcPresence: Failed to get field mask")
-		return "", err
-	}
-	vpc.FieldMask = fieldMask
-
-	listVpcRequest := api.ListVpcRequest{
-		Filter: []*api.Vpc{vpc},
-	}
-	log.Printf("[CVaaS-INFO]CheckVpcRequestPb:%s", vpc)
-
-	request := wrpcRequest{
-		Token:   "RPC_Token_List_" + vpcID + "_" + d.Get("region").(string),
-		Command: "serviceRequest",
-		Params: map[string]interface{}{
-			"service": "clouddeploy.Vpcs",
-			"method":  "ListVpc",
-			"body":    &listVpcRequest,
-		},
-	}
-
-	err = client.wrpcClient.WriteJSON(request)
-	if err != nil {
-		log.Printf("Failed to send %s request to CVaaS : %s",
-			request.Params["method"].(string), err)
-		return "", err
-	}
-	log.Printf("Successfully sent CheckVpcPresence %s request for %s",
-		request.Params["method"].(string), request.Token)
-
-	resp := make(map[string]interface{})
-	err = client.wrpcClient.ReadJSON(&resp)
-	if err != nil {
-		log.Printf("Failed to get %s response from CVaaS, Error: %v",
-			request.Params["method"].(string), err)
 		return "", err
 	}
 
-	log.Printf("Received Resp: %v", resp)
-	if res, ok := resp["result"]; ok {
-		if res, ok := res.(map[string]interface{}); ok {
-			for key, val := range res {
-				if strings.EqualFold(key, "vpc") {
-					if vpc, ok := val.(map[string]interface{}); ok {
-						for k, v := range vpc {
-							if strings.EqualFold(k, "vpc_id") {
-								if v.(string) == vpcID {
-									deployMode := strings.ToLower(vpc["deploy_mode"].(string))
-									return deployMode, nil
-								}
-							}
-						}
-					}
-				}
-			}
+	ents := make([]*cdv1_api.VpcConfig, 0)
+	for {
+		resp, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			return "", fmt.Errorf("error reading grpc stream: %v", err)
+		}
+
+		ents = append(ents, resp.GetValue())
+	}
+
+	for _, ent := range ents {
+		if ent.GetVpcId().GetValue() == vpcID {
+			deployMode := strings.ToLower(ent.GetDeployMode().GetValue())
+			return deployMode, nil
 		}
 	}
-	return "", errors.New("No response for ListVpc")
+
+	return "", errors.New("No response for GetAllVpc")
 }
 
 //AddVpc adds VPC resource to Aeris
 func (p *CloudeosProvider) AddVpc(d *schema.ResourceData) error {
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
+	client, err := p.grpcClient()
 	if err != nil {
-		log.Printf("Failed to create new client to execute AddVpc message")
+		log.Printf("Failed to create new CVaaS Grpc client to execute AddVpc")
 		return err
 	}
-	defer client.wrpcClient.Close()
 
+	defer client.Close()
+	vpcClient := cdv1_api.NewVpcConfigServiceClient(client)
 	roleType := getRoleType(d.Get("role").(string))
 	vpcName, cpType := getCpTypeAndVpcName(d)
 
 	// Note that the deploy_mode for vpc status MUST be the same as vpc config,
 	// resource, ensured by the modules, which use the vpc config resource var
 	// to set the deployMode var for vpc status
-	vpc := &api.Vpc{
-		Name:         vpcName,
-		Id:           d.Get("tf_id").(string),
-		VpcId:        d.Get("vpc_id").(string),
-		CpT:          cpType,
-		Region:       d.Get("region").(string),
-		RoleType:     roleType,
-		TopologyName: d.Get("topology_name").(string),
-		ClosName:     d.Get("clos_name").(string),
-		WanName:      d.Get("wan_name").(string),
-		Cnps:         d.Get("cnps").(string),
-		Account:      d.Get("account").(string),
-		DeployMode:   strings.ToLower(d.Get("deploy_mode").(string)),
+	vpcKey := &cdv1_api.VpcKey{
+		Id: &wrapperspb.StringValue{Value: d.Get("tf_id").(string)},
 	}
 
-	fieldMask, err := getOuterFieldMask(vpc)
-	if err != nil {
-		log.Print("AddVpc: Failed to get field mask")
-		return err
+	vpc := &cdv1_api.VpcConfig{
+		Name:         &wrapperspb.StringValue{Value: vpcName},
+		Key:          vpcKey,
+		VpcId:        &wrapperspb.StringValue{Value: d.Get("vpc_id").(string)},
+		CpT:          cdv1_api.CloudProviderType(cpType),
+		Region:       &wrapperspb.StringValue{Value: d.Get("region").(string)},
+		RoleType:     cdv1_api.RoleType(roleType),
+		TopologyName: &wrapperspb.StringValue{Value: d.Get("topology_name").(string)},
+		ClosName:     &wrapperspb.StringValue{Value: d.Get("clos_name").(string)},
+		WanName:      &wrapperspb.StringValue{Value: d.Get("wan_name").(string)},
+		Cnps:         &wrapperspb.StringValue{Value: d.Get("cnps").(string)},
+		Account:      &wrapperspb.StringValue{Value: d.Get("account").(string)},
+		DeployMode:   &wrapperspb.StringValue{Value: strings.ToLower(d.Get("deploy_mode").(string))},
 	}
 
-	var awsVpcInfo api.AwsVpcInfo
-	var azrVnetInfo api.AzureVnetInfo
 	cloudProvider := d.Get("cloud_provider").(string)
 	switch {
 	case strings.EqualFold("aws", cloudProvider):
-		awsVpcInfo.SecurityGroup = []string{d.Get("security_group_id").(string)}
-		awsVpcInfo.Cidr = d.Get("cidr_block").(string)
+		awsVpcInfo := cdv1_api.AwsVpcInfo{
+			SecurityGroup: &fmp.RepeatedString{Values: []string{d.Get("security_group_id").(string)}},
+			Cidr:          &wrapperspb.StringValue{Value: d.Get("cidr_block").(string)},
+		}
 		vpc.AwsVpcInfo = &awsVpcInfo
-		err = appendInnerFieldMask(&awsVpcInfo, fieldMask, "awsVpcInfo.")
-		if err != nil {
-			log.Print("AddVpc: Failed to append inner field mask for AwsVpcInfo")
-			return err
-		}
 	case strings.EqualFold("azure", cloudProvider):
-		azrVnetInfo.Nsg = []string{d.Get("security_group_id").(string)}
-		azrVnetInfo.ResourceGroup = d.Get("rg_name").(string)
-		azrVnetInfo.Cidr = d.Get("cidr_block").(string)
-		vpc.AzVnetInfo = &azrVnetInfo
-		err = appendInnerFieldMask(&azrVnetInfo, fieldMask, "azVnetInfo.")
-		if err != nil {
-			log.Print("AddVpc: Failed to append inner field mask for AzVnetInfo")
-			return err
+		azrVnetInfo := cdv1_api.AzureVnetInfo{
+			Nsg:           &fmp.RepeatedString{Values: []string{d.Get("security_group_id").(string)}},
+			ResourceGroup: &wrapperspb.StringValue{Value: d.Get("rg_name").(string)},
+			Cidr:          &wrapperspb.StringValue{Value: d.Get("cidr_block").(string)},
 		}
-	}
-	vpc.FieldMask = fieldMask
-
-	addVpcRequest := api.AddVpcRequest{
-		Vpc: vpc,
-	}
-	log.Printf("[CVaaS-INFO]AddVpcRequestPb:%s", vpc)
-
-	request := wrpcRequest{
-		Token:   "RPC_Token_Add_" + vpc.Name + "_" + d.Get("region").(string),
-		Command: "serviceRequest",
-		Params: map[string]interface{}{
-			"service": "clouddeploy.Vpcs",
-			"method":  "AddVpc",
-			"body":    &addVpcRequest,
-		},
+		vpc.AzVnetInfo = &azrVnetInfo
 	}
 
-	_, err = client.wrpcSend(&request)
-	if err != nil {
+	addVpcRequest := cdv1_api.VpcConfigSetRequest{
+		Value: vpc,
+	}
+
+	log.Printf("[CVaaS-INFO] AddVpcRequest: %v", &addVpcRequest)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(requestTimeout*time.Second))
+	defer cancel()
+
+	resp, err := vpcClient.Set(ctx, &addVpcRequest)
+	if err != nil && resp == nil {
 		return err
 	}
 
@@ -918,46 +638,31 @@ func (p *CloudeosProvider) AddVpc(d *schema.ResourceData) error {
 
 //DeleteVpc deletes VPC resource from Aeris
 func (p *CloudeosProvider) DeleteVpc(d *schema.ResourceData) error {
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
+	client, err := p.grpcClient()
 	if err != nil {
-		log.Printf("Failed to create new client to execute DeleteVpc message")
+		log.Printf("Failed to create new CVaaS Grpc client to execute DeleteVpc")
 		return err
 	}
-	defer client.wrpcClient.Close()
 
-	vpcName, cpType := getCpTypeAndVpcName(d)
-	vpc := &api.Vpc{
-		Name:   vpcName,
-		Id:     d.Get("tf_id").(string),
-		CpT:    cpType,
-		Region: d.Get("region").(string),
+	defer client.Close()
+	vpcClient := cdv1_api.NewVpcConfigServiceClient(client)
+	vpcKey := cdv1_api.VpcKey{
+		Id: &wrapperspb.StringValue{Value: d.Get("tf_id").(string)},
 	}
 
-	fieldMask, err := getOuterFieldMask(vpc)
-	if err != nil {
-		log.Print("DeleteVpc: Failed to get field mask")
-		return err
-	}
-	vpc.FieldMask = fieldMask
-
-	delVpcRequest := api.DeleteVpcRequest{
-		Vpc: vpc,
+	delVpcRequest := cdv1_api.VpcConfigDeleteRequest{
+		Key: &vpcKey,
 	}
 
-	log.Printf("[CVaaS-INFO]DeleteVpcRequestPb:%s", vpc)
-	request := wrpcRequest{
-		Token:   "RPC_Token_Delete_" + vpcName + "_" + d.Get("region").(string),
-		Command: "serviceRequest",
-		Params: map[string]interface{}{
-			"service": "clouddeploy.Vpcs",
-			"method":  "DeleteVpc",
-			"body":    &delVpcRequest,
-		},
-	}
+	log.Printf("[CVaaS-INFO] DeleteVpcRequest: %v", &delVpcRequest)
 
-	_, err = client.wrpcSend(&request)
-	if err != nil {
-		return err
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(requestTimeout*time.Second))
+	defer cancel()
+
+	resp, err := vpcClient.Delete(ctx, &delVpcRequest)
+	if err != nil && resp != nil && resp.GetKey().GetId().GetValue() != d.Get("tf_id").(string) {
+		return fmt.Errorf("Deleted key %v, tf_id %v", resp.GetKey().GetId().GetValue(),
+			d.Get("tf_id").(string))
 	}
 	return nil
 }
@@ -1945,91 +1650,63 @@ func (p *CloudeosProvider) AddRouterConfig(d *schema.ResourceData) error {
 //CheckEdgeRouterPresence checks if a edge router is present
 func (p *CloudeosProvider) CheckEdgeRouterPresence(d *schema.ResourceData) error {
 	// Logic to check edge router presence
-	//  - Call ListVpc with region, cp_type and role=Edge and get vpc_ids
+	//  - Call GetAllVpc with region, cp_type and role=Edge and get vpc_ids
 	//    of all edge vpc's.
 	//  - Call ListRouter with edge vpc_id and check if there is any router.
 	//  - If we found a router then that router is an edge router.
 
 	// create new client
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
+	client, err := p.grpcClient()
 	if err != nil {
-		log.Printf("Failed to create new client to execute CheckEdgeRouter message")
+		log.Printf("Failed to create new CVaaS Grpc client to execute CheckEdgeRouterPresence")
 		return err
 	}
-	defer client.wrpcClient.Close()
 
+	defer client.Close()
+	vpcClient := cdv1_api.NewVpcConfigServiceClient(client)
 	cpType := getCloudProviderType(d)
-	// Code for ListVpc request
-	vpc := &api.Vpc{
-		CpT:          cpType,
-		Region:       d.Get("region").(string),
-		TopologyName: d.Get("topology_name").(string),
+	// Code for GetAllVpc request
+	vpc := &cdv1_api.VpcConfig{
+		CpT:          cdv1_api.CloudProviderType(cpType),
+		Region:       &wrapperspb.StringValue{Value: d.Get("region").(string)},
+		TopologyName: &wrapperspb.StringValue{Value: d.Get("topology_name").(string)},
 	}
 
-	fieldMask, err := getOuterFieldMask(vpc)
+	getAllRequest := &cdv1_api.VpcConfigStreamRequest{
+		PartialEqFilter: []*cdv1_api.VpcConfig{vpc},
+	}
+
+	log.Printf("[CVaaS-INFO] GetAllRequest: %v", getAllRequest)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(requestTimeout*time.Second))
+	defer cancel()
+	stream, err := vpcClient.GetAll(ctx, getAllRequest)
 	if err != nil {
-		log.Print("CheckEdgeRouterPresence: Failed to get field mask for vpc")
 		return err
 	}
-	vpc.FieldMask = fieldMask
 
-	listVpcRequest := api.ListVpcRequest{
-		Filter: []*api.Vpc{vpc},
-	}
-	log.Printf("[CVaaS-INFO]ListVpcRequestPb:%s", vpc)
-
-	request := wrpcRequest{
-		Token:   "RPC_Token_List_" + d.Get("region").(string),
-		Command: "serviceRequest",
-		Params: map[string]interface{}{
-			"service": "clouddeploy.Vpcs",
-			"method":  "ListVpc",
-			"body":    &listVpcRequest,
-		},
-	}
-
-	err = client.wrpcClient.WriteJSON(request)
-	if err != nil {
-		log.Printf("Failed to send %s request to CVaaS : %s",
-			request.Params["method"].(string), err)
-		return err
-	}
-	log.Printf("Successfully sent %s request for %s",
-		request.Params["method"].(string), request.Token)
-
-	var edgeVpcIDs []string // store the vpc_id of all edge VPC's
-	resp1 := make(map[string]interface{})
+	ents := make([]*cdv1_api.VpcConfig, 0)
 	for {
-		err = client.wrpcClient.ReadJSON(&resp1)
-		if err != nil {
-			log.Printf("Failed to get %s response from CVaaS, Error: %v",
-				request.Params["method"].(string), err)
-			return err
-		}
-		log.Printf("Received ListVpc for checkEdge resp: %v", resp1)
-
-		// parse response and get vpc_id of edge vpc
-		if res, ok := resp1["result"]; ok {
-			if res, ok := res.(map[string]interface{}); ok {
-				for key, val := range res {
-					if strings.EqualFold(key, "vpc") {
-						if vpc, ok := val.(map[string]interface{}); ok {
-							if vpc["role_type"] == "ROLE_EDGE" {
-								edgeVpcIDs = append(edgeVpcIDs, vpc["vpc_id"].(string))
-							}
-						}
-					}
-				}
-			}
-		}
-		if _, ok := resp1["error"].(string); ok {
+		resp, err := stream.Recv()
+		if err == io.EOF {
 			break
 		}
+
+		if err != nil {
+			return fmt.Errorf("error reading grpc stream: %v", err)
+		}
+
+		ents = append(ents, resp.GetValue())
 	}
 
-	edgeVpcCount := len(edgeVpcIDs)
-	if edgeVpcCount == 0 {
-		return errors.New("No edge VPC exists")
+	var edgeVpcIDs []string // store the vpc_id of all edge VPC's
+	for _, ent := range ents {
+		if ent.GetRoleType().String() == "ROLE_TYPE_EDGE" {
+			edgeVpcIDs = append(edgeVpcIDs, ent.GetVpcId().GetValue())
+		}
+	}
+
+	if len(edgeVpcIDs) == 0 {
+		return errors.New("no edge VPC exists")
 	}
 
 	// for list routers
@@ -2090,7 +1767,7 @@ func (p *CloudeosProvider) CheckEdgeRouterPresence(d *schema.ResourceData) error
 		}
 	}
 
-	return errors.New("No edge router exists")
+	return errors.New("no edge router exists")
 }
 
 // AddRouter adds Router resource to Aeris
