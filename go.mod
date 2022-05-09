@@ -6,7 +6,6 @@ require (
 	github.com/aristanetworks/cloudvision-go v0.0.0-20200916184326-9cdd6dd559ae
 	github.com/golang/protobuf v1.5.2
 	github.com/google/go-cmp v0.5.7 // indirect
-	github.com/gorilla/websocket v1.4.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/hashicorp/go-uuid v1.0.2 // indirect
 	github.com/hashicorp/terraform-plugin-sdk v1.13.1

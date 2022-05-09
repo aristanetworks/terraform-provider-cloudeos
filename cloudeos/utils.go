@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"strings"
 
-	cd_api "terraform-provider-cloudeos/cloudeos/arista/api"
 	cdv1_api "terraform-provider-cloudeos/cloudeos/arista/clouddeploy.v1"
 
 	fmp "terraform-provider-cloudeos/cloudeos/fmp"
@@ -31,14 +30,14 @@ func validateDeployModeWithRole(d *schema.ResourceData) error {
 	return nil
 }
 
-func getCloudProviderType(d *schema.ResourceData) cd_api.CloudProviderType {
+func getCloudProviderType(d *schema.ResourceData) cdv1_api.CloudProviderType {
 	cloudProvider := d.Get("cloud_provider").(string)
-	cpType := cd_api.CloudProviderType_CP_UNSPECIFIED
+	cpType := cdv1_api.CloudProviderType_CLOUD_PROVIDER_TYPE_UNSPECIFIED
 	switch {
 	case strings.EqualFold("aws", cloudProvider):
-		cpType = cd_api.CloudProviderType_CP_AWS
+		cpType = cdv1_api.CloudProviderType_CLOUD_PROVIDER_TYPE_AWS
 	case strings.EqualFold("azure", cloudProvider):
-		cpType = cd_api.CloudProviderType_CP_AZURE
+		cpType = cdv1_api.CloudProviderType_CLOUD_PROVIDER_TYPE_AZURE
 	}
 	return cpType
 }
@@ -59,32 +58,32 @@ func getAwsVpcName(d *schema.ResourceData) (string, error) {
 	return vpcName, nil
 }
 
-func getCpTypeAndVpcName(d *schema.ResourceData) (string, cd_api.CloudProviderType) {
+func getCpTypeAndVpcName(d *schema.ResourceData) (string, cdv1_api.CloudProviderType) {
 	var vpcName string
-	var cpType cd_api.CloudProviderType
+	var cpType cdv1_api.CloudProviderType
 	cloudProvider := d.Get("cloud_provider").(string)
 	switch {
 	case strings.EqualFold("aws", cloudProvider):
-		cpType = cd_api.CloudProviderType_CP_AWS
+		cpType = cdv1_api.CloudProviderType_CLOUD_PROVIDER_TYPE_AWS
 		vpcName, _ = getAwsVpcName(d)
 	case strings.EqualFold("azure", cloudProvider):
-		cpType = cd_api.CloudProviderType_CP_AZURE
+		cpType = cdv1_api.CloudProviderType_CLOUD_PROVIDER_TYPE_AZURE
 		vpcName = d.Get("vnet_name").(string)
 	}
 	return vpcName, cpType
 }
 
-func getRoleType(role string) cd_api.RoleType {
-	var roleType cd_api.RoleType
+func getRoleType(role string) cdv1_api.RoleType {
+	var roleType cdv1_api.RoleType
 	switch {
 	case strings.EqualFold("CloudEdge", role):
-		roleType = cd_api.RoleType_ROLE_EDGE
+		roleType = cdv1_api.RoleType_ROLE_TYPE_EDGE
 	case strings.EqualFold("CloudSpine", role):
-		roleType = cd_api.RoleType_ROLE_SPINE
+		roleType = cdv1_api.RoleType_ROLE_TYPE_SPINE
 	case strings.EqualFold("CloudLeaf", role):
-		roleType = cd_api.RoleType_ROLE_LEAF
+		roleType = cdv1_api.RoleType_ROLE_TYPE_LEAF
 	default:
-		roleType = cd_api.RoleType_ROLE_UNSPECIFIED
+		roleType = cdv1_api.RoleType_ROLE_TYPE_UNSPECIFIED
 	}
 	return roleType
 }

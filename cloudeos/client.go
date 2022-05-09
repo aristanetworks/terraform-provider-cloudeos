@@ -6,18 +6,16 @@ package cloudeos
 
 import (
 	"context"
-	"crypto/tls"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"net/http/httputil"
-	"net/url"
 	"strings"
 	"time"
 
-	api "terraform-provider-cloudeos/cloudeos/arista/api"
 	cdv1_api "terraform-provider-cloudeos/cloudeos/arista/clouddeploy.v1"
 	fmp "terraform-provider-cloudeos/cloudeos/fmp"
 
@@ -27,7 +25,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
-	"github.com/gorilla/websocket"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -42,8 +39,13 @@ const (
 	AwsVpnPrefix = "ar-aws-vpn"
 )
 
-// Retry attempts for wss connect
-const CVaaSRetryCount = 5
+const (
+	// Retry attempts for wss connect
+	CVaaSRetryCount = 5
+	// Decide what should be time limit for request timeout
+	// currently 60 sec
+	requestTimeout = 60
+)
 
 //CloudeosProvider configuration
 type CloudeosProvider struct {
@@ -51,131 +53,6 @@ type CloudeosProvider struct {
 	server        string
 	cvaasDomain   string
 }
-
-//Client struct
-type Client struct {
-	wrpcClient *websocket.Conn
-}
-
-type wrpcRequest struct {
-	Token   string
-	Command string
-	Params  map[string]interface{}
-}
-
-func aristaCvaasClient(server string, webToken string) (*Client, error) {
-	var u = url.URL{Scheme: "wss", Host: server, Path: "/api/v3/wrpc/"}
-	req, _ := http.NewRequest("GET", "https://"+server, nil)
-	req.Header.Set("Authorization", "Bearer "+webToken)
-	req.URL = &u
-
-	var dialer = websocket.DefaultDialer
-	dialer.TLSClientConfig = &tls.Config{}
-
-	var respStatus string
-	var connectErr error
-	var backoffPeriod time.Duration = 4
-	for i := 1; i <= CVaaSRetryCount; i++ {
-		log.Printf("Connecting to : %s Attempt %d", u.String(), i)
-
-		ws, resp, err := dialer.Dial(u.String(), req.Header)
-		if err == nil {
-			log.Printf("Created websocket client :%v", resp)
-			defer resp.Body.Close()
-
-			client := &Client{
-				wrpcClient: ws,
-			}
-			return client, nil
-		}
-		// If the APIServer sends back an HTTP response with status != 101
-		// (Websocket Upgrade request rejected), check if it's an authorization
-		// issue and then fail. For any other err, log the HTTP response if
-		// possible and retry with an increasing backoff
-		if err == websocket.ErrBadHandshake {
-			log.Printf("Failed connecting to CVaaS. Websocket dial failed: %v", err)
-
-			if resp.StatusCode == http.StatusUnauthorized {
-				return nil, fmt.Errorf("Failed connecting to CVaaS, error : %v Status : %s",
-					err, resp.Status)
-			}
-			respStatus = resp.Status
-			connectErr = err
-
-			responseDump, err := httputil.DumpResponse(resp, true)
-			if err == nil {
-				log.Printf("CVaaS response: %q", responseDump)
-			}
-
-		} else {
-			log.Printf("Failed connecting to CVaas, error : %v", err)
-			connectErr = err
-		}
-
-		log.Printf("Retrying connection to CVaaS in %d seconds", backoffPeriod)
-		time.Sleep(backoffPeriod * time.Second)
-		backoffPeriod = backoffPeriod * 2
-	}
-
-	// All retry attempts have failed
-	if respStatus != "" {
-		return nil, fmt.Errorf("Failed connecting to CVaaS, error : %v Status : %s",
-			connectErr, respStatus)
-	}
-	return nil, fmt.Errorf("Failed connecting to CVaaS, error : %v", connectErr)
-
-}
-
-func (c *Client) wrpcSend(request *wrpcRequest) (map[string]interface{}, error) {
-	resp := make(map[string]interface{})
-	err := c.wrpcClient.WriteJSON(request)
-	if err != nil {
-		log.Printf("Failed to send %s request to CVaaS : %s",
-			request.Params["method"].(string), err)
-		return resp, err
-	}
-
-	log.Printf("Successfully sent %s request for %s",
-		request.Params["method"].(string), request.Token)
-
-	// Read response from clouddeploy service
-	err = c.wrpcClient.ReadJSON(&resp)
-	if err != nil {
-		log.Printf("Failed to get %s response from CVaaS, Error: %v",
-			request.Params["method"].(string), err)
-		return resp, err
-	}
-
-	if e, ok := resp["error"].(string); ok {
-		return resp, errors.New(e)
-	}
-
-	// Read "EOF" response from api server
-	resp2 := make(map[string]interface{})
-	err = c.wrpcClient.ReadJSON(&resp2)
-	log.Printf("Received EOF Resp: %v", resp2)
-	if (err != nil) || (resp2["error"].(string) != "EOF") {
-		log.Printf("Failed to get EOF response from ApiServer for %s, Error: %v",
-			request.Params["method"].(string), err)
-		return resp, err
-	}
-
-	_, ok := resp["result"].(map[string]interface{})
-	if !ok {
-		errorMsg := "Error reading result from json response for " +
-			request.Params["method"].(string)
-		log.Println(errorMsg)
-		return resp, errors.New(errorMsg)
-	}
-
-	log.Printf("Received success response for %s, Response: %v",
-		request.Params["method"].(string), resp)
-	return resp, nil
-}
-
-// Decide what should be time limit for request timeout
-// currently 60 sec
-const requestTimeout = 60
 
 func (p *CloudeosProvider) grpcClient() (*grpc.ClientConn, error) {
 	opts := []grpc_retry.CallOption{
@@ -190,52 +67,58 @@ func (p *CloudeosProvider) grpcClient() (*grpc.ClientConn, error) {
 
 }
 
+func (p *CloudeosProvider) httpClient() (*http.Client, error) {
+	return &http.Client{}, nil
+}
+
+// lets use httpClient instead of grpc client for making addenrollmentToken request
+// using grpc client will involve add proto binding and we are not sure
+// if it will be ok to expose those bindings to public repo
 func (p *CloudeosProvider) getDeviceEnrollmentToken() (string, error) {
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
+
+	url := fmt.Sprintf("https://%s/api/v3/services/admin.Enrollment/AddEnrollmentToken", p.server)
+	// Create a Bearer string by appending string access token
+	var bearer = "Bearer " + p.srvcAcctToken
+
+	// Create a new request using http
+	requestBody := strings.NewReader(`{
+		"enrollmentToken":{
+			"reenrollDevices":["*"],
+			"validFor":"2h",
+			"groups":[]}}
+	`)
+
+	req, err := http.NewRequest("POST", url, requestBody)
 	if err != nil {
-		log.Printf("Failed to create new client to execute AddEnrollmentToken message")
-		return "", err
-	}
-	defer client.wrpcClient.Close()
-
-	request := &wrpcRequest{
-		Token:   "RPC_Token_AddEnrollmentToken",
-		Command: "admin",
-		Params: map[string]interface{}{
-			"service": "admin.Enrollment",
-			"method":  "AddEnrollmentToken",
-			"body": map[string]interface{}{
-				"enrollmentToken": map[string]interface{}{
-					"groups":          []string{},    //any groups (in addition to AllDevices)
-					"validFor":        "2h",          //duration of token(max 30 days,default:2hrs)
-					"reenrollDevices": []string{"*"}, //allows re-enrollment
-				},
-			},
-		},
+		return "", errors.New("Error creating AddEnrollmentToken http request")
 	}
 
-	resp, err := client.wrpcSend(request)
+	// add authorization header to the req
+	req.Header.Add("Authorization", bearer)
+	client, err := p.httpClient()
 	if err != nil {
 		return "", err
 	}
 
-	if res, ok := resp["result"]; ok {
-		if res, ok := res.(map[string]interface{}); ok {
-			for key, val := range res {
-				if strings.EqualFold(key, "enrollmentToken") {
-					if tokenInfo, ok := val.(map[string]interface{}); ok {
-						for k, v := range tokenInfo {
-							if strings.EqualFold(k, "token") {
-								return v.(string), nil
-							}
-						}
-					}
-				}
-			}
-		}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
 	}
 
-	return "", errors.New("Token key not found in AddEnrollmentToken response")
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("Error while reading the response bytes: %v", err))
+	}
+
+	var data []map[string]interface{}
+	json.Unmarshal([]byte(body), &data)
+	enrollmentTokenMap, ok := data[0]["enrollmentToken"].(map[string]interface{})
+	if !ok {
+		return "", errors.New("Token key not found in AddEnrollmentToken response")
+	}
+
+	return enrollmentTokenMap["token"].(string), nil
 }
 
 //IsValidTopoAddition checks if there already exists an entry in CVaaS by
@@ -1062,116 +945,76 @@ func (p *CloudeosProvider) DeleteWanTopology(d *schema.ResourceData) error {
 
 //AddSubnet adds subnet resource to Aeris
 func (p *CloudeosProvider) AddSubnet(d *schema.ResourceData) error {
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
+	client, err := p.grpcClient()
 	if err != nil {
-		log.Printf("Failed to create new client to execute AddSubnet message")
+		log.Printf("Failed to create new CVaaS Grpc client to execute AddSubnet")
 		return err
 	}
-	defer client.wrpcClient.Close()
 
+	defer client.Close()
+	subnetClient := cdv1_api.NewSubnetConfigServiceClient(client)
 	cpName := getCloudProviderType(d)
-	subnet := &api.Subnet{
-		SubnetId:  d.Get("subnet_id").(string),
-		CpT:       cpName,
-		Id:        d.Get("tf_id").(string),
-		Cidr:      d.Get("cidr_block").(string),
-		VpcId:     d.Get("vpc_id").(string),
-		AvailZone: d.Get("availability_zone").(string),
+
+	subnetKey := cdv1_api.SubnetKey{
+		Id: &wrapperspb.StringValue{Value: d.Get("tf_id").(string)},
+	}
+	subnet := &cdv1_api.SubnetConfig{
+		Key:       &subnetKey,
+		SubnetId:  &wrapperspb.StringValue{Value: d.Get("subnet_id").(string)},
+		CpT:       cdv1_api.CloudProviderType(cpName),
+		Cidr:      &wrapperspb.StringValue{Value: d.Get("cidr_block").(string)},
+		VpcId:     &wrapperspb.StringValue{Value: d.Get("vpc_id").(string)},
+		AvailZone: &wrapperspb.StringValue{Value: d.Get("availability_zone").(string)},
 	}
 
-	fieldMask, err := getOuterFieldMask(subnet)
-	if err != nil {
-		log.Print("AddSubnet: Failed to get field mask")
-		return err
+	addSubnetRequest := cdv1_api.SubnetConfigSetRequest{
+		Value: subnet,
 	}
-	subnet.FieldMask = fieldMask
+	log.Printf("[CVaaS-INFO] AddSubnetRequest: %v", &addSubnetRequest)
 
-	addSubnetRequest := api.AddSubnetRequest{
-		Subnet: subnet,
-	}
-
-	log.Printf("AddSubnetRequestPb:%s", subnet)
-	request := wrpcRequest{
-		Token:   "RPC_Token_Add_" + d.Get("subnet_id").(string),
-		Command: "serviceRequest",
-		Params: map[string]interface{}{
-			"service": "clouddeploy.Subnets",
-			"method":  "AddSubnet",
-			"body":    &addSubnetRequest,
-		},
-	}
-
-	resp, err := client.wrpcSend(&request)
-	if err != nil {
+	ctx, cancel := context.WithTimeout(context.Background(),
+		time.Duration(requestTimeout*time.Second))
+	defer cancel()
+	resp, err := subnetClient.Set(ctx, &addSubnetRequest)
+	if err != nil && resp == nil {
 		return err
 	}
 
-	// Get the primary key, id, from response and set tf_id = id
-	if res, ok := resp["result"]; ok {
-		if res, ok := res.(map[string]interface{}); ok {
-			for key, val := range res {
-				if strings.EqualFold(key, "subnet") {
-					if subnet, ok := val.(map[string]interface{}); ok {
-						for k, v := range subnet {
-							if strings.EqualFold(k, "id") {
-								err = d.Set("tf_id", v)
-								if err != nil {
-									return err
-								}
-							}
-						}
-					}
-				}
-			}
+	if resp.GetValue().GetKey().GetId() != nil {
+		tf_id := resp.GetValue().GetKey().GetId().GetValue()
+		err = d.Set("tf_id", tf_id)
+		if err != nil {
+			return err
 		}
 	}
-
 	return nil
 }
 
 //DeleteSubnet deletes subnet resource from Aeris
 func (p *CloudeosProvider) DeleteSubnet(d *schema.ResourceData) error {
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
+	client, err := p.grpcClient()
 	if err != nil {
-		log.Printf("Failed to create new client to execute DeleteSubnet message")
-		return err
-	}
-	defer client.wrpcClient.Close()
-
-	cpName := getCloudProviderType(d)
-	subnet := &api.Subnet{
-		SubnetId: d.Get("subnet_id").(string),
-		CpT:      cpName,
-		Id:       d.Get("tf_id").(string),
-		VpcId:    d.Get("vpc_id").(string),
-	}
-
-	fieldMask, err := getOuterFieldMask(subnet)
-	if err != nil {
-		log.Print("DeleteSubnet: Failed to get field mask")
-		return err
-	}
-	subnet.FieldMask = fieldMask
-
-	delSubnetRequest := api.DeleteSubnetRequest{
-		Subnet: subnet,
-	}
-
-	request := wrpcRequest{
-		Token:   "RPC_Token_Delete_" + d.Get("subnet_id").(string),
-		Command: "serviceRequest",
-		Params: map[string]interface{}{
-			"service": "clouddeploy.Subnets",
-			"method":  "DeleteSubnet",
-			"body":    &delSubnetRequest,
-		},
-	}
-
-	_, err = client.wrpcSend(&request)
-	if err != nil {
+		log.Printf("Failed to create new CVaaS Grpc client to execute DeleteSubnet")
 		return err
 	}
 
+	defer client.Close()
+	subnetClient := cdv1_api.NewSubnetConfigServiceClient(client)
+	subnetKey := cdv1_api.SubnetKey{
+		Id: &wrapperspb.StringValue{Value: d.Get("tf_id").(string)},
+	}
+	delSubnetRequest := cdv1_api.SubnetConfigDeleteRequest{
+		Key: &subnetKey,
+	}
+	log.Printf("[CVaaS-INFO] DeleteSubnetRequest: %v", delSubnetRequest)
+	ctx, cancel := context.WithTimeout(context.Background(),
+		time.Duration(requestTimeout*time.Second))
+	defer cancel()
+	resp, err := subnetClient.Delete(ctx, &delSubnetRequest)
+	if err != nil && resp != nil && resp.GetKey().GetId().GetValue() != d.Get("tf_id").(string) {
+		return fmt.Errorf("Deleted key %v, tf_id %v", resp.GetKey().GetId().GetValue(),
+			d.Get("tf_id").(string))
+	}
 	return nil
 }
 
