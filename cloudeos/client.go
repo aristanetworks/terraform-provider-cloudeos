@@ -243,13 +243,14 @@ func (p *CloudeosProvider) getDeviceEnrollmentToken() (string, error) {
 //corresponding meta topo is provision
 func (p *CloudeosProvider) IsValidTopoAddition(d *schema.ResourceData,
 	topoType string) (bool, error) {
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
+	client, err := p.grpcClient()
 	if err != nil {
-		log.Printf("Failed to create new CVaaS client to execute IsValidTopoAddition")
+		log.Printf("Failed to create new CVaaS Grpc client to execute IsValidTopoAddition")
 		return false, err
 	}
-	defer client.wrpcClient.Close()
 
+	defer client.Close()
+	topoInfoClient := cdv1_api.NewTopologyInfoConfigServiceClient(client)
 	closName := ""
 	wanName := ""
 	topoName := d.Get("topology_name").(string)
@@ -261,90 +262,59 @@ func (p *CloudeosProvider) IsValidTopoAddition(d *schema.ResourceData,
 	} else if topoType == "TOPO_INFO_WAN" {
 		wanName = d.Get("name").(string)
 	}
-	topoInfo := &api.TopologyInfo{
-		Name: topoName,
+	topoInfo := &cdv1_api.TopologyInfoConfig{
+		Name: &wrapperspb.StringValue{Value: topoName},
 	}
 
-	fieldMask, err := getOuterFieldMask(topoInfo)
+	getAllTopoInfoRequest := cdv1_api.TopologyInfoConfigStreamRequest{
+		PartialEqFilter: []*cdv1_api.TopologyInfoConfig{topoInfo},
+	}
+
+	log.Printf("[CVaaS-INFO] GetAllTopologyInfoRequest: %v", getAllTopoInfoRequest)
+
+	ctx, cancel := context.WithTimeout(context.Background(),
+		time.Duration(requestTimeout*time.Second))
+	defer cancel()
+
+	stream, err := topoInfoClient.GetAll(ctx, &getAllTopoInfoRequest)
 	if err != nil {
-		log.Print("ListTopology: Failed to get field mask")
 		return false, err
 	}
-	topoInfo.FieldMask = fieldMask
 
-	log.Printf("[CVaaS-INFO]ListTopologyInfoRequestPb:%s", topoInfo)
-
-	listTopoInfoRequest := api.ListTopologyInfoRequest{
-		Filter: []*api.TopologyInfo{topoInfo},
-	}
-
-	request := wrpcRequest{
-		Token:   "RPC_Token_List_" + d.Get("topology_name").(string) + "_1",
-		Command: "serviceRequest",
-		Params: map[string]interface{}{
-			"service": "clouddeploy.Topologyinfos",
-			"method":  "ListTopologyInfo",
-			"body":    &listTopoInfoRequest,
-		},
-	}
-
-	err = client.wrpcClient.WriteJSON(request)
-	if err != nil {
-		return false, fmt.Errorf("Failed to send %s request to CVaaS : %s",
-			request.Params["method"].(string), err)
-	}
-
-	resp := make(map[string]interface{})
+	ents := make([]*cdv1_api.TopologyInfoConfig, 0)
 	for {
-		// read respose from clouddeploy
-		err = client.wrpcClient.ReadJSON(&resp)
-		if err != nil {
-			return false, fmt.Errorf("Failed to get %s response from CVaaS, Error: %v",
-				request.Params["method"].(string), err)
+		resp, err := stream.Recv()
+		if err == io.EOF {
+			break
 		}
-		log.Printf("Received ListTopology Resp: %v", resp)
+		if err != nil {
+			return false, fmt.Errorf("error reading grpc stream: %v", err)
+		}
+		ents = append(ents, resp.GetValue())
+	}
 
-		if res, ok := resp["result"]; ok {
-			if res, ok := res.(map[string]interface{}); ok {
-				for key, val := range res {
-					if strings.EqualFold(key, "topology_info") {
-						if topo, ok := val.(map[string]interface{}); ok {
-							if topo["name"] == topoName && topo["topo_type"] == topoType {
-								if wan, ok := topo["wan_info"].(map[string]interface{}); ok {
-									if wan["wan_name"] == wanName {
-										return false, fmt.Errorf("cloudeos_wan %s already exists",
-											wanName)
-									}
-								} else if clos, ok :=
-									topo["clos_info"].(map[string]interface{}); ok {
-									if clos["clos_name"] == closName {
-										return false, fmt.Errorf("cloudeos_clos %s already exists",
-											closName)
-									}
-								} else {
-									return false, fmt.Errorf("cloudeos_topology %s already exists",
-										topoName)
-								}
-							}
-							// Find the meta topo for the given clos topo (same name). If the
-							// deploy mode for meta is provision, disallow addition of the clos,
-							// since we only allow wan topo in provision mode
-							if topo["name"] == topoName && topo["topo_type"] == "TOPO_INFO_META" &&
-								topoType == "TOPO_INFO_CLOS" && topo["deploy_mode"] == "provision" {
-
-								return false, fmt.Errorf("cloudeos_clos cannot be associated with"+
-									" a cloudeos_topology resource (%s) that has deploy_mode"+
-									" as provision", topoName)
-							}
-						}
-					}
-				}
+	for _, ent := range ents {
+		if ent.GetName().GetValue() == topoName &&
+			ent.GetTopoType().String() == topoType {
+			if ent.GetWanInfo().GetWanName().GetValue() == wanName {
+				return false, fmt.Errorf("cloudeos_wan %s already exists",
+					wanName)
+			} else if ent.GetClosInfo().GetClosName().GetValue() == closName {
+				return false, fmt.Errorf("cloudeos_clos %s already exists",
+					wanName)
 			} else {
-				return false, fmt.Errorf("couldn't parse the ListTopology response from CVaaS")
+				return false, fmt.Errorf("cloudeos_topology %s already exists",
+					topoName)
 			}
 		}
-		if _, ok := resp["error"].(string); ok {
-			break
+		// Find the meta topo for the given clos topo (same name). If the
+		// deploy mode for meta is provision, disallow addition of the clos,
+		// since we only allow wan topo in provision mode
+		if ent.GetName().GetValue() == topoName && ent.GetTopoType().String() == "TOPO_INFO_META" &&
+			topoType == "TOPO_INFO_CLOS" && ent.GetDeployMode().GetValue() == "provision" {
+			return false, fmt.Errorf("cloudeos_clos cannot be associated with"+
+				" a cloudeos_topology resource (%s) that has deploy_mode"+
+				" as provision", topoName)
 		}
 	}
 	return true, nil
@@ -667,121 +637,74 @@ func (p *CloudeosProvider) DeleteVpc(d *schema.ResourceData) error {
 	return nil
 }
 
-// ConstructListTopology - Given a topoName, return a
-// wrpc ListTopologyInfo that satisfies the filters
-func ConstructListTopologyRequest(topoName string) (wrpcRequest, error) {
-
-	topoInfo := &api.TopologyInfo{
-		Name: topoName,
-	}
-
-	fieldMask, err := getOuterFieldMask(topoInfo)
-	if err != nil {
-		log.Print("ListTopology: Failed to get field mask")
-		return wrpcRequest{}, err
-	}
-	topoInfo.FieldMask = fieldMask
-
-	log.Printf("[CVaaS-INFO]ListTopologyInfoRequestPb:%s", topoInfo)
-
-	listTopoInfoRequest := api.ListTopologyInfoRequest{
-		Filter: []*api.TopologyInfo{topoInfo},
-	}
-
-	request := wrpcRequest{
-		Token:   "RPC_Token_List_" + topoName + "_1",
-		Command: "serviceRequest",
-		Params: map[string]interface{}{
-			"service": "clouddeploy.Topologyinfos",
-			"method":  "ListTopologyInfo",
-			"body":    &listTopoInfoRequest,
-		},
-	}
-	return request, nil
-}
-
 // ValidateTopoInfoForAndGetDeployMode -
 func (p *CloudeosProvider) ValidateTopoInfoAndGetDeployMode(
 	d *schema.ResourceData) (string, error) {
-
-	// Create new client, as the client that provider created might have died.
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
+	client, err := p.grpcClient()
 	if err != nil {
-		log.Printf("[CVaaS-ERROR]Failed to create new client in ListTopology")
+		log.Printf("Failed to create new CVaaS Grpc client to execute ValidateTopoInfoAndGetDeployMode")
 		return "", err
 	}
-	defer client.wrpcClient.Close()
 
+	defer client.Close()
+	topoInfoClient := cdv1_api.NewTopologyInfoConfigServiceClient(client)
 	topoName := d.Get("topology_name").(string)
 	closName := d.Get("clos_name").(string)
 	wanName := d.Get("wan_name").(string)
 
-	request, err := ConstructListTopologyRequest(topoName)
-	if err != nil {
-		log.Print("ValidateTopoInfoForAddVpc: failed to create ListTopo request", err)
-		return "", err
+	topoInfo := &cdv1_api.TopologyInfoConfig{
+		Name: &wrapperspb.StringValue{Value: topoName},
 	}
 
-	err = client.wrpcClient.WriteJSON(request)
+	GetAllTopoInfoRequest := cdv1_api.TopologyInfoConfigStreamRequest{
+		PartialEqFilter: []*cdv1_api.TopologyInfoConfig{topoInfo},
+	}
+
+	log.Printf("[CVaaS-INFO] GetAllTopologyInfoRequest: %v", &GetAllTopoInfoRequest)
+	ctx, cancel := context.WithTimeout(context.Background(),
+		time.Duration(requestTimeout*time.Second))
+	defer cancel()
+
+	stream, err := topoInfoClient.GetAll(ctx, &GetAllTopoInfoRequest)
 	if err != nil {
-		log.Printf("Failed to send %s request to CVaaS : %s",
-			request.Params["method"].(string), err)
 		return "", err
 	}
-	log.Printf("Successfully sent %s request for %s",
-		request.Params["method"].(string), request.Token)
 
 	var metaTopoExist bool // true if base topology exists in Aeris
 	var closTopoExist bool // true if clos topology exists in Aeris
 	var wanTopoExist bool  // true if wan topology exists in Aeris
 
-	resp := make(map[string]interface{})
 	var topoDeployMode string
 
+	ents := make([]*cdv1_api.TopologyInfoConfig, 0)
 	for {
-		// read respose from clouddeploy
-		err = client.wrpcClient.ReadJSON(&resp)
-		if err != nil {
-			log.Printf("Failed to get %s response from CVaaS, Error: %v",
-				request.Params["method"].(string), err)
-			return "", err
+		resp, err := stream.Recv()
+		if err == io.EOF {
+			break
 		}
-		log.Printf("Received ListTopology Resp: %v", resp)
+		if err != nil {
+			return "", fmt.Errorf("error reading grpc stream: %v", err)
+		}
+		ents = append(ents, resp.GetValue())
+	}
 
-		// parse response and find the topology/clos/wan name returned
-		if res, ok := resp["result"]; ok {
-			if res, ok := res.(map[string]interface{}); ok {
-				for key, val := range res {
-					if strings.EqualFold(key, "topology_info") {
-						if topo, ok := val.(map[string]interface{}); ok {
-							if topo["name"] == topoName &&
-								topo["topo_type"] == "TOPO_INFO_META" {
-								metaTopoExist = true
-								topoDeployMode = strings.ToLower(topo["deploy_mode"].(string))
-							}
-							if topo["name"] == topoName &&
-								topo["topo_type"] == "TOPO_INFO_WAN" {
-								if wan, ok := topo["wan_info"].(map[string]interface{}); ok {
-									if wan["wan_name"] == wanName {
-										wanTopoExist = true
-									}
-								}
-							}
-							if topo["name"] == topoName &&
-								topo["topo_type"] == "TOPO_INFO_CLOS" {
-								if clos, ok := topo["clos_info"].(map[string]interface{}); ok {
-									if clos["clos_name"] == closName {
-										closTopoExist = true
-									}
-								}
-							}
-						}
-					}
-				}
+	for _, ent := range ents {
+		if ent.GetName().GetValue() == topoName &&
+			ent.GetTopoType().String() == "TOPOLOGY_INFO_TYPE_META" {
+			metaTopoExist = true
+			topoDeployMode = strings.ToLower(ent.GetDeployMode().GetValue())
+		}
+		if ent.GetName().GetValue() == topoName &&
+			ent.GetTopoType().String() == "TOPOLOGY_INFO_TYPE_WAN" {
+			if ent.GetWanInfo().GetWanName().GetValue() == wanName {
+				wanTopoExist = true
 			}
 		}
-		if _, ok := resp["error"].(string); ok {
-			break
+		if ent.GetName().GetValue() == topoName &&
+			ent.GetTopoType().String() == "TOPOLOGY_INFO_TYPE_CLOS" {
+			if ent.GetClosInfo().GetClosName().GetValue() == closName {
+				closTopoExist = true
+			}
 		}
 	}
 
@@ -831,79 +754,36 @@ func (p *CloudeosProvider) ValidateTopoInfoAndGetDeployMode(
 
 //CheckTopologyDeletionStatus returns nil if topology doesn't exist
 func (p *CloudeosProvider) CheckTopologyDeletionStatus(d *schema.ResourceData) error {
-	// Create new client
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
+	client, err := p.grpcClient()
 	if err != nil {
-		log.Printf("[CVaaS-ERROR]Failed to create new client CheckTopologyDeletionStatus")
+		log.Printf("Failed to create new CVaaS Grpc client to execute CheckTopologyDeletionStatus")
 		return err
 	}
-	defer client.wrpcClient.Close()
-
-	topoInfo := &api.TopologyInfo{
-		Id: d.Get("tf_id").(string),
+	defer client.Close()
+	topoInfoClient := cdv1_api.NewTopologyInfoConfigServiceClient(client)
+	topoInfoKey := cdv1_api.TopologyInfoKey{
+		Id: &wrapperspb.StringValue{Value: d.Get("tf_id").(string)},
 	}
 
-	fieldMask, err := getOuterFieldMask(topoInfo)
-	if err != nil {
-		log.Print("CheckTopologyDeletionStatus: Failed to get field mask")
-		return err
-	}
-	topoInfo.FieldMask = fieldMask
-
-	log.Printf("[CVaaS-INFO]GetTopologyInfoRequestPb:%s", topoInfo)
-
-	getTopoInfoRequest := api.GetTopologyInfoRequest{
-		TopologyInfo: topoInfo,
+	getTopoInfoRequest := cdv1_api.TopologyInfoConfigRequest{
+		Key: &topoInfoKey,
 	}
 
-	request := wrpcRequest{
-		Token:   "RPC_Token_Get_" + d.Get("tf_id").(string),
-		Command: "serviceRequest",
-		Params: map[string]interface{}{
-			"service": "clouddeploy.Topologyinfos",
-			"method":  "GetTopologyInfo",
-			"body":    &getTopoInfoRequest,
-		},
-	}
+	log.Printf("[CVaaS-INFO] GetTopologyInfoRequest: %v", getTopoInfoRequest)
 
-	err = client.wrpcClient.WriteJSON(request)
-	if err != nil {
-		log.Printf("Failed to send %s request to CVaaS : %s",
-			request.Params["method"].(string), err)
-		return err
-	}
-	log.Printf("Successfully sent %s request for %s",
-		request.Params["method"].(string), request.Token)
-
-	resp := make(map[string]interface{})
-	// read respose from clouddeploy
-	err = client.wrpcClient.ReadJSON(&resp)
-	if err != nil {
-		log.Printf("Failed to get %s response from CVaaS, Error: %v",
-			request.Params["method"].(string), err)
+	ctx, cancel := context.WithTimeout(context.Background(),
+		time.Duration(requestTimeout*time.Second))
+	defer cancel()
+	resp, err := topoInfoClient.GetOne(ctx, &getTopoInfoRequest)
+	if err != nil && resp == nil {
 		return err
 	}
 
 	topologyExists := false
-	/* A response with no topology looks like:
-	   map[error:rpc error: code = NotFound desc = did not find resource "xxx"
-	       status:map[code:5 message:did not find resource "xxx"] token: ... ] */
-
-	// parse response and check if topology exist
-	if res, ok := resp["result"]; ok {
-		if res, ok := res.(map[string]interface{}); ok {
-			for key, val := range res {
-				if strings.EqualFold(key, "topology_info") {
-					if topo, ok := val.(map[string]interface{}); ok {
-						if topo["topo_type"] == "TOPO_INFO_META" ||
-							topo["topo_type"] == "TOPO_INFO_WAN" ||
-							topo["topo_type"] == "TOPO_INFO_CLOS" {
-							topologyExists = true
-						}
-					}
-				}
-			}
-		}
+	if resp.GetValue().GetTopoType().String() == "TOPO_INFO_META" ||
+		resp.GetValue().GetTopoType().String() == "TOPO_INFO_WAN" ||
+		resp.GetValue().GetTopoType().String() == "TOPO_INFO_CLOS" {
+		topologyExists = true
 	}
 
 	log.Printf("topologyExist: %v", topologyExists)
@@ -915,14 +795,13 @@ func (p *CloudeosProvider) CheckTopologyDeletionStatus(d *schema.ResourceData) e
 
 //AddTopology adds Topology resource to Aeris
 func (p *CloudeosProvider) AddTopology(d *schema.ResourceData) error {
-	// Create new client, as the client that provider created might have died.
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
+	client, err := p.grpcClient()
 	if err != nil {
-		log.Printf("[CVaaS-ERROR]Failed to create new client in AddTopology")
+		log.Printf("Failed to create new CVaaS Grpc client to execute AddTopology")
 		return err
 	}
-	defer client.wrpcClient.Close()
-
+	defer client.Close()
+	topoInfoClient := cdv1_api.NewTopologyInfoConfigServiceClient(client)
 	// bgp_asn is not needed when deploy_mode = 'provision'
 	deployMode := d.Get("deploy_mode").(string)
 	asnLow, asnHigh, err := getBgpAsn(d.Get("bgp_asn").(string))
@@ -941,402 +820,243 @@ func (p *CloudeosProvider) AddTopology(d *schema.ResourceData) error {
 
 	log.Printf("Current provider cloudeos version %s", providerCloudEOSVersion)
 
-	topoInfo := &api.TopologyInfo{
-		Version:             providerCloudEOSVersion,
-		Name:                d.Get("topology_name").(string),
-		Id:                  d.Get("tf_id").(string),
-		TopoType:            api.TopologyInfoType_TOPO_INFO_META,
-		BgpAsnLow:           asnLow,
-		BgpAsnHigh:          asnHigh,
-		VtepIpCidr:          d.Get("vtep_ip_cidr").(string),
-		TerminattrIpCidr:    d.Get("terminattr_ip_cidr").(string),
-		DpsControlPlaneCidr: d.Get("dps_controlplane_cidr").(string),
-		ManagedDevices:      managedDevices,
-		CvaasDomain:         p.cvaasDomain,
-		CvaasServer:         p.server,
-		DeployMode:          deployMode,
+	topoInfoKey := cdv1_api.TopologyInfoKey{
+		Id: &wrapperspb.StringValue{Value: d.Get("tf_id").(string)},
 	}
 
-	fieldMask, err := getOuterFieldMask(topoInfo)
-	if err != nil {
-		log.Print("AddTopology: Failed to get field mask")
+	topoInfo := &cdv1_api.TopologyInfoConfig{
+		Version:             &wrapperspb.StringValue{Value: providerCloudEOSVersion},
+		Name:                &wrapperspb.StringValue{Value: d.Get("topology_name").(string)},
+		Key:                 &topoInfoKey,
+		TopoType:            cdv1_api.TopologyInfoType_TOPOLOGY_INFO_TYPE_META,
+		BgpAsnLow:           &wrapperspb.Int32Value{Value: int32(asnLow)},
+		BgpAsnHigh:          &wrapperspb.Int32Value{Value: int32(asnHigh)},
+		VtepIpCidr:          &wrapperspb.StringValue{Value: d.Get("vtep_ip_cidr").(string)},
+		TerminattrIpCidr:    &wrapperspb.StringValue{Value: d.Get("terminattr_ip_cidr").(string)},
+		DpsControlPlaneCidr: &wrapperspb.StringValue{Value: d.Get("dps_controlplane_cidr").(string)},
+		ManagedDevices:      &fmp.RepeatedString{Values: managedDevices},
+		CvaasDomain:         &wrapperspb.StringValue{Value: p.cvaasDomain},
+		CvaasServer:         &wrapperspb.StringValue{Value: p.server},
+		DeployMode:          &wrapperspb.StringValue{Value: deployMode},
+	}
+
+	addTopoInfoRequest := cdv1_api.TopologyInfoConfigSetRequest{
+		Value: topoInfo,
+	}
+
+	log.Printf("[CVaaS-INFO] AddTopologyInfoRequest: %v", &addTopoInfoRequest)
+
+	ctx, cancel := context.WithTimeout(context.Background(),
+		time.Duration(requestTimeout*time.Second))
+	defer cancel()
+
+	resp, err := topoInfoClient.Set(ctx, &addTopoInfoRequest)
+	if err != nil && resp == nil {
 		return err
 	}
-	topoInfo.FieldMask = fieldMask
 
-	log.Printf("[CVaaS-INFO]AddTopologyInfoRequestPb:%s", topoInfo)
-	addTopoInfoRequest := api.AddTopologyInfoRequest{
-		TopologyInfo: topoInfo,
-	}
-
-	request := wrpcRequest{
-		Token:   "RPC_Token_Add_" + d.Get("topology_name").(string) + "_1",
-		Command: "serviceRequest",
-		Params: map[string]interface{}{
-			"service": "clouddeploy.Topologyinfos",
-			"method":  "AddTopologyInfo",
-			"body":    &addTopoInfoRequest,
-		},
-	}
-
-	resp, err := client.wrpcSend(&request)
-	if err != nil {
-		return err
-	}
-	// Get the primary key, id, from response and set tf_id = id
-	if res, ok := resp["result"]; ok {
-		if res, ok := res.(map[string]interface{}); ok {
-			for key, val := range res {
-				if strings.EqualFold(key, "topology_info") {
-					if topoInfo, ok := val.(map[string]interface{}); ok {
-						for k, v := range topoInfo {
-							if strings.EqualFold(k, "id") {
-								err = d.Set("tf_id", v)
-								if err != nil {
-									return err
-								}
-							}
-						}
-					}
-				}
-			}
+	if resp.GetValue().GetKey().GetId() != nil {
+		tf_id := resp.GetValue().GetKey().GetId().GetValue()
+		err = d.Set("tf_id", tf_id)
+		if err != nil {
+			return err
 		}
 	}
-
 	return nil
 }
 
 //DeleteTopology deletes Topology resource from Aeris
 func (p *CloudeosProvider) DeleteTopology(d *schema.ResourceData) error {
-	// Create new client, as the client that provider created might have died.
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
+	client, err := p.grpcClient()
 	if err != nil {
-		log.Printf("[CVaaS-ERROR]Failed to create new client in DeleteTopology")
+		log.Printf("Failed to create new CVaaS Grpc client to execute DeleteTopology")
 		return err
 	}
-	defer client.wrpcClient.Close()
-
-	topoInfo := &api.TopologyInfo{
-		Name:     d.Get("topology_name").(string),
-		Id:       d.Get("tf_id").(string),
-		TopoType: api.TopologyInfoType_TOPO_INFO_META,
+	defer client.Close()
+	topoInfoClient := cdv1_api.NewTopologyInfoConfigServiceClient(client)
+	topoInfoKey := cdv1_api.TopologyInfoKey{
+		Id: &wrapperspb.StringValue{Value: d.Get("tf_id").(string)},
+	}
+	delTopoInfoRequest := cdv1_api.TopologyInfoConfigDeleteRequest{
+		Key: &topoInfoKey,
 	}
 
-	fieldMask, err := getOuterFieldMask(topoInfo)
-	if err != nil {
-		log.Print("ListTopology: Failed to get field mask")
-		return err
-	}
-	topoInfo.FieldMask = fieldMask
+	log.Printf("[CVaaS-INFO] DeleteTopologyInfoRequest: %v", &delTopoInfoRequest)
 
-	delTopoInfoRequest := api.DeleteTopologyInfoRequest{
-		TopologyInfo: topoInfo,
-	}
+	ctx, cancel := context.WithTimeout(context.Background(),
+		time.Duration(requestTimeout*time.Second))
+	defer cancel()
 
-	request := wrpcRequest{
-		Token:   "RPC_Token_Delete_" + d.Get("topology_name").(string) + "_1",
-		Command: "serviceRequest",
-		Params: map[string]interface{}{
-			"service": "clouddeploy.Topologyinfos",
-			"method":  "DeleteTopologyInfo",
-			"body":    &delTopoInfoRequest,
-		},
+	resp, err := topoInfoClient.Delete(ctx, &delTopoInfoRequest)
+	if err != nil && resp != nil && resp.GetKey().GetId().GetValue() != d.Get("tf_id").(string) {
+		return fmt.Errorf("Deleted key %v, tf_id %v", resp.GetKey().GetId().GetValue(),
+			d.Get("tf_id").(string))
 	}
-
-	_, err = client.wrpcSend(&request)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
 //AddClosTopology adds clos Topology resource to Aeris
 func (p *CloudeosProvider) AddClosTopology(d *schema.ResourceData) error {
-	// Create new client, as the client that provider created might have died.
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
+	client, err := p.grpcClient()
 	if err != nil {
-		log.Printf("[CVaaS-ERROR]Failed to create new client in AddClosTopology")
+		log.Printf("Failed to create new CVaaS Grpc client to execute AddClosTopology")
 		return err
 	}
-	defer client.wrpcClient.Close()
-
+	defer client.Close()
+	topoInfoClient := cdv1_api.NewTopologyInfoConfigServiceClient(client)
 	fabricName := d.Get("fabric").(string)
-	fabric := api.FabricType_FABRIC_TYPE_UNSPECIFIED
+	fabric := cdv1_api.FabricType_FABRIC_TYPE_UNSPECIFIED
 	if strings.EqualFold("full_mesh", fabricName) {
-		fabric = api.FabricType_FULL_MESH
+		fabric = cdv1_api.FabricType_FABRIC_TYPE_FULL_MESH
 	} else if strings.EqualFold("hub_spoke", fabricName) {
-		fabric = api.FabricType_HUB_SPOKE
+		fabric = cdv1_api.FabricType_FABRIC_TYPE_HUB_SPOKE
 	}
 
-	closInfo := &api.ClosInfo{
-		ClosName:         d.Get("name").(string),
-		Fabric:           fabric,
-		LeafEdgePeering:  d.Get("leaf_to_edge_peering").(bool),
-		LeafEdgeIgw:      d.Get("leaf_to_edge_igw").(bool),
-		LeafEncryption:   d.Get("leaf_encryption").(bool),
-		CvpContainerName: d.Get("cv_container_name").(string),
+	closInfo := &cdv1_api.ClosInfo{
+		ClosName:         &wrapperspb.StringValue{Value: d.Get("name").(string)},
+		Fabric:           cdv1_api.FabricType(fabric),
+		LeafEdgePeering:  &wrapperspb.BoolValue{Value: d.Get("leaf_to_edge_peering").(bool)},
+		LeafEdgeIgw:      &wrapperspb.BoolValue{Value: d.Get("leaf_to_edge_igw").(bool)},
+		LeafEncryption:   &wrapperspb.BoolValue{Value: d.Get("leaf_encryption").(bool)},
+		CvpContainerName: &wrapperspb.StringValue{Value: d.Get("cv_container_name").(string)},
 	}
 
-	topoInfo := &api.TopologyInfo{
-		Name:     d.Get("topology_name").(string),
-		Id:       d.Get("tf_id").(string),
-		TopoType: api.TopologyInfoType_TOPO_INFO_CLOS,
+	topoInfoKey := cdv1_api.TopologyInfoKey{
+		Id: &wrapperspb.StringValue{Value: d.Get("tf_id").(string)},
+	}
+
+	topoInfo := &cdv1_api.TopologyInfoConfig{
+		Name:     &wrapperspb.StringValue{Value: d.Get("topology_name").(string)},
+		Key:      &topoInfoKey,
+		TopoType: cdv1_api.TopologyInfoType(cdv1_api.TopologyInfoType_TOPOLOGY_INFO_TYPE_CLOS),
 		ClosInfo: closInfo,
 	}
+	addTopoInfoRequest := cdv1_api.TopologyInfoConfigSetRequest{
+		Value: topoInfo,
+	}
 
-	fieldMask, err := getOuterFieldMask(topoInfo)
-	if err != nil {
-		log.Print("AddClosTopology: Failed to get topoInfo field mask")
+	log.Printf("[CVaaS-INFO] AddTopologyInfoRequest: %v", &addTopoInfoRequest)
+	ctx, cancel := context.WithTimeout(context.Background(),
+		time.Duration(requestTimeout*time.Second))
+	defer cancel()
+	resp, err := topoInfoClient.Set(ctx, &addTopoInfoRequest)
+	if err != nil && resp == nil {
 		return err
 	}
 
-	err = appendInnerFieldMask(closInfo, fieldMask, "closInfo.")
-	if err != nil {
-		log.Print("AddClosTopology: Failed to get closInfo field mask")
-		return err
-	}
-	topoInfo.FieldMask = fieldMask
-
-	addTopoInfoRequest := api.AddTopologyInfoRequest{
-		TopologyInfo: topoInfo,
-	}
-	log.Printf("[CVaaS-INFO]AddTopologyInfoRequestPb:%s", topoInfo)
-
-	token := d.Get("topology_name").(string) + "_3_" + d.Get("name").(string)
-	request := wrpcRequest{
-		Token:   "RPC_Token_Add_" + token,
-		Command: "serviceRequest",
-		Params: map[string]interface{}{
-			"service": "clouddeploy.Topologyinfos",
-			"method":  "AddTopologyInfo",
-			"body":    &addTopoInfoRequest,
-		},
-	}
-
-	resp, err := client.wrpcSend(&request)
-	if err != nil {
-		return err
-	}
-
-	// Get the primary key, id, from response and set tf_id = id
-	if res, ok := resp["result"]; ok {
-		if res, ok := res.(map[string]interface{}); ok {
-			for key, val := range res {
-				if strings.EqualFold(key, "topology_info") {
-					if topoInfo, ok := val.(map[string]interface{}); ok {
-						for k, v := range topoInfo {
-							if strings.EqualFold(k, "id") {
-								err = d.Set("tf_id", v)
-								if err != nil {
-									return err
-								}
-
-							}
-						}
-					}
-				}
-			}
+	if resp.GetValue().GetKey().GetId() != nil {
+		tf_id := resp.GetValue().GetKey().GetId().GetValue()
+		err = d.Set("tf_id", tf_id)
+		if err != nil {
+			return err
 		}
 	}
-
 	return nil
 }
 
 //DeleteClosTopology deletes clos Topology resource from Aeris
 func (p *CloudeosProvider) DeleteClosTopology(d *schema.ResourceData) error {
-	// Create new client, as the client that provider created might have died.
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
+	client, err := p.grpcClient()
 	if err != nil {
-		log.Printf("[CVaaS-ERROR]Failed to create new client in DeleteClosTopology")
+		log.Printf("Failed to create new CVaaS Grpc client to execute DeleteClosTopology")
 		return err
 	}
-	defer client.wrpcClient.Close()
+	defer client.Close()
+	topoInfoClient := cdv1_api.NewTopologyInfoConfigServiceClient(client)
 
-	closInfo := &api.ClosInfo{
-		ClosName: d.Get("name").(string),
+	topoInfoKey := cdv1_api.TopologyInfoKey{
+		Id: &wrapperspb.StringValue{Value: d.Get("tf_id").(string)},
 	}
-
-	topoInfo := &api.TopologyInfo{
-		Name:     d.Get("topology_name").(string),
-		Id:       d.Get("tf_id").(string),
-		TopoType: api.TopologyInfoType_TOPO_INFO_CLOS,
-		ClosInfo: closInfo,
+	delTopoInfoRequest := cdv1_api.TopologyInfoConfigDeleteRequest{
+		Key: &topoInfoKey,
 	}
-
-	fieldMask, err := getOuterFieldMask(topoInfo)
-	if err != nil {
-		log.Print("DeleteClosTopology: Failed to get topoInfo field mask")
-		return err
+	log.Printf("[CVaaS-INFO] DeleteClosTopologyInfoRequest: %v", &delTopoInfoRequest)
+	ctx, cancel := context.WithTimeout(context.Background(),
+		time.Duration(requestTimeout*time.Second))
+	defer cancel()
+	resp, err := topoInfoClient.Delete(ctx, &delTopoInfoRequest)
+	if err != nil && resp != nil && resp.GetKey().GetId().GetValue() != d.Get("tf_id").(string) {
+		return fmt.Errorf("Deleted key %v, tf_id %v", resp.GetKey().GetId().GetValue(),
+			d.Get("tf_id").(string))
 	}
-
-	err = appendInnerFieldMask(closInfo, fieldMask, "closInfo.")
-	if err != nil {
-		log.Print("AddClosTopology: Failed to get closInfo field mask")
-		return err
-	}
-	topoInfo.FieldMask = fieldMask
-
-	log.Printf("[CVaaS-INFO]DeleteClosTopology DeleteTopologyInfoRequestPb:%s", topoInfo)
-	delTopoInfoRequest := api.DeleteTopologyInfoRequest{
-		TopologyInfo: topoInfo,
-	}
-
-	token := d.Get("topology_name").(string) + "_3_" + d.Get("name").(string)
-	request := wrpcRequest{
-		Token:   "RPC_Token_Delete_" + token,
-		Command: "serviceRequest",
-		Params: map[string]interface{}{
-			"service": "clouddeploy.Topologyinfos",
-			"method":  "DeleteTopologyInfo",
-			"body":    &delTopoInfoRequest,
-		},
-	}
-
-	_, err = client.wrpcSend(&request)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
 //AddWanTopology adds wan Topology resource to Aeris
 func (p *CloudeosProvider) AddWanTopology(d *schema.ResourceData) error {
-	// Create new client, as the client that provider created might have died.
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
+	client, err := p.grpcClient()
 	if err != nil {
-		log.Printf("[CVaaS-ERROR]Failed to create new client in AddWanTopology")
+		log.Printf("Failed to create new CVaaS Grpc client to execute AddWanTopology")
 		return err
 	}
-	defer client.wrpcClient.Close()
-
-	wanInfo := &api.WanInfo{
-		WanName:              d.Get("name").(string),
-		EdgeEdgePeering:      d.Get("edge_to_edge_peering").(bool),
-		EdgeEdgeIgw:          d.Get("edge_to_edge_igw").(bool),
-		EdgeDedicatedConnect: d.Get("edge_to_edge_dedicated_connect").(bool),
-		CvpContainerName:     d.Get("cv_container_name").(string),
+	defer client.Close()
+	topoInfoClient := cdv1_api.NewTopologyInfoConfigServiceClient(client)
+	wanInfo := &cdv1_api.WanInfo{
+		WanName:              &wrapperspb.StringValue{Value: d.Get("name").(string)},
+		EdgeEdgePeering:      &wrapperspb.BoolValue{Value: d.Get("edge_to_edge_peering").(bool)},
+		EdgeEdgeIgw:          &wrapperspb.BoolValue{Value: d.Get("edge_to_edge_igw").(bool)},
+		EdgeDedicatedConnect: &wrapperspb.BoolValue{Value: d.Get("edge_to_edge_dedicated_connect").(bool)},
+		CvpContainerName:     &wrapperspb.StringValue{Value: d.Get("cv_container_name").(string)},
 	}
 
-	topoInfo := &api.TopologyInfo{
-		Name:     d.Get("topology_name").(string),
-		Id:       d.Get("tf_id").(string),
-		TopoType: api.TopologyInfoType_TOPO_INFO_WAN,
+	topoInfoKey := cdv1_api.TopologyInfoKey{
+		Id: &wrapperspb.StringValue{Value: d.Get("tf_id").(string)},
+	}
+
+	topoInfo := &cdv1_api.TopologyInfoConfig{
+		Name:     &wrapperspb.StringValue{Value: d.Get("topology_name").(string)},
+		Key:      &topoInfoKey,
+		TopoType: cdv1_api.TopologyInfoType_TOPOLOGY_INFO_TYPE_WAN,
 		WanInfo:  wanInfo,
 	}
+	addTopoInfoRequest := cdv1_api.TopologyInfoConfigSetRequest{
+		Value: topoInfo,
+	}
+	log.Printf("[CVaaS-INFO] AddWanTopologyInfoRequest: %v", &addTopoInfoRequest)
 
-	fieldMask, err := getOuterFieldMask(topoInfo)
-	if err != nil {
-		log.Print("AddWanTopology: Failed to get topoInfo field mask")
+	ctx, cancel := context.WithTimeout(context.Background(),
+		time.Duration(requestTimeout*time.Second))
+	defer cancel()
+	resp, err := topoInfoClient.Set(ctx, &addTopoInfoRequest)
+	if err != nil && resp == nil {
 		return err
 	}
 
-	err = appendInnerFieldMask(wanInfo, fieldMask, "wanInfo.")
-	if err != nil {
-		log.Print("AddClosTopology: Failed to get wanInfo field mask")
-		return err
-	}
-	topoInfo.FieldMask = fieldMask
-
-	addTopoInfoRequest := api.AddTopologyInfoRequest{
-		TopologyInfo: topoInfo,
-	}
-	log.Printf("[CVaaS-INFO]AddTopologyInfoRequestPb:%s", topoInfo)
-
-	token := d.Get("topology_name").(string) + "_2_" + d.Get("name").(string)
-	request := wrpcRequest{
-		Token:   "RPC_Token_Add_" + token,
-		Command: "serviceRequest",
-		Params: map[string]interface{}{
-			"service": "clouddeploy.Topologyinfos",
-			"method":  "AddTopologyInfo",
-			"body":    &addTopoInfoRequest,
-		},
-	}
-
-	resp, err := client.wrpcSend(&request)
-	if err != nil {
-		return err
-	}
-
-	// Get the primary key, id, from response and set tf_id = id
-	if res, ok := resp["result"]; ok {
-		if res, ok := res.(map[string]interface{}); ok {
-			for key, val := range res {
-				if strings.EqualFold(key, "topology_info") {
-					if topoInfo, ok := val.(map[string]interface{}); ok {
-						for k, v := range topoInfo {
-							if strings.EqualFold(k, "id") {
-								err = d.Set("tf_id", v)
-								if err != nil {
-									return err
-								}
-							}
-						}
-					}
-				}
-			}
+	if resp.GetValue().GetKey().GetId() != nil {
+		tf_id := resp.GetValue().GetKey().GetId().GetValue()
+		err = d.Set("tf_id", tf_id)
+		if err != nil {
+			return err
 		}
 	}
-
 	return nil
 }
 
 //DeleteWanTopology deletes wan Topology resource from Aeris
 func (p *CloudeosProvider) DeleteWanTopology(d *schema.ResourceData) error {
-	// Create new client, as the client that provider created might have died.
-	client, err := aristaCvaasClient(p.server, p.srvcAcctToken)
+	client, err := p.grpcClient()
 	if err != nil {
-		log.Printf("[CVaaS-ERROR]Failed to create new client in DeleteClosTopology")
+		log.Printf("Failed to create new CVaaS Grpc client to execute DeleteWanTopology")
 		return err
 	}
-	defer client.wrpcClient.Close()
-
-	wanInfo := &api.WanInfo{
-		WanName: d.Get("name").(string),
+	defer client.Close()
+	topoInfoClient := cdv1_api.NewTopologyInfoConfigServiceClient(client)
+	topoInfoKey := cdv1_api.TopologyInfoKey{
+		Id: &wrapperspb.StringValue{Value: d.Get("tf_id").(string)},
 	}
-
-	topoInfo := &api.TopologyInfo{
-		Name:     d.Get("topology_name").(string),
-		Id:       d.Get("tf_id").(string),
-		TopoType: api.TopologyInfoType_TOPO_INFO_WAN,
-		WanInfo:  wanInfo,
+	delTopoInfoRequest := cdv1_api.TopologyInfoConfigDeleteRequest{
+		Key: &topoInfoKey,
 	}
+	log.Printf("[CVaaS-INFO] DeleteWanTopologyInfoRequest: %v", &delTopoInfoRequest)
 
-	fieldMask, err := getOuterFieldMask(topoInfo)
-	if err != nil {
-		log.Print("DeleteWanTopology: Failed to get field mask")
-		return err
+	ctx, cancel := context.WithTimeout(context.Background(),
+		time.Duration(requestTimeout*time.Second))
+	defer cancel()
+	resp, err := topoInfoClient.Delete(ctx, &delTopoInfoRequest)
+	if err != nil && resp != nil && resp.GetKey().GetId().GetValue() != d.Get("tf_id").(string) {
+		return fmt.Errorf("Deleted key %v, tf_id %v", resp.GetKey().GetId().GetValue(),
+			d.Get("tf_id").(string))
 	}
-
-	err = appendInnerFieldMask(wanInfo, fieldMask, "wanInfo.")
-	if err != nil {
-		log.Print("AddClosTopology: Failed to get wanInfo field mask")
-		return err
-	}
-	topoInfo.FieldMask = fieldMask
-
-	delTopoInfoRequest := api.DeleteTopologyInfoRequest{
-		TopologyInfo: topoInfo,
-	}
-
-	token := d.Get("topology_name").(string) + "_2_" + d.Get("name").(string)
-	request := wrpcRequest{
-		Token:   "RPC_Token_Delete_" + token,
-		Command: "serviceRequest",
-		Params: map[string]interface{}{
-			"service": "clouddeploy.Topologyinfos",
-			"method":  "DeleteTopologyInfo",
-			"body":    &delTopoInfoRequest,
-		},
-	}
-
-	_, err = client.wrpcSend(&request)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
