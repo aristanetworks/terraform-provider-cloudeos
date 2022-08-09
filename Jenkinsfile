@@ -10,10 +10,10 @@ pipeline {
             }
         }
         stage("make check") {
-            agent { docker reuseNode: true, image: 'golang:1.13.8-buster' }
+            agent { docker reuseNode: true, image: 'golang:1.18.5-buster' }
             steps {
                script {
-		   sh 'make clean'
+		           sh 'make clean'
                    sh 'make'
                    sh 'make test'
                }
