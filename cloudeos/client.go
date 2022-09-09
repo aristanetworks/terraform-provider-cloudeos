@@ -284,34 +284,30 @@ func (p *CloudeosProvider) GetVpc(d *schema.ResourceData) error {
 	}
 
 	if peerVpcInfo := resp.GetValue().GetPeerVpcInfo(); peerVpcInfo != nil {
-		// these fields are only required for azure
-		if resp.GetValue().GetCpT() == cdv1_api.CloudProviderType_CLOUD_PROVIDER_TYPE_AZURE {
-			if err = d.Set("peer_rg_name", peerVpcInfo.GetPeerRgName().GetValue()); err != nil {
+		if err = d.Set("peer_rg_name", peerVpcInfo.GetPeerRgName().GetValue()); err != nil {
+			return err
+		}
+
+		if err = d.Set("peer_vnet_name", peerVpcInfo.GetPeerVnetName().GetValue()); err != nil {
+			return err
+		}
+
+		if err = d.Set("peer_vnet_id", peerVpcInfo.GetPeerVnetId().GetValue()); err != nil {
+			return err
+		}
+
+		peerVpcCidrInfoMap := peerVpcInfo.GetPeerVpcCidr().GetValues()
+		for k := range peerVpcCidrInfoMap {
+			if err = d.Set("peer_vpc_id", k); err != nil {
 				return err
 			}
 
-			if err = d.Set("peer_vnet_name", peerVpcInfo.GetPeerVnetName().GetValue()); err != nil {
+			if err = d.Set("peervpcidr", peerVpcCidrInfoMap[k]); err != nil {
 				return err
 			}
 
-			if err = d.Set("peer_vnet_id", peerVpcInfo.GetPeerVnetId().GetValue()); err != nil {
+			if err = d.Set("peer_vpc_cidr", peerVpcCidrInfoMap[k]); err != nil {
 				return err
-			}
-		} else {
-			// these fields are only required for azure
-			peerVpcCidrInfoMap := peerVpcInfo.GetPeerVpcCidr().GetValues()
-			for k := range peerVpcCidrInfoMap {
-				if err = d.Set("peer_vpc_id", k); err != nil {
-					return err
-				}
-
-				if err = d.Set("peervpcidr", peerVpcCidrInfoMap[k]); err != nil {
-					return err
-				}
-
-				if err = d.Set("peer_vpc_cidr", peerVpcCidrInfoMap[k]); err != nil {
-					return err
-				}
 			}
 		}
 	}
