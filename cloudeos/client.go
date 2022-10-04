@@ -40,11 +40,10 @@ const (
 )
 
 const (
-	// Retry attempts for wss connect
+	// Retry attempts for grpc connect
 	CVaaSRetryCount = 5
-	// Decide what should be time limit for request timeout
-	// currently 60 sec
-	requestTimeout = 60
+	// Time limit for request timeout 3 min
+	requestTimeout = 180
 )
 
 //CloudeosProvider configuration
@@ -57,7 +56,7 @@ type CloudeosProvider struct {
 func (p *CloudeosProvider) grpcClient() (*grpc.ClientConn, error) {
 	opts := []grpc_retry.CallOption{
 		grpc_retry.WithMax(5),
-		grpc_retry.WithBackoff(grpc_retry.BackoffExponential(100 * time.Millisecond)),
+		grpc_retry.WithBackoff(grpc_retry.BackoffExponential(500 * time.Millisecond)),
 		grpc_retry.WithCodes(codes.Unavailable),
 	}
 
@@ -71,13 +70,9 @@ func (p *CloudeosProvider) httpClient() (*http.Client, error) {
 	return &http.Client{}, nil
 }
 
-// lets use httpClient instead of grpc client for making addenrollmentToken request
-// using grpc client will involve add proto binding and we are not sure
-// if it will be ok to expose those bindings to public repo
 func (p *CloudeosProvider) getDeviceEnrollmentToken() (string, error) {
 
 	url := fmt.Sprintf("https://%s/api/v3/services/admin.Enrollment/AddEnrollmentToken", p.server)
-	// Create a Bearer string by appending string access token
 	var bearer = "Bearer " + p.srvcAcctToken
 
 	// Create a new request using http
