@@ -7,7 +7,8 @@ import (
 	"time"
 
 	api "terraform-provider-cloudeos/cloudeos/arista/clouddeploy.v1"
-	fmp "terraform-provider-cloudeos/cloudeos/fmp"
+
+	fmp "github.com/aristanetworks/cloudvision-go/api/fmp"
 
 	"github.com/golang/protobuf/ptypes/wrappers"
 

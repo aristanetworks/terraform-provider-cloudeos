@@ -1,15 +1,15 @@
-// Copyright (c) 2020 Arista Networks, Inc.
-// Use of this source code is governed by the Mozilla Public License Version 2.0
-// that can be found in the LICENSE file.
+// Copyright (c) 2020 Arista Networks, Inc.  All rights reserved.
+// Arista Networks, Inc. Confidential and Proprietary.
+// Subject to Arista Networks, Inc.'s EULA.
+// FOR INTERNAL USE ONLY. NOT FOR DISTRIBUTION.
 
 // Nilable wrapper messages for repeated scalar types and maps with scalar types
-// source: https://github.com/aristanetworks/cloudvision-apis/blob/trunk/fmp/wrappers.proto
 
 syntax = "proto3";
 
 package fmp;
 
-option go_package = "cloudeos-terraform-provider/cloudeos/fmp";
+option go_package = "github.com/aristanetworks/cloudvision-go/api/fmp";
 
 // Wrapper message for `repeated double`.
 message RepeatedDouble {

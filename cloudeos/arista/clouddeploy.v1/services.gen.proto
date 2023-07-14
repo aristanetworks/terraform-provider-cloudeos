@@ -5,10 +5,10 @@
 syntax = "proto3";
 
 package arista.clouddeploy.v1;
-option go_package = "cloudeos-terraform-provider/cloudeos/arista/clouddeploy.v1;clouddeploy_v1";
+option go_package = "terraform-provider-cloudeos/cloudeos/arista/clouddeploy.v1;clouddeploy_v1";
 
 import "arista/clouddeploy.v1/clouddeploy.proto";
-import "arista/time_v1/time.proto";
+import "arista/time/time.proto";
 import "arista/subscriptions/subscriptions.proto";
 import "fmp/deletes.proto";
 import "google/protobuf/timestamp.proto";
@@ -46,6 +46,17 @@ message AWSTgwStreamRequest {
 
 	// TimeRange allows limiting response data to within a specified time window.
 	// If this field is populated, at least one of the two time fields are required.
+	//
+	// For GetAll, the fields start and end can be used as follows:
+	//
+	//   * end: Returns the state of each AWSTgw at end.
+	//     * Each AWSTgw response is fully-specified (all fields set).
+	//   * start: Returns the state of each AWSTgw at start, followed by updates until now.
+	//     * Each AWSTgw response at start is fully-specified, but updates may be partial.
+	//   * start and end: Returns the state of each AWSTgw at start, followed by updates
+	//     until end.
+	//     * Each AWSTgw response at start is fully-specified, but updates until end may
+	//       be partial.
 	//
 	// This field is not allowed in the Subscribe RPC.
 	arista.time.TimeBounds time = 3;
@@ -106,6 +117,17 @@ message AWSTgwAttachmentStreamRequest {
 	// TimeRange allows limiting response data to within a specified time window.
 	// If this field is populated, at least one of the two time fields are required.
 	//
+	// For GetAll, the fields start and end can be used as follows:
+	//
+	//   * end: Returns the state of each AWSTgwAttachment at end.
+	//     * Each AWSTgwAttachment response is fully-specified (all fields set).
+	//   * start: Returns the state of each AWSTgwAttachment at start, followed by updates until now.
+	//     * Each AWSTgwAttachment response at start is fully-specified, but updates may be partial.
+	//   * start and end: Returns the state of each AWSTgwAttachment at start, followed by updates
+	//     until end.
+	//     * Each AWSTgwAttachment response at start is fully-specified, but updates until end may
+	//       be partial.
+	//
 	// This field is not allowed in the Subscribe RPC.
 	arista.time.TimeBounds time = 3;
 };
@@ -165,6 +187,17 @@ message AWSVpnConfigStreamRequest {
 	// TimeRange allows limiting response data to within a specified time window.
 	// If this field is populated, at least one of the two time fields are required.
 	//
+	// For GetAll, the fields start and end can be used as follows:
+	//
+	//   * end: Returns the state of each AWSVpnConfig at end.
+	//     * Each AWSVpnConfig response is fully-specified (all fields set).
+	//   * start: Returns the state of each AWSVpnConfig at start, followed by updates until now.
+	//     * Each AWSVpnConfig response at start is fully-specified, but updates may be partial.
+	//   * start and end: Returns the state of each AWSVpnConfig at start, followed by updates
+	//     until end.
+	//     * Each AWSVpnConfig response at start is fully-specified, but updates until end may
+	//       be partial.
+	//
 	// This field is not allowed in the Subscribe RPC.
 	arista.time.TimeBounds time = 3;
 };
@@ -205,6 +238,21 @@ message AWSVpnConfigSetResponse {
 	google.protobuf.Timestamp time = 2;
 };
 
+message AWSVpnConfigSetSomeRequest {
+	// value contains a list of AWSVpnConfig values to write.
+	// It is possible to provide more values than can fit within either:
+	//     - the maxiumum send size of the client
+	//     - the maximum receive size of the server
+	// If this error occurs you must reduce the number of values sent.
+	// See gRPC "maximum message size" documentation for more information.
+	repeated AWSVpnConfig values = 1;
+};
+
+message AWSVpnConfigSetSomeResponse {
+	AWSVpnKey key = 1;
+	string error = 2;
+};
+
 message AWSVpnConfigDeleteRequest {
 	// Key indicates which AWSVpnConfig instance to remove.
 	// This field must always be set.
@@ -243,6 +291,7 @@ service AWSVpnConfigService {
 	rpc GetAll (AWSVpnConfigStreamRequest) returns (stream AWSVpnConfigStreamResponse);
 	rpc Subscribe (AWSVpnConfigStreamRequest) returns (stream AWSVpnConfigStreamResponse);
 	rpc Set (AWSVpnConfigSetRequest) returns (AWSVpnConfigSetResponse);
+	rpc SetSome (AWSVpnConfigSetSomeRequest) returns (stream AWSVpnConfigSetSomeResponse);
 	rpc Delete (AWSVpnConfigDeleteRequest) returns (AWSVpnConfigDeleteResponse);
 	rpc DeleteAll (AWSVpnConfigDeleteAllRequest) returns (stream AWSVpnConfigDeleteAllResponse);
 }
@@ -279,6 +328,17 @@ message PathStreamRequest {
 
 	// TimeRange allows limiting response data to within a specified time window.
 	// If this field is populated, at least one of the two time fields are required.
+	//
+	// For GetAll, the fields start and end can be used as follows:
+	//
+	//   * end: Returns the state of each Path at end.
+	//     * Each Path response is fully-specified (all fields set).
+	//   * start: Returns the state of each Path at start, followed by updates until now.
+	//     * Each Path response at start is fully-specified, but updates may be partial.
+	//   * start and end: Returns the state of each Path at start, followed by updates
+	//     until end.
+	//     * Each Path response at start is fully-specified, but updates until end may
+	//       be partial.
 	//
 	// This field is not allowed in the Subscribe RPC.
 	arista.time.TimeBounds time = 3;
@@ -339,6 +399,17 @@ message RouterConfigStreamRequest {
 	// TimeRange allows limiting response data to within a specified time window.
 	// If this field is populated, at least one of the two time fields are required.
 	//
+	// For GetAll, the fields start and end can be used as follows:
+	//
+	//   * end: Returns the state of each RouterConfig at end.
+	//     * Each RouterConfig response is fully-specified (all fields set).
+	//   * start: Returns the state of each RouterConfig at start, followed by updates until now.
+	//     * Each RouterConfig response at start is fully-specified, but updates may be partial.
+	//   * start and end: Returns the state of each RouterConfig at start, followed by updates
+	//     until end.
+	//     * Each RouterConfig response at start is fully-specified, but updates until end may
+	//       be partial.
+	//
 	// This field is not allowed in the Subscribe RPC.
 	arista.time.TimeBounds time = 3;
 };
@@ -379,6 +450,21 @@ message RouterConfigSetResponse {
 	google.protobuf.Timestamp time = 2;
 };
 
+message RouterConfigSetSomeRequest {
+	// value contains a list of RouterConfig values to write.
+	// It is possible to provide more values than can fit within either:
+	//     - the maxiumum send size of the client
+	//     - the maximum receive size of the server
+	// If this error occurs you must reduce the number of values sent.
+	// See gRPC "maximum message size" documentation for more information.
+	repeated RouterConfig values = 1;
+};
+
+message RouterConfigSetSomeResponse {
+	RouterKey key = 1;
+	string error = 2;
+};
+
 message RouterConfigDeleteRequest {
 	// Key indicates which RouterConfig instance to remove.
 	// This field must always be set.
@@ -417,6 +503,7 @@ service RouterConfigService {
 	rpc GetAll (RouterConfigStreamRequest) returns (stream RouterConfigStreamResponse);
 	rpc Subscribe (RouterConfigStreamRequest) returns (stream RouterConfigStreamResponse);
 	rpc Set (RouterConfigSetRequest) returns (RouterConfigSetResponse);
+	rpc SetSome (RouterConfigSetSomeRequest) returns (stream RouterConfigSetSomeResponse);
 	rpc Delete (RouterConfigDeleteRequest) returns (RouterConfigDeleteResponse);
 	rpc DeleteAll (RouterConfigDeleteAllRequest) returns (stream RouterConfigDeleteAllResponse);
 }
@@ -453,6 +540,17 @@ message SubnetConfigStreamRequest {
 
 	// TimeRange allows limiting response data to within a specified time window.
 	// If this field is populated, at least one of the two time fields are required.
+	//
+	// For GetAll, the fields start and end can be used as follows:
+	//
+	//   * end: Returns the state of each SubnetConfig at end.
+	//     * Each SubnetConfig response is fully-specified (all fields set).
+	//   * start: Returns the state of each SubnetConfig at start, followed by updates until now.
+	//     * Each SubnetConfig response at start is fully-specified, but updates may be partial.
+	//   * start and end: Returns the state of each SubnetConfig at start, followed by updates
+	//     until end.
+	//     * Each SubnetConfig response at start is fully-specified, but updates until end may
+	//       be partial.
 	//
 	// This field is not allowed in the Subscribe RPC.
 	arista.time.TimeBounds time = 3;
@@ -494,6 +592,21 @@ message SubnetConfigSetResponse {
 	google.protobuf.Timestamp time = 2;
 };
 
+message SubnetConfigSetSomeRequest {
+	// value contains a list of SubnetConfig values to write.
+	// It is possible to provide more values than can fit within either:
+	//     - the maxiumum send size of the client
+	//     - the maximum receive size of the server
+	// If this error occurs you must reduce the number of values sent.
+	// See gRPC "maximum message size" documentation for more information.
+	repeated SubnetConfig values = 1;
+};
+
+message SubnetConfigSetSomeResponse {
+	SubnetKey key = 1;
+	string error = 2;
+};
+
 message SubnetConfigDeleteRequest {
 	// Key indicates which SubnetConfig instance to remove.
 	// This field must always be set.
@@ -532,6 +645,7 @@ service SubnetConfigService {
 	rpc GetAll (SubnetConfigStreamRequest) returns (stream SubnetConfigStreamResponse);
 	rpc Subscribe (SubnetConfigStreamRequest) returns (stream SubnetConfigStreamResponse);
 	rpc Set (SubnetConfigSetRequest) returns (SubnetConfigSetResponse);
+	rpc SetSome (SubnetConfigSetSomeRequest) returns (stream SubnetConfigSetSomeResponse);
 	rpc Delete (SubnetConfigDeleteRequest) returns (SubnetConfigDeleteResponse);
 	rpc DeleteAll (SubnetConfigDeleteAllRequest) returns (stream SubnetConfigDeleteAllResponse);
 }
@@ -568,6 +682,17 @@ message TopologyInfoConfigStreamRequest {
 
 	// TimeRange allows limiting response data to within a specified time window.
 	// If this field is populated, at least one of the two time fields are required.
+	//
+	// For GetAll, the fields start and end can be used as follows:
+	//
+	//   * end: Returns the state of each TopologyInfoConfig at end.
+	//     * Each TopologyInfoConfig response is fully-specified (all fields set).
+	//   * start: Returns the state of each TopologyInfoConfig at start, followed by updates until now.
+	//     * Each TopologyInfoConfig response at start is fully-specified, but updates may be partial.
+	//   * start and end: Returns the state of each TopologyInfoConfig at start, followed by updates
+	//     until end.
+	//     * Each TopologyInfoConfig response at start is fully-specified, but updates until end may
+	//       be partial.
 	//
 	// This field is not allowed in the Subscribe RPC.
 	arista.time.TimeBounds time = 3;
@@ -609,6 +734,21 @@ message TopologyInfoConfigSetResponse {
 	google.protobuf.Timestamp time = 2;
 };
 
+message TopologyInfoConfigSetSomeRequest {
+	// value contains a list of TopologyInfoConfig values to write.
+	// It is possible to provide more values than can fit within either:
+	//     - the maxiumum send size of the client
+	//     - the maximum receive size of the server
+	// If this error occurs you must reduce the number of values sent.
+	// See gRPC "maximum message size" documentation for more information.
+	repeated TopologyInfoConfig values = 1;
+};
+
+message TopologyInfoConfigSetSomeResponse {
+	TopologyInfoKey key = 1;
+	string error = 2;
+};
+
 message TopologyInfoConfigDeleteRequest {
 	// Key indicates which TopologyInfoConfig instance to remove.
 	// This field must always be set.
@@ -647,6 +787,7 @@ service TopologyInfoConfigService {
 	rpc GetAll (TopologyInfoConfigStreamRequest) returns (stream TopologyInfoConfigStreamResponse);
 	rpc Subscribe (TopologyInfoConfigStreamRequest) returns (stream TopologyInfoConfigStreamResponse);
 	rpc Set (TopologyInfoConfigSetRequest) returns (TopologyInfoConfigSetResponse);
+	rpc SetSome (TopologyInfoConfigSetSomeRequest) returns (stream TopologyInfoConfigSetSomeResponse);
 	rpc Delete (TopologyInfoConfigDeleteRequest) returns (TopologyInfoConfigDeleteResponse);
 	rpc DeleteAll (TopologyInfoConfigDeleteAllRequest) returns (stream TopologyInfoConfigDeleteAllResponse);
 }
@@ -683,6 +824,17 @@ message VpcConfigStreamRequest {
 
 	// TimeRange allows limiting response data to within a specified time window.
 	// If this field is populated, at least one of the two time fields are required.
+	//
+	// For GetAll, the fields start and end can be used as follows:
+	//
+	//   * end: Returns the state of each VpcConfig at end.
+	//     * Each VpcConfig response is fully-specified (all fields set).
+	//   * start: Returns the state of each VpcConfig at start, followed by updates until now.
+	//     * Each VpcConfig response at start is fully-specified, but updates may be partial.
+	//   * start and end: Returns the state of each VpcConfig at start, followed by updates
+	//     until end.
+	//     * Each VpcConfig response at start is fully-specified, but updates until end may
+	//       be partial.
 	//
 	// This field is not allowed in the Subscribe RPC.
 	arista.time.TimeBounds time = 3;
@@ -724,6 +876,21 @@ message VpcConfigSetResponse {
 	google.protobuf.Timestamp time = 2;
 };
 
+message VpcConfigSetSomeRequest {
+	// value contains a list of VpcConfig values to write.
+	// It is possible to provide more values than can fit within either:
+	//     - the maxiumum send size of the client
+	//     - the maximum receive size of the server
+	// If this error occurs you must reduce the number of values sent.
+	// See gRPC "maximum message size" documentation for more information.
+	repeated VpcConfig values = 1;
+};
+
+message VpcConfigSetSomeResponse {
+	VpcKey key = 1;
+	string error = 2;
+};
+
 message VpcConfigDeleteRequest {
 	// Key indicates which VpcConfig instance to remove.
 	// This field must always be set.
@@ -762,6 +929,7 @@ service VpcConfigService {
 	rpc GetAll (VpcConfigStreamRequest) returns (stream VpcConfigStreamResponse);
 	rpc Subscribe (VpcConfigStreamRequest) returns (stream VpcConfigStreamResponse);
 	rpc Set (VpcConfigSetRequest) returns (VpcConfigSetResponse);
+	rpc SetSome (VpcConfigSetSomeRequest) returns (stream VpcConfigSetSomeResponse);
 	rpc Delete (VpcConfigDeleteRequest) returns (VpcConfigDeleteResponse);
 	rpc DeleteAll (VpcConfigDeleteAllRequest) returns (stream VpcConfigDeleteAllResponse);
 }

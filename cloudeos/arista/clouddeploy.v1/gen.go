@@ -11,6 +11,6 @@ package clouddeploy_v1
 
 //go:generate go install google.golang.org/protobuf/cmd/protoc-gen-go
 //go:generate go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
-//go:generate protoc -I ../.. -I ../../../.. --go_out=../../../.. --go-grpc_out=../../../.. arista/clouddeploy.v1/clouddeploy.proto
-//go:generate protoc -I ../.. -I ../../../.. --go_out=../../../.. --go-grpc_out=../../../.. arista/clouddeploy.v1/services.gen.proto
+//go:generate protoc -I ../.. -I ../../../cloudvision-apis --go_out=../../../.. --go-grpc_out=../../../.. arista/clouddeploy.v1/clouddeploy.proto
+//go:generate protoc -I ../.. -I ../../../cloudvision-apis --go_out=../../../.. --go-grpc_out=../../../.. arista/clouddeploy.v1/services.gen.proto
 //go:generate goimports -w .

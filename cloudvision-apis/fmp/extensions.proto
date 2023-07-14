@@ -1,12 +1,12 @@
 // Copyright (c) 2020 Arista Networks, Inc.
-// Use of this source code is governed by the Mozilla Public License Version 2.0
-// that can be found in the LICENSE file.
+// Use of this source code is governed by the Apache License 2.0
+// that can be found in the COPYING file.
 
 syntax = "proto3";
 
 package fmp;
 
-option go_package = "cloudeos-terraform-provider/cloudeos/fmp";
+option go_package = "github.com/aristanetworks/cloudvision-go/api/fmp";
 
 import "google/protobuf/descriptor.proto";
 

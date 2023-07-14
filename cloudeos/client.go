@@ -17,12 +17,13 @@ import (
 	"time"
 
 	cdv1_api "terraform-provider-cloudeos/cloudeos/arista/clouddeploy.v1"
-	fmp "terraform-provider-cloudeos/cloudeos/fmp"
+	fmp "github.com/aristanetworks/cloudvision-go/api/fmp"
 
 	cvgrpc "github.com/aristanetworks/cloudvision-go/grpc"
 	grpc_retry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -71,7 +72,6 @@ func (p *CloudeosProvider) httpClient() (*http.Client, error) {
 }
 
 func (p *CloudeosProvider) getDeviceEnrollmentToken() (string, error) {
-
 	url := fmt.Sprintf("https://%s/api/v3/services/admin.Enrollment/AddEnrollmentToken", p.server)
 	var bearer = "Bearer " + p.srvcAcctToken
 
@@ -108,6 +108,7 @@ func (p *CloudeosProvider) getDeviceEnrollmentToken() (string, error) {
 
 	var data []map[string]interface{}
 	json.Unmarshal([]byte(body), &data)
+
 	enrollmentTokenMap, ok := data[0]["enrollmentToken"].(map[string]interface{})
 	if !ok {
 		return "", errors.New("Token key not found in AddEnrollmentToken response")

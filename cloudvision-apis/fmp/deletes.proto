@@ -1,13 +1,11 @@
-// Copyright (c) 2020 Arista Networks, Inc.
-// Use of this source code is governed by the Mozilla Public License Version 2.0
-// that can be found in the LICENSE file.
-
-// source: https://github.com/aristanetworks/cloudvision-apis/blob/trunk/fmp/deletes.proto
+// Copyright (c) 2021 Arista Networks, Inc.
+// Use of this source code is governed by the Apache License 2.0
+// that can be found in the COPYING file.
 
 syntax = "proto3";
 
 package fmp;
-option go_package = "cloudeos-terraform-provider/cloudeos/fmp";
+option go_package = "github.com/aristanetworks/cloudvision-go/api/fmp";
 
 // DeleteError defines the set of delete error types.
 enum DeleteError {
