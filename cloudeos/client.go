@@ -13,11 +13,13 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
 	cdv1_api "terraform-provider-cloudeos/cloudeos/arista/clouddeploy.v1"
 	fmp "github.com/aristanetworks/cloudvision-go/api/fmp"
+	rdr "github.com/aristanetworks/cloudvision-go/api/arista/redirector.v1"
 
 	cvgrpc "github.com/aristanetworks/cloudvision-go/grpc"
 	grpc_retry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
@@ -71,8 +73,70 @@ func (p *CloudeosProvider) httpClient() (*http.Client, error) {
 	return &http.Client{}, nil
 }
 
+func (p *CloudeosProvider) getAssignment(target string) (string, error) {
+	if strings.ToLower(os.Getenv("CLOUDVISION_REGIONAL_REDIRECT")) == "false" {
+		return target, nil
+	}
+
+        client, err := p.httpClient()
+        if err != nil {
+                return "", err
+        }
+
+        url := fmt.Sprintf("https://%s/api/v3/services/arista.redirector.v1.AssignmentService/GetOne", target)
+        requestBody := strings.NewReader(`{"key":{"system_id":"*"}}`)
+        req, err := http.NewRequest("POST", url, requestBody)
+        if err != nil {
+                return "", err
+        }
+
+        var bearer = "Bearer " + p.srvcAcctToken
+        req.Header.Add("Authorization", bearer)
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+        var intfs []interface{}
+        err = json.Unmarshal([]byte(body), &intfs)
+        if err != nil {
+                return "", fmt.Errorf("Failed to unmarshal to interface: %v", err)
+        }
+
+        aResp := &rdr.AssignmentResponse{}
+        bytes, err := json.Marshal(intfs[0])
+        if err != nil {
+                return "", fmt.Errorf("Failed to marshal interface: %v", err)
+        }
+        opts := &protojson.UnmarshalOptions{AllowPartial: true, DiscardUnknown: true}
+        err = opts.Unmarshal(bytes, aResp)
+        if err != nil {
+                return "", fmt.Errorf("Failed to unmarshal with protojson: %v", err)
+        }
+
+	fmt.Printf("Clusters returned %+v", aResp.Value.Clusters.Values)
+        for _, vals := range aResp.Value.Clusters.Values {
+                for _, host := range vals.Hosts.Values {
+                        return host, nil
+                }
+        }
+        return "", fmt.Errorf("No assignment found for service account token")
+}
+
 func (p *CloudeosProvider) getDeviceEnrollmentToken() (string, error) {
-	url := fmt.Sprintf("https://%s/api/v3/services/admin.Enrollment/AddEnrollmentToken", p.server)
+	server, err := p.getAssignment(p.server)
+	if err != nil || server == "" {
+		return "", fmt.Errorf("Failed to get server assignment: %s", err)
+	}
+
+	url := fmt.Sprintf("https://%s/api/v3/services/admin.Enrollment/AddEnrollmentToken",
+		strings.Split(server, ":")[0])
 	var bearer = "Bearer " + p.srvcAcctToken
 
 	// Create a new request using http
@@ -107,7 +171,10 @@ func (p *CloudeosProvider) getDeviceEnrollmentToken() (string, error) {
 	}
 
 	var data []map[string]interface{}
-	json.Unmarshal([]byte(body), &data)
+	err = json.Unmarshal([]byte(body), &data)
+	if err != nil {
+		return "", fmt.Errorf("Failed to get enrollment token : %s (%s)", err, body)
+	}
 
 	enrollmentTokenMap, ok := data[0]["enrollmentToken"].(map[string]interface{})
 	if !ok {
