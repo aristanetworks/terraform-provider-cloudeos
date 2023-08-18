@@ -1,4 +1,4 @@
-module terraform-provider-cloudeos
+module github.com/aristanetworks/terraform-provider-cloudeos
 
 go 1.13
 

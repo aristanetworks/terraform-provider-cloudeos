@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	cdv1_api "terraform-provider-cloudeos/cloudeos/arista/clouddeploy.v1"
+	cdv1_api "github.com/aristanetworks/terraform-provider-cloudeos/cloudeos/arista/clouddeploy.v1"
 
 	fmp "github.com/aristanetworks/cloudvision-go/api/fmp"
 

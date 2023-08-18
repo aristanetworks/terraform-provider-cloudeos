@@ -5,8 +5,7 @@
 syntax = "proto3";
 
 package arista.clouddeploy.v1;
-
-option go_package = "terraform-provider-cloudeos/cloudeos/arista/clouddeploy.v1;clouddeploy_v1";
+option go_package = "github.com/aristanetworks/terraform-provider-cloudeos/cloudeos/arista/clouddeploy.v1;clouddeploy_v1";
 
 import "google/protobuf/wrappers.proto";
 import "google/protobuf/timestamp.proto";

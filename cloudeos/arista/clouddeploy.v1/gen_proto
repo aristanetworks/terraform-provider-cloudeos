@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Script to generate .pb.go files in this directory. Steps:
+# - Copy over .proto files form arista.git/resources/arista/clouddeploy.v1 .
+# - Invoke script.
+#
+# Usage:
+# ./gen_proto
+set -e
+
+# Fixup go_package in .proto files copied over from arista.git.
+find $PWD/*.proto -exec sed -i.orig 's/.*go_package.*/option go_package = "github.com\/aristanetworks\/terraform-provider-cloudeos\/cloudeos\/arista\/clouddeploy.v1;clouddeploy_v1";/' {} \; && rm *.orig
+
+# Invoke go generate -v.
+go generate -v $PWD
+
+# go generate creates files in directory corresponding to go_package, relative to go_out. Move the files to current dir.
+cp $PWD/github.com/aristanetworks/terraform-provider-cloudeos/cloudeos/arista/clouddeploy.v1/*.pb.go $PWD && rm -rf $PWD/github.com
