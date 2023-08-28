@@ -7,6 +7,7 @@
 # Usage:
 # ./gen_proto
 set -e
+cd $(dirname $0)
 
 # Fixup go_package in .proto files copied over from arista.git.
 find $PWD/*.proto -exec sed -i.orig 's/.*go_package.*/option go_package = "github.com\/aristanetworks\/terraform-provider-cloudeos\/cloudeos\/arista\/clouddeploy.v1;clouddeploy_v1";/' {} \; && rm *.orig
