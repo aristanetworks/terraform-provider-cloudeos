@@ -135,7 +135,7 @@ func (p *CloudeosProvider) getDeviceEnrollmentToken() (string, error) {
 		return "", fmt.Errorf("Failed to get server assignment: %s", err)
 	}
 
-	url := fmt.Sprintf("https://%s/api/v3/services/admin.Enrollment/AddEnrollmentToken",
+	url := fmt.Sprintf("https://%s/api/resources/admin.Enrollment/AddEnrollmentToken",
 		strings.Split(server, ":")[0])
 	var bearer = "Bearer " + p.srvcAcctToken
 
@@ -143,7 +143,7 @@ func (p *CloudeosProvider) getDeviceEnrollmentToken() (string, error) {
 	requestBody := strings.NewReader(`{
 		"enrollmentToken":{
 			"reenrollDevices":["*"],
-			"validFor":"2h",
+			"validFor":"7200s",
 			"groups":[]}}
 	`)
 
@@ -170,13 +170,13 @@ func (p *CloudeosProvider) getDeviceEnrollmentToken() (string, error) {
 		return "", errors.New(fmt.Sprintf("Error while reading the response bytes: %v", err))
 	}
 
-	var data []map[string]interface{}
+	var data map[string]interface{}
 	err = json.Unmarshal([]byte(body), &data)
 	if err != nil {
 		return "", fmt.Errorf("Failed to get enrollment token : %s (%s)", err, body)
 	}
 
-	enrollmentTokenMap, ok := data[0]["enrollmentToken"].(map[string]interface{})
+	enrollmentTokenMap, ok := data["enrollmentToken"].(map[string]interface{})
 	if !ok {
 		return "", errors.New("Token key not found in AddEnrollmentToken response")
 	}
